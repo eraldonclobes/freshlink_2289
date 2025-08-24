@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import ConsumerTabNavigation from '../../components/ui/ConsumerTabNavigation';
+import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import VendorProfileHeader from './components/VendorProfileHeader';
 import VendorHeroSection from './components/VendorHeroSection';
 import ProductCategoryFilter from './components/ProductCategoryFilter';
@@ -303,7 +303,7 @@ const VendorProfileProducts = () => {
           })}
         </script>
       </Helmet>
-      <ConsumerTabNavigation />
+      <ResponsiveHeader />
       <VendorProfileHeader
         vendor={vendorData}
         onShare={handleShare}

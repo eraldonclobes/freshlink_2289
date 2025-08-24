@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConsumerTabNavigation from '../../components/ui/ConsumerTabNavigation';
+import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 
 import LocationSelector from './components/LocationSelector';
 import SearchBar from './components/SearchBar';
@@ -256,7 +256,7 @@ const ConsumerHomeSearch = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <ConsumerTabNavigation />
+      <ResponsiveHeader />
       {/* Header with Location and Search */}
       <div className="sticky top-0 z-40 bg-background border-b border-border">
         <div className="container mx-auto px-4 py-4">
