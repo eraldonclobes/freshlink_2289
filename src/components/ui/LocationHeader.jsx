@@ -79,6 +79,14 @@ const LocationHeader = ({ className = '' }) => {
             <button className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200">
               <Icon name="Filter" size={20} />
             </button>
+
+            {/* User Account */}
+            <button 
+              onClick={() => navigate('/client-auth')}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
+            >
+              <Icon name="User" size={20} />
+            </button>
           </div>
         </div>
 

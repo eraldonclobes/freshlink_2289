@@ -27,16 +27,16 @@ const AuthenticationGateway = ({ className = '' }) => {
           {/* Navigation Links */}
           <div className="flex items-center space-x-6">
             <button
-              onClick={() => navigate('/vendor-login')}
+              onClick={() => navigate('/client-auth')}
               className="text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
             >
               Entrar
             </button>
             <button
-              onClick={() => navigate('/vendor-registration')}
+              onClick={() => navigate('/vendor-login')}
               className="px-4 py-2 bg-primary text-primary-foreground text-sm font-body font-medium rounded-lg hover:bg-primary/90 transition-colors duration-200"
             >
-              Cadastrar-se
+              Sou Vendedor
             </button>
           </div>
         </div>

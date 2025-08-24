@@ -25,6 +25,12 @@ const VendorSidebarNavigation = ({ isCollapsed = false, className = '' }) => {
       path: '/vendor-profile-products',
       icon: 'Store',
       tooltip: 'Informações do negócio'
+    },
+    {
+      label: 'Configurações',
+      path: '/vendor-profile',
+      icon: 'Settings',
+      tooltip: 'Configurações da conta'
     }
   ];
 

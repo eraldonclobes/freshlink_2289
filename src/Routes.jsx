@@ -9,6 +9,8 @@ import VendorLogin from './pages/vendor-login';
 import VendorDashboard from './pages/vendor-dashboard';
 import ConsumerHomeSearch from './pages/consumer-home-search';
 import VendorProfileProducts from './pages/vendor-profile-products';
+import VendorProfile from './pages/vendor-profile';
+import ClientAuth from './pages/client-auth';
 
 const Routes = () => {
   return (
@@ -24,6 +26,8 @@ const Routes = () => {
         <Route path="/vendor-dashboard" element={<VendorDashboard />} />
         <Route path="/consumer-home-search" element={<ConsumerHomeSearch />} />
         <Route path="/vendor-profile-products" element={<VendorProfileProducts />} />
+        <Route path="/vendor-profile" element={<VendorProfile />} />
+        <Route path="/client-auth" element={<ClientAuth />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
       </ErrorBoundary>
