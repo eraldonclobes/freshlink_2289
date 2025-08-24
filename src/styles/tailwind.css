@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;500&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,38 +10,38 @@
 @layer base {
   :root {
     /* Core System Colors */
-    --color-background: #FAFAFA; /* gray-50 */
-    --color-foreground: #1A1A1A; /* gray-900 */
-    --color-border: #E5E5E5; /* gray-200 */
+    --color-background: #FFFFFF; /* white */
+    --color-foreground: #0F172A; /* slate-900 */
+    --color-border: #E2E8F0; /* slate-200 */
     --color-input: #FFFFFF; /* white */
-    --color-ring: #2D5016; /* green-800 */
+    --color-ring: #059669; /* emerald-600 */
     
     /* Card Colors */
     --color-card: #FFFFFF; /* white */
-    --color-card-foreground: #1A1A1A; /* gray-900 */
+    --color-card-foreground: #0F172A; /* slate-900 */
     
     /* Popover Colors */
     --color-popover: #FFFFFF; /* white */
-    --color-popover-foreground: #1A1A1A; /* gray-900 */
+    --color-popover-foreground: #0F172A; /* slate-900 */
     
     /* Muted Colors */
-    --color-muted: #F5F5F5; /* gray-100 */
-    --color-muted-foreground: #666666; /* gray-500 */
+    --color-muted: #F8FAFC; /* slate-50 */
+    --color-muted-foreground: #64748B; /* slate-500 */
     
     /* Primary Colors */
-    --color-primary: #2D5016; /* green-800 */
+    --color-primary: #059669; /* emerald-600 */
     --color-primary-foreground: #FFFFFF; /* white */
     
     /* Secondary Colors */
-    --color-secondary: #8B4513; /* brown-600 */
+    --color-secondary: #475569; /* slate-600 */
     --color-secondary-foreground: #FFFFFF; /* white */
     
     /* Accent Colors */
-    --color-accent: #FF6B35; /* orange-500 */
+    --color-accent: #3B82F6; /* blue-500 */
     --color-accent-foreground: #FFFFFF; /* white */
     
     /* Success Colors */
-    --color-success: #22C55E; /* green-500 */
+    --color-success: #10B981; /* emerald-500 */
     --color-success-foreground: #FFFFFF; /* white */
     
     /* Warning Colors */
@@ -62,23 +62,73 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Open Sans', sans-serif;
   }
 }
 
 @layer utilities {
   .font-heading {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
   }
   
   .font-body {
-    font-family: 'Source Sans Pro', sans-serif;
+    font-family: 'Open Sans', sans-serif;
   }
   
   .font-caption {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Nunito', sans-serif;
   }
   
   .font-data {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', monospace;
+  }
+
+  /* Scrollbar styles */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  /* Modern shadows */
+  .shadow-card {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+  
+  .shadow-modal {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Modern button styles */
+  .btn-modern {
+    @apply px-6 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 active:scale-95;
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
   }
 }

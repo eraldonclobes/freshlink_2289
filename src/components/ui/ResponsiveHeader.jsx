@@ -71,7 +71,7 @@ const ResponsiveHeader = ({ className = '' }) => {
   };
 
   return (
-    <header className={`bg-card border-b border-border sticky top-0 z-50 ${className}`}>
+    <header className={`bg-card border-b border-border fixed top-0 left-0 right-0 z-50 ${className}`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Mobile Menu Button */}
@@ -100,6 +100,18 @@ const ResponsiveHeader = ({ className = '' }) => {
               className="text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
             >
               Buscar Produtos
+            </button>
+            <button
+              onClick={() => navigate('/products')}
+              className="text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              Produtos
+            </button>
+            <button
+              onClick={() => navigate('/vendors')}
+              className="text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              Vendedores
             </button>
             {userAuth?.type === 'vendor' && (
               <>
@@ -181,7 +193,7 @@ const ResponsiveHeader = ({ className = '' }) => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-border bg-card">
+          <div className="md:hidden absolute top-16 left-0 right-0 bg-card border-b border-border shadow-lg">
             <nav className="px-4 py-4 space-y-2">
               <button
                 onClick={() => {
@@ -192,6 +204,28 @@ const ResponsiveHeader = ({ className = '' }) => {
               >
                 <Icon name="Search" size={20} />
                 <span>Buscar Produtos</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  navigate('/products');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
+              >
+                <Icon name="Package" size={20} />
+                <span>Produtos</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  navigate('/vendors');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
+              >
+                <Icon name="Store" size={20} />
+                <span>Vendedores</span>
               </button>
 
               {userAuth?.type === 'vendor' && (

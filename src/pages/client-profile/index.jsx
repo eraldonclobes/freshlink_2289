@@ -161,7 +161,7 @@ const ClientProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-16">
       <ResponsiveHeader />
       
       <main className="container mx-auto px-4 py-8">

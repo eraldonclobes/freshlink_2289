@@ -19,6 +19,9 @@ const ConsumerHomeSearch = () => {
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [sortBy, setSortBy] = useState('sponsored');
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState(null);
 
   // Mock vendor data
   const mockVendors = [
@@ -136,6 +139,33 @@ const ConsumerHomeSearch = () => {
     }
   ];
 
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.continuous = false;
+      recognitionInstance.interimResults = false;
+      recognitionInstance.lang = 'pt-BR';
+
+      recognitionInstance.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setSearchQuery(transcript);
+        setIsListening(false);
+      };
+
+      recognitionInstance.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognitionInstance.onend = () => {
+        setIsListening(false);
+      };
+
+      setRecognition(recognitionInstance);
+    }
+  }, []);
+
   // Load vendors on component mount
   useEffect(() => {
     loadVendors();
@@ -144,7 +174,7 @@ const ConsumerHomeSearch = () => {
   // Filter vendors based on search and filters
   useEffect(() => {
     filterVendors();
-  }, [searchQuery, activeFilters, currentLocation]);
+  }, [searchQuery, activeFilters, currentLocation, sortBy]);
 
   const loadVendors = async () => {
     setLoading(true);
@@ -175,15 +205,29 @@ const ConsumerHomeSearch = () => {
       );
     }
 
-    // Sort by sponsored first, then by rating
+    // Sort vendors based on selected option
     filtered?.sort((a, b) => {
+      // Always prioritize sponsored vendors
       if (a?.isSponsored && !b?.isSponsored) return -1;
       if (!a?.isSponsored && b?.isSponsored) return 1;
-      return b?.rating - a?.rating;
+
+      switch (sortBy) {
+        case 'distance':
+          return parseFloat(a?.distance) - parseFloat(b?.distance);
+        case 'rating':
+          return b?.rating - a?.rating;
+        case 'name':
+          return a?.name?.localeCompare(b?.name);
+        case 'reviews':
+          return b?.reviewCount - a?.reviewCount;
+        case 'sponsored':
+        default:
+          return b?.rating - a?.rating;
+      }
     });
 
     setVendors(filtered);
-  }, [searchQuery, activeFilters, mockVendors]);
+  }, [searchQuery, activeFilters, sortBy, mockVendors]);
 
   const handleLocationChange = (location) => {
     setCurrentLocation(location);
@@ -193,6 +237,13 @@ const ConsumerHomeSearch = () => {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+  };
+
+  const startVoiceSearch = () => {
+    if (recognition && !isListening) {
+      setIsListening(true);
+      recognition.start();
+    }
   };
 
   const handleFilterChange = (filters) => {
@@ -253,12 +304,21 @@ const ConsumerHomeSearch = () => {
     document.addEventListener('touchend', handleTouchEnd);
   };
 
+  const sortOptions = [
+    { value: 'sponsored', label: 'Recomendados' },
+    { value: 'distance', label: 'Mais próximos' },
+    { value: 'rating', label: 'Melhor avaliados' },
+    { value: 'name', label: 'Nome A-Z' },
+    { value: 'reviews', label: 'Mais avaliações' }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <ResponsiveHeader />
+      
       {/* Header with Location and Search */}
-      <div className="sticky top-0 z-40 bg-background border-b border-border">
+      <div className="sticky top-16 z-40 bg-background border-b border-border">
         <div className="container mx-auto px-4 py-4">
           {/* Location Selector */}
           <div className="flex items-center justify-between mb-4">
@@ -272,7 +332,20 @@ const ConsumerHomeSearch = () => {
           </div>
 
           {/* Search Bar */}
-          <SearchBar onSearch={handleSearch} className="mb-4" />
+          <div className="relative mb-4">
+            <SearchBar onSearch={handleSearch} />
+            <button
+              onClick={startVoiceSearch}
+              disabled={!recognition}
+              className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-colors duration-200 ${
+                isListening 
+                  ? 'text-error bg-error/10' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              <Icon name={isListening ? "MicOff" : "Mic"} size={18} />
+            </button>
+          </div>
 
           {/* Filter Chips */}
           <FilterChips
@@ -281,6 +354,7 @@ const ConsumerHomeSearch = () => {
           />
         </div>
       </div>
+      
       {/* Main Content */}
       <main 
         className="container mx-auto px-4 py-6 pb-20 md:pb-6"
@@ -308,10 +382,17 @@ const ConsumerHomeSearch = () => {
           
           {/* Sort Options */}
           <div className="flex items-center space-x-2">
-            <button className="flex items-center space-x-1 px-3 py-2 bg-muted rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors duration-200">
-              <Icon name="ArrowUpDown" size={16} />
-              <span className="hidden sm:inline">Ordenar</span>
-            </button>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-2 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              {sortOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

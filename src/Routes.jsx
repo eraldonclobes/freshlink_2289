@@ -12,6 +12,8 @@ import VendorProfileProducts from './pages/vendor-profile-products';
 import VendorProfile from './pages/vendor-profile';
 import Auth from './pages/auth';
 import ClientProfile from './pages/client-profile';
+import ProductsPage from './pages/products';
+import VendorsPage from './pages/vendors';
 
 const Routes = () => {
   return (
@@ -31,6 +33,8 @@ const Routes = () => {
         <Route path="/auth" element={<Auth />} />
         <Route path="/client-auth" element={<Auth />} />
         <Route path="/client-profile" element={<ClientProfile />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/vendors" element={<VendorsPage />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
       </ErrorBoundary>
