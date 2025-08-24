@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
+import Footer from '../../components/ui/Footer';
+import ShareModal from '../../components/ui/ShareModal';
+import ProductModal from '../../components/ui/ProductModal';
 import VendorProfileHeader from './components/VendorProfileHeader';
 import VendorHeroSection from './components/VendorHeroSection';
 import ProductCategoryFilter from './components/ProductCategoryFilter';
@@ -14,6 +17,9 @@ const VendorProfileProducts = () => {
   const [activeTab, setActiveTab] = useState('products');
   const [activeCategory, setActiveCategory] = useState('all');
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showProductModal, setShowProductModal] = useState(false);
 
   // Mock vendor data
   const vendorData = {
@@ -215,17 +221,13 @@ const VendorProfileProducts = () => {
     window.open(whatsappUrl, '_blank');
   };
 
+  const handleProductClick = (product) => {
+    setSelectedProduct({ ...product, vendor: vendorData });
+    setShowProductModal(true);
+  };
+
   const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: vendorData?.name,
-        text: `Confira os produtos frescos da ${vendorData?.name}`,
-        url: window.location?.href
-      });
-    } else {
-      navigator.clipboard?.writeText(window.location?.href);
-      alert('Link copiado para a área de transferência!');
-    }
+    setShowShareModal(true);
   };
 
   const averageRating = reviewsData?.reduce((acc, review) => acc + review?.rating, 0) / reviewsData?.length;
@@ -244,6 +246,7 @@ const VendorProfileProducts = () => {
               <ProductGrid
                 products={filteredProducts}
                 onProductInquiry={handleProductInquiry}
+                onProductClick={handleProductClick}
               />
             </div>
           </div>
@@ -270,7 +273,7 @@ const VendorProfileProducts = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Helmet>
         <title>{vendorData?.name} - Produtos Frescos | FreshLink</title>
         <meta name="description" content={`Confira os produtos frescos da ${vendorData?.name} em ${vendorData?.location}. Entrega local disponível.`} />
@@ -325,6 +328,27 @@ const VendorProfileProducts = () => {
         onWhatsAppContact={handleWhatsAppContact}
         onDirections={handleDirections}
       />
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        vendor={vendorData}
+      />
+
+      {/* Product Modal */}
+      <ProductModal
+        product={selectedProduct}
+        vendor={selectedProduct?.vendor}
+        isOpen={showProductModal}
+        onClose={() => {
+          setShowProductModal(false);
+          setSelectedProduct(null);
+        }}
+      />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
+import Footer from '../../components/ui/Footer';
+import ProductModal from '../../components/ui/ProductModal';
 
 import LocationSelector from './components/LocationSelector';
 import SearchBar from './components/SearchBar';
@@ -22,6 +24,8 @@ const ConsumerHomeSearch = () => {
   const [sortBy, setSortBy] = useState('sponsored');
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showProductModal, setShowProductModal] = useState(false);
 
   // Mock vendor data
   const mockVendors = [
@@ -304,6 +308,11 @@ const ConsumerHomeSearch = () => {
     document.addEventListener('touchend', handleTouchEnd);
   };
 
+  const handleProductClick = (product, vendor) => {
+    setSelectedProduct({ ...product, vendor });
+    setShowProductModal(true);
+  };
+
   const sortOptions = [
     { value: 'sponsored', label: 'Recomendados' },
     { value: 'distance', label: 'Mais próximos' },
@@ -313,7 +322,7 @@ const ConsumerHomeSearch = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Navigation */}
       <ResponsiveHeader />
       
@@ -417,6 +426,20 @@ const ConsumerHomeSearch = () => {
           </div>
         )}
       </main>
+
+      {/* Product Modal */}
+      <ProductModal
+        product={selectedProduct}
+        vendor={selectedProduct?.vendor}
+        isOpen={showProductModal}
+        onClose={() => {
+          setShowProductModal(false);
+          setSelectedProduct(null);
+        }}
+      />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

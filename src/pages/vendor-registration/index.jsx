@@ -107,17 +107,17 @@ const VendorRegistration = () => {
         <meta name="keywords" content="cadastro vendedor, marketplace, produtos frescos, venda online" />
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <RegistrationHeader />
         
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-8 flex-1">
           <div className="max-w-2xl mx-auto">
             <ProgressIndicator 
               currentStep={currentStep} 
               totalSteps={totalSteps} 
             />
             
-            <div className="bg-card rounded-xl shadow-sm border border-border p-6 md:p-8">
+            <div className="bg-card rounded-xl shadow-sm border border-border p-6 md:p-8 hover-lift">
               {renderCurrentStep()}
             </div>
           </div>

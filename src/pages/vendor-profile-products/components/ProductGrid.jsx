@@ -3,7 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 
-const ProductGrid = ({ products, onProductInquiry }) => {
+const ProductGrid = ({ products, onProductInquiry, onProductClick }) => {
   const formatPrice = (price) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -30,14 +30,15 @@ const ProductGrid = ({ products, onProductInquiry }) => {
       {products?.map((product) => (
         <div
           key={product?.id}
-          className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-200"
+          className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+          onClick={() => onProductClick && onProductClick(product)}
         >
           {/* Product Image */}
           <div className="relative aspect-square bg-muted">
             <Image
               src={product?.image}
               alt={product?.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
             {!product?.available && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -82,7 +83,10 @@ const ProductGrid = ({ products, onProductInquiry }) => {
               iconPosition="left"
               fullWidth
               disabled={!product?.available}
-              onClick={() => onProductInquiry(product)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onProductInquiry(product);
+              }}
             >
               {product?.available ? 'Perguntar' : 'Indisponível'}
             </Button>

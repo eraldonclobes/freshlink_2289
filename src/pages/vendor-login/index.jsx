@@ -77,9 +77,9 @@ const VendorLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <LoginHeader />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Left Column - Login Form */}
@@ -124,37 +124,7 @@ const VendorLogin = () => {
         </div>
       </main>
       {/* Footer */}
-      <footer className="bg-card border-t border-border mt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
-                <Icon name="Leaf" size={14} color="white" />
-              </div>
-              <span className="font-heading font-bold text-lg text-foreground">FreshLink</span>
-            </div>
-            <p className="text-sm font-body text-muted-foreground mb-4">
-              Conectando produtores locais com consumidores conscientes
-            </p>
-            <div className="flex items-center justify-center space-x-6 text-xs font-caption text-muted-foreground">
-              <button className="hover:text-foreground transition-colors duration-200">
-                Termos de Uso
-              </button>
-              <button className="hover:text-foreground transition-colors duration-200">
-                Política de Privacidade
-              </button>
-              <button className="hover:text-foreground transition-colors duration-200">
-                Suporte
-              </button>
-            </div>
-            <div className="mt-4 pt-4 border-t border-border">
-              <p className="text-xs font-caption text-muted-foreground">
-                © {new Date()?.getFullYear()} FreshLink. Todos os direitos reservados.
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

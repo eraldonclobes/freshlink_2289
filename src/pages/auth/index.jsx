@@ -6,6 +6,7 @@ import { Checkbox } from '../../components/ui/Checkbox';
 import Select from '../../components/ui/Select';
 import Icon from '../../components/AppIcon';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
+import Footer from '../../components/ui/Footer';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -215,12 +216,12 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-16">
+    <div className="min-h-screen bg-background pt-16 flex flex-col">
       <ResponsiveHeader />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-md mx-auto">
-          <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
+          <div className="bg-card rounded-lg border border-border p-6 shadow-sm hover-lift">
             {/* Tab Navigation */}
             <div className="flex mb-6 bg-muted rounded-lg p-1">
               <button
@@ -518,6 +519,8 @@ const Auth = () => {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 };

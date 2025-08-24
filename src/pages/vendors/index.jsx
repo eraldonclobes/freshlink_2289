@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
+import Footer from '../../components/ui/Footer';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import Button from '../../components/ui/Button';
 import Select from '../../components/ui/Select';
 
 const VendorsPage = () => {
+  const navigate = useNavigate();
   const [vendors, setVendors] = useState([]);
   const [filteredVendors, setFilteredVendors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -276,7 +279,7 @@ const VendorsPage = () => {
   };
 
   const VendorCard = ({ vendor }) => (
-    <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group">
+    <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
       {vendor.isSponsored && (
         <div className="absolute top-3 left-3 z-10 bg-accent text-accent-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
           Patrocinado
@@ -401,7 +404,7 @@ const VendorsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <ResponsiveHeader />
       
       <main className="pt-16">
@@ -529,6 +532,9 @@ const VendorsPage = () => {
           )}
         </div>
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

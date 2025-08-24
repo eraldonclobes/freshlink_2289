@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
+import Footer from '../../components/ui/Footer';
+import ProductModal from '../../components/ui/ProductModal';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import Button from '../../components/ui/Button';
@@ -18,6 +20,8 @@ const ProductsPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showProductModal, setShowProductModal] = useState(false);
 
   const PRODUCTS_PER_PAGE = 12;
 
@@ -248,6 +252,21 @@ const ProductsPage = () => {
     window.open(whatsappUrl, '_blank');
   };
 
+  const handleProductClick = (product) => {
+    // Mock vendor data for the product
+    const mockVendor = {
+      id: product.vendorId,
+      name: product.vendor,
+      image: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&h=300&fit=crop",
+      location: "São Paulo, SP",
+      distance: `${product.distance}km`,
+      phone: "11999999999"
+    };
+    
+    setSelectedProduct({ ...product, vendor: mockVendor });
+    setShowProductModal(true);
+  };
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -259,7 +278,10 @@ const ProductsPage = () => {
   const hasMoreToShow = displayedProducts.length < filteredProducts.length;
 
   const ProductCard = ({ product }) => (
-    <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group">
+    <div 
+      className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+      onClick={() => handleProductClick(product)}
+    >
       <div className="relative aspect-square bg-muted">
         <Image
           src={product.image}
@@ -306,7 +328,10 @@ const ProductsPage = () => {
           iconPosition="left"
           fullWidth
           disabled={!product.available}
-          onClick={() => handleProductInquiry(product)}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleProductInquiry(product);
+          }}
         >
           {product.available ? 'Perguntar' : 'Indisponível'}
         </Button>
@@ -330,7 +355,7 @@ const ProductsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <ResponsiveHeader />
       
       <main className="pt-16">
@@ -458,6 +483,20 @@ const ProductsPage = () => {
           )}
         </div>
       </main>
+
+      {/* Product Modal */}
+      <ProductModal
+        product={selectedProduct}
+        vendor={selectedProduct?.vendor}
+        isOpen={showProductModal}
+        onClose={() => {
+          setShowProductModal(false);
+          setSelectedProduct(null);
+        }}
+      />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
