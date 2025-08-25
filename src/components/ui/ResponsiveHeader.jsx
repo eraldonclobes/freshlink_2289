@@ -154,7 +154,7 @@ const ResponsiveHeader = ({ className = '' }) => {
 
                 {/* Profile Dropdown */}
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-lg shadow-lg py-2">
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-lg shadow-lg py-2 animate-fade-in">
                     <button
                       onClick={handleProfileClick}
                       className="w-full flex items-center space-x-3 px-4 py-2 text-sm font-body text-foreground hover:bg-muted transition-colors duration-200"
@@ -173,7 +173,7 @@ const ResponsiveHeader = ({ className = '' }) => {
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div className="hidden lg:flex items-center space-x-3">
                 <button
                   onClick={() => navigate('/auth')}
                   className="text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
@@ -193,7 +193,7 @@ const ResponsiveHeader = ({ className = '' }) => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 bg-card border-b border-border shadow-lg">
+          <div className="md:hidden absolute top-16 left-0 right-0 bg-card border-b border-border shadow-lg animate-slide-down">
             <nav className="px-4 py-4 space-y-2">
               <button
                 onClick={() => {

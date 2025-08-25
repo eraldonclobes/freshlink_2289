@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import VendorSidebarNavigation from '../../components/ui/VendorSidebarNavigation';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 import ProductCard from './components/ProductCard';
 import ProductForm from './components/ProductForm';
 import BulkActions from './components/BulkActions';
@@ -13,6 +14,8 @@ const ProductManagement = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
   const [filters, setFilters] = useState({
     search: '',
@@ -199,10 +202,15 @@ const ProductManagement = () => {
   };
 
   const handleDeleteProduct = (productId) => {
-    if (window.confirm('Tem certeza que deseja excluir este produto?')) {
-      setProducts(prev => prev?.filter(p => p?.id !== productId));
-      setSelectedProducts(prev => prev?.filter(id => id !== productId));
-    }
+    setProductToDelete(productId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteProduct = () => {
+    setProducts(prev => prev?.filter(p => p?.id !== productToDelete));
+    setSelectedProducts(prev => prev?.filter(id => id !== productToDelete));
+    setShowDeleteModal(false);
+    setProductToDelete(null);
   };
 
   const handleDuplicateProduct = (product) => {
@@ -282,8 +290,8 @@ const ProductManagement = () => {
 
           {/* Product Form Modal */}
           {showProductForm && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+              <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-scale-in">
                 <ProductForm
                   product={editingProduct}
                   onSave={handleSaveProduct}
@@ -296,6 +304,22 @@ const ProductManagement = () => {
               </div>
             </div>
           )}
+
+          {/* Delete Confirmation Modal */}
+          <ConfirmModal
+            isOpen={showDeleteModal}
+            onClose={() => {
+              setShowDeleteModal(false);
+              setProductToDelete(null);
+            }}
+            onConfirm={confirmDeleteProduct}
+            title="Excluir Produto"
+            message="Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita."
+            confirmText="Excluir"
+            cancelText="Cancelar"
+            variant="destructive"
+            icon="Trash2"
+          />
 
           {/* Bulk Actions */}
           <BulkActions

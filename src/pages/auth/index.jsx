@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { Checkbox } from '../../components/ui/Checkbox';
-import Select from '../../components/ui/Select';
 import Icon from '../../components/AppIcon';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
@@ -12,7 +11,6 @@ const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('login');
-  const [userType, setUserType] = useState('client');
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     // Login fields
@@ -22,9 +20,6 @@ const Auth = () => {
     
     // Register fields
     name: '',
-    businessName: '',
-    businessType: '',
-    whatsappNumber: '',
     confirmPassword: '',
     termsAccepted: false
   });
@@ -38,15 +33,6 @@ const Auth = () => {
       setActiveTab('register');
     }
   }, [searchParams]);
-
-  const businessTypes = [
-    { value: 'farmer', label: 'Produtor Rural' },
-    { value: 'market_vendor', label: 'Vendedor de Feira' },
-    { value: 'organic_producer', label: 'Produtor Orgânico' },
-    { value: 'cooperative', label: 'Cooperativa' },
-    { value: 'small_business', label: 'Pequeno Negócio' },
-    { value: 'other', label: 'Outro' }
-  ];
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -82,20 +68,8 @@ const Auth = () => {
   const validateRegister = () => {
     const newErrors = {};
 
-    if (userType === 'client') {
-      if (!formData.name.trim()) {
-        newErrors.name = 'Nome é obrigatório';
-      }
-    } else {
-      if (!formData.businessName.trim()) {
-        newErrors.businessName = 'Nome do negócio é obrigatório';
-      }
-      if (!formData.businessType) {
-        newErrors.businessType = 'Tipo de negócio é obrigatório';
-      }
-      if (!formData.whatsappNumber) {
-        newErrors.whatsappNumber = 'WhatsApp é obrigatório';
-      }
+    if (!formData.name.trim()) {
+      newErrors.name = 'Nome é obrigatório';
     }
 
     if (!formData.email) {
@@ -174,45 +148,19 @@ const Auth = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      if (userType === 'client') {
-        localStorage.setItem('clientAuth', JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          loginTime: new Date().toISOString(),
-          type: 'client'
-        }));
-        alert('Conta de cliente criada com sucesso!');
-        navigate('/consumer-home-search');
-      } else {
-        localStorage.setItem('vendorAuth', JSON.stringify({
-          businessName: formData.businessName,
-          businessType: formData.businessType,
-          email: formData.email,
-          whatsappNumber: formData.whatsappNumber,
-          loginTime: new Date().toISOString(),
-          type: 'vendor'
-        }));
-        alert('Conta de vendedor criada com sucesso!');
-        navigate('/vendor-dashboard');
-      }
+      localStorage.setItem('clientAuth', JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        loginTime: new Date().toISOString(),
+        type: 'client'
+      }));
+      alert('Conta criada com sucesso!');
+      navigate('/consumer-home-search');
     } catch (error) {
       alert('Erro ao criar conta. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const formatWhatsApp = (value) => {
-    const numbers = value.replace(/\D/g, '');
-    if (numbers.length <= 11) {
-      return numbers.replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3');
-    }
-    return value;
-  };
-
-  const handleWhatsAppChange = (e) => {
-    const formatted = formatWhatsApp(e.target.value);
-    handleInputChange('whatsappNumber', formatted);
   };
 
   return (
@@ -314,95 +262,40 @@ const Auth = () => {
                     Entrar
                   </Button>
                 </form>
+
+                <div className="mt-6 text-center">
+                  <p className="text-sm font-body text-muted-foreground">
+                    Quer vender seus produtos?{' '}
+                    <button
+                      onClick={() => navigate('/vendor-registration')}
+                      className="text-primary hover:text-primary/80 font-medium transition-colors duration-200"
+                    >
+                      Cadastre-se como vendedor
+                    </button>
+                  </p>
+                </div>
               </div>
             ) : (
               <div>
                 <div className="text-center mb-6">
                   <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
-                    Criar conta
+                    Criar conta de cliente
                   </h1>
                   <p className="text-sm font-body text-muted-foreground">
-                    Escolha o tipo de conta que deseja criar
+                    Crie sua conta para encontrar produtos frescos
                   </p>
                 </div>
 
-                {/* User Type Selection */}
-                <div className="flex mb-6 bg-muted rounded-lg p-1">
-                  <button
-                    type="button"
-                    onClick={() => setUserType('client')}
-                    className={`flex-1 py-3 px-4 text-sm font-body font-medium rounded-md transition-colors duration-200 ${
-                      userType === 'client'
-                        ? 'bg-card text-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <div className="flex flex-col items-center space-y-1">
-                      <Icon name="User" size={20} />
-                      <span>Cliente</span>
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUserType('vendor')}
-                    className={`flex-1 py-3 px-4 text-sm font-body font-medium rounded-md transition-colors duration-200 ${
-                      userType === 'vendor'
-                        ? 'bg-card text-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <div className="flex flex-col items-center space-y-1">
-                      <Icon name="Store" size={20} />
-                      <span>Vendedor</span>
-                    </div>
-                  </button>
-                </div>
-
                 <form onSubmit={handleRegister} className="space-y-4">
-                  {userType === 'client' ? (
-                    <Input
-                      label="Nome completo"
-                      type="text"
-                      placeholder="Seu nome"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
-                      error={errors.name}
-                      required
-                    />
-                  ) : (
-                    <>
-                      <Input
-                        label="Nome do negócio"
-                        type="text"
-                        placeholder="Ex: Fazenda São João"
-                        value={formData.businessName}
-                        onChange={(e) => handleInputChange('businessName', e.target.value)}
-                        error={errors.businessName}
-                        required
-                      />
-
-                      <Select
-                        label="Tipo de negócio"
-                        placeholder="Selecione o tipo do seu negócio"
-                        options={businessTypes}
-                        value={formData.businessType}
-                        onChange={(value) => handleInputChange('businessType', value)}
-                        error={errors.businessType}
-                        required
-                      />
-
-                      <Input
-                        label="WhatsApp para contato"
-                        type="tel"
-                        placeholder="(11) 99999-9999"
-                        value={formData.whatsappNumber}
-                        onChange={handleWhatsAppChange}
-                        error={errors.whatsappNumber}
-                        description="Clientes entrarão em contato através deste número"
-                        required
-                      />
-                    </>
-                  )}
+                  <Input
+                    label="Nome completo"
+                    type="text"
+                    placeholder="Seu nome"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    error={errors.name}
+                    required
+                  />
 
                   <Input
                     label="Email"
@@ -484,9 +377,21 @@ const Auth = () => {
                     loading={isLoading}
                     className="mt-6"
                   >
-                    {userType === 'client' ? 'Criar Conta de Cliente' : 'Criar Conta de Vendedor'}
+                    Criar Conta
                   </Button>
                 </form>
+
+                <div className="mt-6 text-center">
+                  <p className="text-sm font-body text-muted-foreground">
+                    Quer vender seus produtos?{' '}
+                    <button
+                      onClick={() => navigate('/vendor-registration')}
+                      className="text-primary hover:text-primary/80 font-medium transition-colors duration-200"
+                    >
+                      Cadastre-se como vendedor
+                    </button>
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -500,19 +405,19 @@ const Auth = () => {
               <div className="flex items-center space-x-3">
                 <Icon name="Heart" size={16} className="text-primary flex-shrink-0" />
                 <span className="text-sm font-body text-muted-foreground">
-                  {userType === 'client' ? 'Salve seus vendedores favoritos' : 'Gerencie seus produtos facilmente'}
+                  Salve seus vendedores e produtos favoritos
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Icon name="Clock" size={16} className="text-primary flex-shrink-0" />
                 <span className="text-sm font-body text-muted-foreground">
-                  {userType === 'client' ? 'Histórico de consultas e compras' : 'Acompanhe métricas de vendas'}
+                  Histórico de consultas e compras
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Icon name="Bell" size={16} className="text-primary flex-shrink-0" />
                 <span className="text-sm font-body text-muted-foreground">
-                  {userType === 'client' ? 'Notificações de novos produtos' : 'Receba consultas de clientes'}
+                  Notificações de novos produtos
                 </span>
               </div>
             </div>

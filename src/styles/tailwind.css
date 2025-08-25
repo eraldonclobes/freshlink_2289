@@ -145,6 +145,18 @@
     animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
+  .animate-slide-down {
+    animation: slide-down 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .animate-step-transition {
+    animation: step-transition 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   /* Smooth hover transitions */
   .hover-lift {
     @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-2;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import ProductModal from '../../components/ui/ProductModal';
@@ -13,17 +13,60 @@ import Icon from '../../components/AppIcon';
 
 const ConsumerHomeSearch = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [currentLocation, setCurrentLocation] = useState({ id: 1, name: "São Paulo, SP", distance: "Atual" });
     const [searchQuery, setSearchQuery] = useState('');
     const [vendors, setVendors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [sortBy, setSortBy] = useState('sponsored');
-    const [isListening, setIsListening] = useState(false);
-    const [recognition, setRecognition] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showProductModal, setShowProductModal] = useState(false);
 
+    // Mock suggestions for search
+    const mockSuggestions = [
+        { id: 1, type: 'vendor', name: 'Fazenda Verde Orgânicos', category: 'Vendedor', vendorId: 1 },
+        { id: 2, type: 'product', name: 'Tomate Orgânico', category: 'Produto', productId: 1, vendorId: 1 },
+        { id: 3, type: 'vendor', name: 'Hortifruti do João', category: 'Vendedor', vendorId: 2 },
+        { id: 4, type: 'product', name: 'Alface Hidropônica', category: 'Produto', productId: 2, vendorId: 2 },
+        { id: 5, type: 'location', name: 'Vila Madalena', category: 'Localização' },
+        { id: 6, type: 'product', name: 'Banana Prata', category: 'Produto', productId: 3, vendorId: 3 },
+        { id: 7, type: 'vendor', name: 'Sítio das Frutas', category: 'Vendedor', vendorId: 3 }
+    ];
+
+    // Mock products for modal
+    const mockProducts = [
+        {
+            id: 1,
+            name: "Tomate Orgânico",
+            price: 8.50,
+            unit: "kg",
+            image: "https://images.unsplash.com/photo-1546470427-e5ac89c8ba37?w=300&h=300&fit=crop",
+            available: true,
+            isOrganic: true,
+            description: "Tomates frescos cultivados sem agrotóxicos, direto da nossa horta familiar."
+        },
+        {
+            id: 2,
+            name: "Alface Hidropônica",
+            price: 3.20,
+            unit: "unidade",
+            image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=300&fit=crop",
+            available: true,
+            isOrganic: false,
+            description: "Alface fresca cultivada em sistema hidropônico, crocante e saborosa."
+        },
+        {
+            id: 3,
+            name: "Banana Prata",
+            price: 6.90,
+            unit: "kg",
+            image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=300&h=300&fit=crop",
+            available: true,
+            isOrganic: false,
+            description: "Bananas doces e maduras, ricas em potássio."
+        }
+    ];
     // Mock vendor data
     const mockVendors = [
         {
@@ -140,33 +183,6 @@ const ConsumerHomeSearch = () => {
         }
     ];
 
-    // Initialize speech recognition
-    useEffect(() => {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognitionInstance = new SpeechRecognition();
-            recognitionInstance.continuous = false;
-            recognitionInstance.interimResults = false;
-            recognitionInstance.lang = 'pt-BR';
-
-            recognitionInstance.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                setSearchQuery(transcript);
-                setIsListening(false);
-            };
-
-            recognitionInstance.onerror = () => {
-                setIsListening(false);
-            };
-
-            recognitionInstance.onend = () => {
-                setIsListening(false);
-            };
-
-            setRecognition(recognitionInstance);
-        }
-    }, []);
-
     // Load vendors on component mount
     useEffect(() => {
         loadVendors();
@@ -231,12 +247,24 @@ const ConsumerHomeSearch = () => {
         setSearchQuery(query);
     };
 
-    const startVoiceSearch = () => {
-        if (recognition && !isListening) {
-            setIsListening(true);
-            recognition.start();
+    const handleSuggestionClick = (suggestion) => {
+        if (suggestion.type === 'vendor') {
+            navigate('/vendor-profile-products', { state: { vendorId: suggestion.vendorId } });
+        } else if (suggestion.type === 'product') {
+            const product = mockProducts.find(p => p.id === suggestion.productId);
+            const vendor = mockVendors.find(v => v.id === suggestion.vendorId);
+            if (product && vendor) {
+                handleProductClick(product, vendor);
+            }
         }
     };
+
+    // Filter suggestions based on search query
+    const filteredSuggestions = searchQuery?.length > 1 
+        ? mockSuggestions.filter(item =>
+            item?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const handleRefresh = async () => {
         setRefreshing(true);
@@ -295,6 +323,8 @@ const ConsumerHomeSearch = () => {
                         <div className="flex-1">
                             <SearchBar
                                 onSearch={handleSearch}
+                                onSuggestionClick={handleSuggestionClick}
+                                suggestions={filteredSuggestions}
                             />
                         </div>
                         
@@ -302,20 +332,6 @@ const ConsumerHomeSearch = () => {
                             currentLocation={currentLocation}
                             onLocationChange={handleLocationChange}
                         />
-                        
-                        {/* Voice Search Button */}
-                        <div className="relative">
-                            <button
-                                onClick={startVoiceSearch}
-                                disabled={!recognition}
-                                className={`p-3 rounded-lg transition-colors duration-200 ${isListening
-                                    ? 'text-error bg-error/10'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted border border-border'
-                                    }`}
-                            >
-                                <Icon name={isListening ? "MicOff" : "Mic"} size={18} />
-                            </button>
-                        </div>
                         
                         {refreshing && (
                             <LoadingSpinner size="sm" className="ml-4" />

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import ProductModal from '../../components/ui/ProductModal';
+import SearchBar from '../../components/ui/SearchBar';
+import LocationSelector from '../../components/ui/LocationSelector';
 import FilterDropdown from '../../components/ui/FilterDropdown';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
@@ -14,26 +16,15 @@ const ProductsPage = () => {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedRadius, setSelectedRadius] = useState('2');
-    const [customRadius, setCustomRadius] = useState('');
+    const [currentLocation, setCurrentLocation] = useState({ id: 1, name: "São Paulo, SP", distance: "Atual" });
     const [sortBy, setSortBy] = useState('distance');
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-    const [isListening, setIsListening] = useState(false);
-    const [recognition, setRecognition] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showProductModal, setShowProductModal] = useState(false);
     const [categoryFilter, setCategoryFilter] = useState('');
 
     const PRODUCTS_PER_PAGE = 12;
-
-    const radiusOptions = [
-        { value: '0.5', label: '500m' },
-        { value: '1', label: '1km' },
-        { value: '2', label: '2km' },
-        { value: '5', label: '5km' },
-        { value: 'custom', label: 'Personalizado' }
-    ];
 
     const sortOptions = [
         { value: 'distance', label: 'Mais próximos' },
@@ -52,6 +43,15 @@ const ProductsPage = () => {
         { value: 'temperos', label: 'Temperos' },
         { value: 'laticinios', label: 'Laticínios' },
         { value: 'carnes', label: 'Carnes' }
+    ];
+
+    // Mock suggestions for search
+    const mockSuggestions = [
+        { id: 1, type: 'product', name: 'Tomate Orgânico', category: 'Produto', productId: 1, vendorId: 1 },
+        { id: 2, type: 'product', name: 'Alface Americana', category: 'Produto', productId: 2, vendorId: 2 },
+        { id: 3, type: 'vendor', name: 'Fazenda Verde', category: 'Vendedor', vendorId: 1 },
+        { id: 4, type: 'product', name: 'Cenouras Frescas', category: 'Produto', productId: 3, vendorId: 3 },
+        { id: 5, type: 'vendor', name: 'Hortifruti do João', category: 'Vendedor', vendorId: 2 }
     ];
 
     // Mock products data
@@ -162,33 +162,6 @@ const ProductsPage = () => {
         }
     ];
 
-    // Initialize speech recognition
-    useEffect(() => {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognitionInstance = new SpeechRecognition();
-            recognitionInstance.continuous = false;
-            recognitionInstance.interimResults = false;
-            recognitionInstance.lang = 'pt-BR';
-
-            recognitionInstance.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                setSearchQuery(transcript);
-                setIsListening(false);
-            };
-
-            recognitionInstance.onerror = () => {
-                setIsListening(false);
-            };
-
-            recognitionInstance.onend = () => {
-                setIsListening(false);
-            };
-
-            setRecognition(recognitionInstance);
-        }
-    }, []);
-
     // Load initial products
     useEffect(() => {
         loadProducts();
@@ -207,7 +180,7 @@ const ProductsPage = () => {
     // Filter and sort products
     useEffect(() => {
         filterAndSortProducts();
-    }, [products, searchQuery, selectedRadius, customRadius, sortBy, categoryFilter]);
+    }, [products, searchQuery, currentLocation, sortBy, categoryFilter]);
 
     const loadProducts = async () => {
         setLoading(true);
@@ -233,9 +206,8 @@ const ProductsPage = () => {
             filtered = filtered.filter(product => product.category === categoryFilter);
         }
 
-        // Filter by radius
-        const radius = selectedRadius === 'custom' ? parseFloat(customRadius) || 2 : parseFloat(selectedRadius);
-        filtered = filtered.filter(product => product.distance <= radius);
+        // Filter by distance (mock - in real app would use actual location)
+        filtered = filtered.filter(product => product.distance <= 5);
 
         // Sort products
         filtered.sort((a, b) => {
@@ -258,7 +230,7 @@ const ProductsPage = () => {
         setFilteredProducts(filtered);
         setCurrentPage(1);
         setHasMore(filtered.length > PRODUCTS_PER_PAGE);
-    }, [searchQuery, selectedRadius, customRadius, sortBy, categoryFilter]);
+    }, [searchQuery, currentLocation, sortBy, categoryFilter]);
 
     const loadMoreProducts = async () => {
         setLoadingMore(true);
@@ -267,12 +239,31 @@ const ProductsPage = () => {
         setLoadingMore(false);
     };
 
-    const startVoiceSearch = () => {
-        if (recognition && !isListening) {
-            setIsListening(true);
-            recognition.start();
+    const handleSearch = (query) => {
+        setSearchQuery(query);
+    };
+
+    const handleSuggestionClick = (suggestion) => {
+        if (suggestion.type === 'vendor') {
+            navigate('/vendor-profile-products', { state: { vendorId: suggestion.vendorId } });
+        } else if (suggestion.type === 'product') {
+            const product = mockProducts.find(p => p.id === suggestion.productId);
+            if (product) {
+                handleProductClick(product);
+            }
         }
     };
+
+    const handleLocationChange = (location) => {
+        setCurrentLocation(location);
+    };
+
+    // Filter suggestions based on search query
+    const filteredSuggestions = searchQuery?.length > 1 
+        ? mockSuggestions.filter(item =>
+            item?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const handleProductInquiry = (product) => {
         const message = encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name} (${product.unit}). Está disponível?`);
@@ -398,7 +389,7 @@ const ProductsPage = () => {
                     {/* Favorite Button */}
                     <button
                         onClick={handleFavoriteClick}
-                        className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                        className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${favoriteProducts.includes(product.id) ? 'opacity-100 scale-100' : 'opacity-100 scale-100'
                             } ${favoriteProducts.includes(product.id)
                                 ? 'bg-error text-white'
                                 : 'bg-white/80 backdrop-blur-sm text-muted-foreground hover:text-error'
@@ -504,70 +495,39 @@ const ProductsPage = () => {
                 {/* Search and Filters */}
                 <div className="bg-muted/50 border-b border-border">
                     <div className="container mx-auto px-4 py-4">
-                        <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex items-center space-x-3 flex-wrap gap-3">
                             {/* Search Bar */}
                             <div className="flex-1">
-                                <div className="relative flex-1 lg:w-80">
-                                    <Icon
-                                        name="Search"
-                                        size={18}
-                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Buscar produtos..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    />
-                                    <button
-                                        onClick={startVoiceSearch}
-                                        disabled={!recognition}
-                                        className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-colors duration-200 ${isListening
-                                            ? 'text-error bg-error/10'
-                                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                                            }`}
-                                    >
-                                        <Icon name={isListening ? "MicOff" : "Mic"} size={16} />
-                                    </button>
-                                </div>
+                                <SearchBar
+                                    onSearch={handleSearch}
+                                    onSuggestionClick={handleSuggestionClick}
+                                    suggestions={filteredSuggestions}
+                                    placeholder="Buscar produtos..."
+                                />
                             </div>
 
-                            {/* Filters */}
-                            <div className="flex items-center space-x-3">
-                                <FilterDropdown
-                                    label="Categoria"
-                                    options={categoryOptions}
-                                    value={categoryFilter}
-                                    onChange={setCategoryFilter}
-                                    placeholder="Raio"
-                                />
-                                
-                                <FilterDropdown
-                                    label="Raio"
-                                    options={radiusOptions}
-                                    value={selectedRadius}
-                                    onChange={setSelectedRadius}
-                                />
-                                
-                                {selectedRadius === 'custom' && (
-                                    <input
-                                        type="number"
-                                        placeholder="km"
-                                        value={customRadius}
-                                        onChange={(e) => setCustomRadius(e.target.value)}
-                                        className="w-20 px-3 py-2 bg-background border border-border rounded-lg text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary"
-                                    />
-                                )}
+                            {/* Category Filter */}
+                            <FilterDropdown
+                                label="Categoria"
+                                options={categoryOptions}
+                                value={categoryFilter}
+                                onChange={setCategoryFilter}
+                                placeholder="Categoria"
+                            />
 
-                                <FilterDropdown
-                                    label="Ordenar"
-                                    options={sortOptions}
-                                    value={sortBy}
-                                    onChange={setSortBy}
+                            {/* Sort Filter */}
+                            <FilterDropdown
+                                label="Ordenar"
+                                options={sortOptions}
+                                value={sortBy}
+                                onChange={setSortBy}
                                 placeholder="Ordenar por"
-                                />
-                            </div>
+                            />
+
+                            <LocationSelector
+                                currentLocation={currentLocation}
+                                onLocationChange={handleLocationChange}
+                            />
                         </div>
                     </div>
                 </div>

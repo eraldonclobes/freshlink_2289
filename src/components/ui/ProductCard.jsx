@@ -94,7 +94,7 @@ const ProductCard = ({ product, vendor, onProductClick, onFavoriteToggle, isFavo
                 {/* Favorite Button */}
                 <button
                     onClick={handleFavoriteClick}
-                    className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                    className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isFavorited ? 'opacity-100 scale-100' : 'opacity-100 scale-100'
                         } ${isFavorited
                             ? 'bg-error text-white'
                             : 'bg-white/80 backdrop-blur-sm text-muted-foreground hover:text-error'

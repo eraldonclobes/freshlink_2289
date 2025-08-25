@@ -4,7 +4,6 @@ import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import ShareModal from '../../components/ui/ShareModal';
 import ProductModal from '../../components/ui/ProductModal';
-import VendorProfileHeader from './components/VendorProfileHeader';
 import VendorHeroSection from './components/VendorHeroSection';
 import ProductCategoryFilter from './components/ProductCategoryFilter';
 import TabNavigation from './components/TabNavigation';
@@ -324,15 +323,14 @@ const VendorProfileProducts = () => {
           })}
         </script>
       </Helmet>
+      
       <ResponsiveHeader />
-      <VendorProfileHeader
-        vendor={vendorData}
-        onShare={handleShare}
-      />
+      
       <VendorHeroSection
         vendor={vendorData}
         onWhatsAppContact={handleWhatsAppContact}
         onDirections={handleDirections}
+        onShare={handleShare}
       />
       <TabNavigation
         activeTab={activeTab}
