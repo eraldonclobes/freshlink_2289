@@ -85,10 +85,12 @@ const VendorLogin = () => {
             {/* Left Column - Login Form */}
             <div className="order-2 lg:order-1">
               <div className="sticky top-8">
-                <LoginForm 
-                  onSubmit={handleLogin} 
-                  isLoading={isLoading}
-                />
+                <div className="auth-form">
+                  <LoginForm 
+                    onSubmit={handleLogin} 
+                    isLoading={isLoading}
+                  />
+                </div>
                 
                 <div className="mt-6">
                   <SocialLogin 

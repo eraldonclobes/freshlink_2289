@@ -221,7 +221,7 @@ const Auth = () => {
       
       <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-md mx-auto">
-          <div className="bg-card rounded-lg border border-border p-6 shadow-sm hover-lift">
+          <div className="bg-card rounded-lg border border-border p-6 shadow-sm auth-form">
             {/* Tab Navigation */}
             <div className="flex mb-6 bg-muted rounded-lg p-1">
               <button

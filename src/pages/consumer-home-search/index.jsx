@@ -9,7 +9,6 @@ import SearchBar from './components/SearchBar';
 import FilterChips from './components/FilterChips';
 import VendorGrid from './components/VendorGrid';
 import FeaturedVendors from './components/FeaturedVendors';
-import QuickActions from './components/QuickActions';
 import LoadingSpinner from './components/LoadingSpinner';
 import Icon from '../../components/AppIcon';
 
@@ -329,20 +328,19 @@ const ConsumerHomeSearch = () => {
       {/* Header with Location and Search */}
       <div className="sticky top-16 z-40 bg-background border-b border-border">
         <div className="container mx-auto px-4 py-4">
-          {/* Location Selector */}
-          <div className="flex items-center justify-between mb-4">
-            <LocationSelector
+          {/* Search Bar with Location */}
+          <div className="relative mb-4 flex items-center justify-between">
+            <SearchBar 
+              onSearch={handleSearch}
               currentLocation={currentLocation}
               onLocationChange={handleLocationChange}
             />
             {refreshing && (
-              <LoadingSpinner size="sm" />
+              <LoadingSpinner size="sm" className="ml-4" />
             )}
           </div>
 
-          {/* Search Bar */}
-          <div className="relative mb-4">
-            <SearchBar onSearch={handleSearch} />
+          <div className="relative">
             <button
               onClick={startVoiceSearch}
               disabled={!recognition}

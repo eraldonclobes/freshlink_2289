@@ -67,7 +67,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
+      <div className="bg-card rounded-lg border border-border p-6 shadow-sm auth-form">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
             Entrar na sua conta

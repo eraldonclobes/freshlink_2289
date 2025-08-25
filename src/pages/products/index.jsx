@@ -10,6 +10,7 @@ import Select from '../../components/ui/Select';
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [favoriteProducts, setFavoriteProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -179,6 +180,9 @@ const ProductsPage = () => {
   // Load initial products
   useEffect(() => {
     loadProducts();
+    // Load favorite products from localStorage
+    const savedFavorites = JSON.parse(localStorage.getItem('favoriteProducts') || '[]');
+    setFavoriteProducts(savedFavorites);
   }, []);
 
   // Filter and sort products
@@ -267,6 +271,15 @@ const ProductsPage = () => {
     setShowProductModal(true);
   };
 
+  const handleFavoriteToggle = (productId) => {
+    const updatedFavorites = favoriteProducts.includes(productId)
+      ? favoriteProducts.filter(id => id !== productId)
+      : [...favoriteProducts, productId];
+    
+    setFavoriteProducts(updatedFavorites);
+    localStorage.setItem('favoriteProducts', JSON.stringify(updatedFavorites));
+  };
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -276,6 +289,15 @@ const ProductsPage = () => {
 
   const displayedProducts = filteredProducts.slice(0, currentPage * PRODUCTS_PER_PAGE);
   const hasMoreToShow = displayedProducts.length < filteredProducts.length;
+
+  // Sort products to show favorites first
+  const sortedProducts = [...displayedProducts].sort((a, b) => {
+    const aIsFavorite = favoriteProducts.includes(a.id);
+    const bIsFavorite = favoriteProducts.includes(b.id);
+    if (aIsFavorite && !bIsFavorite) return -1;
+    if (!aIsFavorite && bIsFavorite) return 1;
+    return 0;
+  });
 
   const ProductCard = ({ product }) => (
     <div 
@@ -459,8 +481,15 @@ const ProductsPage = () => {
           ) : (
             <>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                {displayedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                {sortedProducts.map((product) => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product}
+                    vendor={{ id: product.vendorId, name: product.vendor }}
+                    onProductClick={handleProductClick}
+                    onFavoriteToggle={handleFavoriteToggle}
+                    isFavorited={favoriteProducts.includes(product.id)}
+                  />
                 ))}
               </div>
 

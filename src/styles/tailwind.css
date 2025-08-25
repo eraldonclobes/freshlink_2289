@@ -134,11 +134,11 @@
 
   /* Enhanced animations */
   .animate-fade-in {
-    animation: fade-in 0.3s ease-out;
+    animation: fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .animate-slide-up {
-    animation: slide-up 0.3s ease-out;
+    animation: slide-up 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .animate-bounce-in {
@@ -147,14 +147,20 @@
 
   /* Smooth hover transitions */
   .hover-lift {
-    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-2;
   }
 
   .hover-scale {
-    @apply transition-transform duration-200 hover:scale-105;
+    @apply transition-transform duration-300 hover:scale-105;
   }
 
   .hover-glow {
-    @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20;
+    @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/25;
+  }
+
+  /* Remove hover animations for auth forms */
+  .auth-form .hover-lift,
+  .auth-form .card-hover {
+    @apply hover:shadow-none hover:translate-y-0;
   }
 }

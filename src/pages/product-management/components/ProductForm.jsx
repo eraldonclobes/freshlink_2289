@@ -11,6 +11,7 @@ const ProductForm = ({ product, onSave, onCancel, isEditing = false }) => {
     name: product?.name || '',
     description: product?.description || '',
     category: product?.category || '',
+    unit: product?.unit || 'kg',
     price: product?.price || '',
     stock: product?.stock || '',
     images: product?.images || [],
@@ -33,6 +34,19 @@ const ProductForm = ({ product, onSave, onCancel, isEditing = false }) => {
     { value: 'graos', label: 'Grãos e Cereais' },
     { value: 'laticinios', label: 'Laticínios' },
     { value: 'outros', label: 'Outros' }
+  ];
+
+  const unitOptions = [
+    { value: 'kg', label: 'Quilograma (kg)' },
+    { value: 'g', label: 'Grama (g)' },
+    { value: 'unidade', label: 'Unidade' },
+    { value: 'maço', label: 'Maço' },
+    { value: 'dúzia', label: 'Dúzia' },
+    { value: 'litro', label: 'Litro (L)' },
+    { value: 'ml', label: 'Mililitro (ml)' },
+    { value: 'pacote', label: 'Pacote' },
+    { value: 'caixa', label: 'Caixa' },
+    { value: 'bandeja', label: 'Bandeja' }
   ];
 
   const sections = [
@@ -176,6 +190,15 @@ const ProductForm = ({ product, onSave, onCancel, isEditing = false }) => {
         value={formData?.category}
         onChange={(value) => handleInputChange('category', value)}
         error={errors?.category}
+        required
+      />
+
+      <Select
+        label="Unidade de Medida"
+        placeholder="Selecione a unidade"
+        options={unitOptions}
+        value={formData?.unit}
+        onChange={(value) => handleInputChange('unit', value)}
         required
       />
     </div>

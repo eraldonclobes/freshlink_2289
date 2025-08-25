@@ -117,7 +117,7 @@ const VendorRegistration = () => {
               totalSteps={totalSteps} 
             />
             
-            <div className="bg-card rounded-xl shadow-sm border border-border p-6 md:p-8 hover-lift">
+            <div className="bg-card rounded-xl shadow-sm border border-border p-6 md:p-8 auth-form">
               {renderCurrentStep()}
             </div>
           </div>

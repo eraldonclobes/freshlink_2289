@@ -27,14 +27,6 @@ const ProductModal = ({ product, vendor, isOpen, onClose }) => {
 
   const images = Array.isArray(product.images) ? product.images : [product.image];
 
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
-
-  const handleNextImage = () => {
-    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
-
   const handleMouseMove = (e) => {
     if (!isZoomed || !imageRef.current) return;
 
@@ -54,6 +46,19 @@ const ProductModal = ({ product, vendor, isOpen, onClose }) => {
     const message = encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}. Está disponível?`);
     const whatsappUrl = `https://wa.me/55${vendor?.phone}?text=${message}`;
     window.open(whatsappUrl, '_blank');
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: `Confira este produto: ${product.name}`,
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copiado!');
+    }
   };
 
   const formatPrice = (price) => {
@@ -92,7 +97,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-card rounded-2xl shadow-modal max-w-4xl w-full max-h-[90vh] overflow-hidden animate-fade-in">
+      <div className="bg-card rounded-2xl shadow-modal max-w-6xl w-full max-h-[90vh] overflow-hidden animate-fade-in">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-xl font-heading font-bold text-foreground">
@@ -106,11 +111,12 @@ const ProductModal = ({ product, vendor, isOpen, onClose }) => {
           </button>
         </div>
 
-        <div className="flex flex-col lg:flex-row max-h-[calc(90vh-80px)] overflow-hidden">
+        <div className="flex flex-col lg:flex-row">
           {/* Image Section */}
-          <div className="lg:w-1/2 relative bg-muted">
+          <div className="lg:w-1/2 p-6">
+            {/* Main Image */}
             <div 
-              className="relative h-64 lg:h-full overflow-hidden cursor-zoom-in"
+              className="relative aspect-square bg-muted rounded-xl overflow-hidden mb-4 cursor-zoom-in"
               onMouseMove={handleMouseMove}
               onMouseEnter={() => setIsZoomed(true)}
               onMouseLeave={() => setIsZoomed(false)}
@@ -131,68 +137,39 @@ const ProductModal = ({ product, vendor, isOpen, onClose }) => {
                 }
               />
               
-              {/* Navigation Arrows */}
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={handlePrevImage}
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/50 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200"
-                  >
-                    <Icon name="ChevronLeft" size={20} />
-                  </button>
-                  <button
-                    onClick={handleNextImage}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/50 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200"
-                  >
-                    <Icon name="ChevronRight" size={20} />
-                  </button>
-                </>
-              )}
-
-              {/* Image Indicators */}
-              {images.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                  {images.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`w-2 h-2 rounded-full transition-colors duration-200 ${
-                        index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                      }`}
-                    />
-                  ))}
+              {!product.available && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <span className="text-white font-body font-medium">Indisponível</span>
                 </div>
               )}
 
-              {/* Zoom Hint */}
-              <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-caption">
-                <Icon name="ZoomIn" size={14} className="inline mr-1" />
-                Passe o mouse para ampliar
-              </div>
+              {product.isOrganic && (
+                <div className="absolute top-4 left-4 bg-success text-success-foreground px-3 py-1 rounded-full text-sm font-caption font-medium">
+                  Orgânico
+                </div>
+              )}
             </div>
 
-            {/* Thumbnail Strip */}
+            {/* Thumbnail Images */}
             {images.length > 1 && (
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-4">
-                <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
-                  {images.map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                        index === currentImageIndex
-                          ? 'border-white shadow-lg'
-                          : 'border-white/30 hover:border-white/60'
-                      }`}
-                    >
-                      <Image
-                        src={image}
-                        alt={`${product.name} ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
+              <div className="flex space-x-3 overflow-x-auto scrollbar-hide">
+                {images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                      index === currentImageIndex
+                        ? 'border-primary shadow-lg'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <Image
+                      src={image}
+                      alt={`${product.name} ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -202,19 +179,40 @@ const ProductModal = ({ product, vendor, isOpen, onClose }) => {
             <div className="space-y-6">
               {/* Product Info */}
               <div>
-                <div className="flex items-start justify-between mb-3">
-                  <h1 className="text-2xl font-heading font-bold text-foreground">
-                    {product.name}
-                  </h1>
-                  {product.isOrganic && (
-                    <span className="bg-success/10 text-success px-3 py-1 rounded-full text-sm font-caption font-medium">
-                      Orgânico
-                    </span>
+                <h1 className="text-3xl font-heading font-bold text-foreground mb-2">
+                  {product.name}
+                </h1>
+                
+                <div className="flex items-center space-x-4 mb-4">
+                  {product.rating && (
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1">
+                        {renderStars(product.rating)}
+                      </div>
+                      <span className="text-sm font-body font-medium text-foreground">
+                        {product.rating.toFixed(1)}
+                      </span>
+                      {product.reviewCount && (
+                        <span className="text-sm text-muted-foreground">
+                          ({product.reviewCount} avaliações)
+                        </span>
+                      )}
+                    </div>
                   )}
+                  
+                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                    <span>Categoria: <span className="font-medium text-foreground">{product.category || 'Não informado'}</span></span>
+                    <span className={`font-medium ${product.available ? 'text-success' : 'text-error'}`}>
+                      {product.available ? 'Disponível' : 'Indisponível'}
+                    </span>
+                    {product.isOrganic && (
+                      <span className="text-success font-medium">Orgânico</span>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="text-3xl font-heading font-bold text-primary">
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="text-4xl font-heading font-bold text-primary">
                     {formatPrice(product.price)}
                   </div>
                   <div className="text-lg text-muted-foreground">
@@ -222,24 +220,8 @@ const ProductModal = ({ product, vendor, isOpen, onClose }) => {
                   </div>
                 </div>
 
-                {product.rating && (
-                  <div className="flex items-center space-x-2 mb-4">
-                    <div className="flex items-center space-x-1">
-                      {renderStars(product.rating)}
-                    </div>
-                    <span className="text-sm font-body font-medium text-foreground">
-                      {product.rating.toFixed(1)}
-                    </span>
-                    {product.reviewCount && (
-                      <span className="text-sm text-muted-foreground">
-                        ({product.reviewCount} avaliações)
-                      </span>
-                    )}
-                  </div>
-                )}
-
                 {product.description && (
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed mb-6">
                     {product.description}
                   </p>
                 )}
@@ -248,7 +230,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose }) => {
               {/* Vendor Info */}
               <div className="bg-muted/50 rounded-xl p-4">
                 <h3 className="font-body font-semibold text-foreground mb-3">
-                  Vendido por
+                  Vendedor
                 </h3>
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 rounded-full overflow-hidden bg-muted">
@@ -287,35 +269,21 @@ const ProductModal = ({ product, vendor, isOpen, onClose }) => {
               </div>
 
               {/* Product Details */}
-              <div className="space-y-3">
-                <h3 className="font-body font-semibold text-foreground">
-                  Informações do Produto
-                </h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Categoria:</span>
-                    <span className="ml-2 font-medium text-foreground">
-                      {product.category || 'Não informado'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Disponibilidade:</span>
-                    <span className={`ml-2 font-medium ${
-                      product.available ? 'text-success' : 'text-error'
-                    }`}>
-                      {product.available ? 'Disponível' : 'Indisponível'}
-                    </span>
-                  </div>
-                  {product.stock && (
+              {product.stock && (
+                <div className="space-y-3">
+                  <h3 className="font-body font-semibold text-foreground">
+                    Informações Adicionais
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-muted-foreground">Estoque:</span>
                       <span className="ml-2 font-medium text-foreground">
                         {product.stock} unidades
                       </span>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
@@ -335,18 +303,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose }) => {
                   size="lg"
                   iconName="Share"
                   iconPosition="left"
-                  onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({
-                        title: product.name,
-                        text: `Confira este produto: ${product.name}`,
-                        url: window.location.href
-                      });
-                    } else {
-                      navigator.clipboard.writeText(window.location.href);
-                      alert('Link copiado!');
-                    }
-                  }}
+                  onClick={handleShare}
                 >
                   Compartilhar
                 </Button>

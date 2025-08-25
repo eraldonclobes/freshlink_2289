@@ -21,12 +21,12 @@ const Checkbox = React.forwardRef(({
     // Size variants
     const sizeClasses = {
         sm: "h-4 w-4",
-        default: "h-4 w-4",
-        lg: "h-5 w-5"
+        default: "h-5 w-5",
+        lg: "h-6 w-6"
     };
 
     return (
-        <div className={cn("flex items-start space-x-2", className)}>
+        <div className={cn("flex items-start space-x-3", className)}>
             <div className="relative flex items-center">
                 <input
                     type="checkbox"
@@ -42,20 +42,22 @@ const Checkbox = React.forwardRef(({
                 <label
                     htmlFor={checkboxId}
                     className={cn(
-                        "peer shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground cursor-pointer transition-colors",
+                        "peer shrink-0 rounded-md border-2 border-border bg-background ring-offset-background transition-all duration-200 cursor-pointer hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
                         sizeClasses?.[size],
-                        checked && "bg-primary text-primary-foreground border-primary",
-                        indeterminate && "bg-primary text-primary-foreground border-primary",
+                        checked && "bg-primary border-primary text-primary-foreground",
+                        indeterminate && "bg-primary border-primary text-primary-foreground",
                         error && "border-destructive",
                         disabled && "cursor-not-allowed opacity-50"
                     )}
                 >
-                    {checked && !indeterminate && (
-                        <Check className="h-3 w-3 text-current flex items-center justify-center" />
-                    )}
-                    {indeterminate && (
-                        <Minus className="h-3 w-3 text-current flex items-center justify-center" />
-                    )}
+                    <div className="flex items-center justify-center w-full h-full">
+                        {checked && !indeterminate && (
+                            <Check className="h-3 w-3 text-current animate-fade-in" />
+                        )}
+                        {indeterminate && (
+                            <Minus className="h-3 w-3 text-current animate-fade-in" />
+                        )}
+                    </div>
                 </label>
             </div>
             {(label || description || error) && (
@@ -64,8 +66,8 @@ const Checkbox = React.forwardRef(({
                         <label
                             htmlFor={checkboxId}
                             className={cn(
-                                "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer",
-                                error ? "text-destructive" : "text-foreground"
+                                "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer transition-colors duration-200",
+                                error ? "text-destructive" : "text-foreground hover:text-primary"
                             )}
                         >
                             {label}
@@ -80,7 +82,7 @@ const Checkbox = React.forwardRef(({
                     )}
 
                     {error && (
-                        <p className="text-sm text-destructive">
+                        <p className="text-sm text-destructive animate-fade-in">
                             {error}
                         </p>
                     )}
@@ -112,7 +114,7 @@ const CheckboxGroup = React.forwardRef(({
         >
             {label && (
                 <legend className={cn(
-                    "text-sm font-medium",
+                    "text-sm font-medium transition-colors duration-200",
                     error ? "text-destructive" : "text-foreground"
                 )}>
                     {label}
@@ -126,12 +128,12 @@ const CheckboxGroup = React.forwardRef(({
                 </p>
             )}
 
-            <div className="space-y-2">
+            <div className="space-y-3">
                 {children}
             </div>
 
             {error && (
-                <p className="text-sm text-destructive">
+                <p className="text-sm text-destructive animate-fade-in">
                     {error}
                 </p>
             )}

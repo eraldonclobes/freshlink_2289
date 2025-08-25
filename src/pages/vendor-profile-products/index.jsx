@@ -17,6 +17,7 @@ const VendorProfileProducts = () => {
   const [activeTab, setActiveTab] = useState('products');
   const [activeCategory, setActiveCategory] = useState('all');
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [favoriteProducts, setFavoriteProducts] = useState([]);
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showProductModal, setShowProductModal] = useState(false);
@@ -28,6 +29,7 @@ const VendorProfileProducts = () => {
     location: "Vila Madalena, São Paulo",
     distance: "2.3 km",
     image: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&h=300&fit=crop",
+    bannerImage: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&h=400&fit=crop",
     rating: 4.8,
     reviewCount: 127,
     productCount: 24,
@@ -196,6 +198,10 @@ const VendorProfileProducts = () => {
 
   // Filter products based on active category
   useEffect(() => {
+    // Load favorite products from localStorage
+    const savedFavorites = JSON.parse(localStorage.getItem('favoriteProducts') || '[]');
+    setFavoriteProducts(savedFavorites);
+
     if (activeCategory === 'all') {
       setFilteredProducts(allProducts);
     } else {
@@ -226,6 +232,15 @@ const VendorProfileProducts = () => {
     setShowProductModal(true);
   };
 
+  const handleFavoriteToggle = (productId) => {
+    const updatedFavorites = favoriteProducts.includes(productId)
+      ? favoriteProducts.filter(id => id !== productId)
+      : [...favoriteProducts, productId];
+    
+    setFavoriteProducts(updatedFavorites);
+    localStorage.setItem('favoriteProducts', JSON.stringify(updatedFavorites));
+  };
+
   const handleShare = () => {
     setShowShareModal(true);
   };
@@ -245,8 +260,11 @@ const VendorProfileProducts = () => {
             <div className="container mx-auto px-4 pb-20 md:pb-6">
               <ProductGrid
                 products={filteredProducts}
+                vendor={vendorData}
                 onProductInquiry={handleProductInquiry}
                 onProductClick={handleProductClick}
+                onFavoriteToggle={handleFavoriteToggle}
+                favoriteProducts={favoriteProducts}
               />
             </div>
           </div>
