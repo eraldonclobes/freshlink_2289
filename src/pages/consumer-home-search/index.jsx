@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import ProductModal from '../../components/ui/ProductModal';
-
 import LocationSelector from './components/LocationSelector';
 import SearchBar from './components/SearchBar';
 import FilterChips from './components/FilterChips';
 import VendorGrid from './components/VendorGrid';
 import FeaturedVendors from './components/FeaturedVendors';
 import LoadingSpinner from './components/LoadingSpinner';
+// Import QuickActions - ADICIONE ESTA LINHA
+import QuickActions from './components/QuickActions';
 import Icon from '../../components/AppIcon';
 
 const ConsumerHomeSearch = () => {
@@ -328,30 +329,31 @@ const ConsumerHomeSearch = () => {
       {/* Header with Location and Search */}
       <div className="sticky top-16 z-40 bg-background border-b border-border">
         <div className="container mx-auto px-4 py-4">
-          {/* Search Bar with Location */}
+          {/* Search Bar with Location and Voice Button */}
           <div className="relative mb-4 flex items-center justify-between">
-            <SearchBar 
-              onSearch={handleSearch}
-              currentLocation={currentLocation}
-              onLocationChange={handleLocationChange}
-            />
+            <div className="relative flex-1">
+              <SearchBar 
+                onSearch={handleSearch}
+                currentLocation={currentLocation}
+                onLocationChange={handleLocationChange}
+                searchQuery={searchQuery}
+              />
+              {/* Voice Search Button - MOVIDO PARA DENTRO DO CONTAINER */}
+              <button
+                onClick={startVoiceSearch}
+                disabled={!recognition}
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-colors duration-200 ${
+                  isListening 
+                    ? 'text-error bg-error/10' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                <Icon name={isListening ? "MicOff" : "Mic"} size={18} />
+              </button>
+            </div>
             {refreshing && (
               <LoadingSpinner size="sm" className="ml-4" />
             )}
-          </div>
-
-          <div className="relative">
-            <button
-              onClick={startVoiceSearch}
-              disabled={!recognition}
-              className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-colors duration-200 ${
-                isListening 
-                  ? 'text-error bg-error/10' 
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
-            >
-              <Icon name={isListening ? "MicOff" : "Mic"} size={18} />
-            </button>
           </div>
 
           {/* Filter Chips */}
