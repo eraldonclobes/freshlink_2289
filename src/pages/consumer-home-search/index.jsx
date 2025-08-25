@@ -3,21 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import ProductModal from '../../components/ui/ProductModal';
-import LocationSelector from './components/LocationSelector';
+import LocationSelector from '../../components/ui/LocationSelector';
 import SearchBar from './components/SearchBar';
-import FilterChips from './components/FilterChips';
+import CategoryChips from './components/CategoryChips';
 import VendorGrid from './components/VendorGrid';
 import FeaturedVendors from './components/FeaturedVendors';
 import LoadingSpinner from './components/LoadingSpinner';
-// Import QuickActions - ADICIONE ESTA LINHA
-import QuickActions from './components/QuickActions';
 import Icon from '../../components/AppIcon';
 
 const ConsumerHomeSearch = () => {
     const navigate = useNavigate();
     const [currentLocation, setCurrentLocation] = useState({ id: 1, name: "São Paulo, SP", distance: "Atual" });
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeFilters, setActiveFilters] = useState([]);
     const [vendors, setVendors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -178,7 +175,7 @@ const ConsumerHomeSearch = () => {
     // Filter vendors based on search and filters
     useEffect(() => {
         filterVendors();
-    }, [searchQuery, activeFilters, currentLocation, sortBy]);
+    }, [searchQuery, currentLocation, sortBy]);
 
     const loadVendors = async () => {
         setLoading(true);
@@ -197,15 +194,6 @@ const ConsumerHomeSearch = () => {
                 vendor?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
                 vendor?.categories?.some(cat => cat?.toLowerCase()?.includes(searchQuery?.toLowerCase())) ||
                 vendor?.location?.toLowerCase()?.includes(searchQuery?.toLowerCase())
-            );
-        }
-
-        // Apply category filters
-        if (activeFilters?.length > 0) {
-            filtered = filtered?.filter(vendor =>
-                activeFilters?.some(filter =>
-                    vendor?.categories?.some(cat => cat?.toLowerCase()?.includes(filter?.toLowerCase()))
-                )
             );
         }
 
@@ -231,7 +219,7 @@ const ConsumerHomeSearch = () => {
         });
 
         setVendors(filtered);
-    }, [searchQuery, activeFilters, sortBy, mockVendors]);
+    }, [searchQuery, sortBy, mockVendors]);
 
     const handleLocationChange = (location) => {
         setCurrentLocation(location);
@@ -247,33 +235,6 @@ const ConsumerHomeSearch = () => {
         if (recognition && !isListening) {
             setIsListening(true);
             recognition.start();
-        }
-    };
-
-    const handleFilterChange = (filters) => {
-        setActiveFilters(filters);
-    };
-
-    const handleQuickAction = (actionId) => {
-        switch (actionId) {
-            case 'organic':
-                setActiveFilters(['organicos']);
-                break;
-            case 'nearby':
-                // Filter by distance (mock implementation)
-                const nearbyVendors = mockVendors?.filter(v => parseFloat(v?.distance) <= 2);
-                setVendors(nearbyVendors);
-                break;
-            case 'open-now':
-                const openVendors = mockVendors?.filter(v => v?.isOpen);
-                setVendors(openVendors);
-                break;
-            case 'delivery':
-                // Mock delivery filter
-                setActiveFilters(['entrega']);
-                break;
-            default:
-                break;
         }
     };
 
@@ -330,36 +291,36 @@ const ConsumerHomeSearch = () => {
             <div className="sticky top-16 z-40 bg-background border-b border-border mb-16">
                 <div className="container mx-auto px-4 py-4">
                     {/* Search Bar with Location and Voice Button */}
-                    <div className="relative mb-4 flex items-center justify-between">
-                        <div className="relative flex-1">
+                    <div className="relative mb-4 flex items-center space-x-3">
+                        <div className="flex-1">
                             <SearchBar
                                 onSearch={handleSearch}
-                                currentLocation={currentLocation}
-                                onLocationChange={handleLocationChange}
-                                searchQuery={searchQuery}
                             />
-                            {/* Voice Search Button - MOVIDO PARA DENTRO DO CONTAINER */}
+                        </div>
+                        
+                        <LocationSelector
+                            currentLocation={currentLocation}
+                            onLocationChange={handleLocationChange}
+                        />
+                        
+                        {/* Voice Search Button */}
+                        <div className="relative">
                             <button
                                 onClick={startVoiceSearch}
                                 disabled={!recognition}
-                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-colors duration-200 ${isListening
+                                className={`p-3 rounded-lg transition-colors duration-200 ${isListening
                                     ? 'text-error bg-error/10'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted border border-border'
                                     }`}
                             >
                                 <Icon name={isListening ? "MicOff" : "Mic"} size={18} />
                             </button>
                         </div>
+                        
                         {refreshing && (
                             <LoadingSpinner size="sm" className="ml-4" />
                         )}
                     </div>
-
-                    {/* Filter Chips */}
-                    <FilterChips
-                        activeFilters={activeFilters}
-                        onFilterChange={handleFilterChange}
-                    />
                 </div>
             </div>
 
@@ -368,9 +329,8 @@ const ConsumerHomeSearch = () => {
                 className="container mx-auto px-4 py-6 pb-20 md:pb-6"
                 onTouchStart={handlePullToRefresh}
             >
-                {/* Quick Actions */}
-                <QuickActions
-                    onActionClick={handleQuickAction}
+                {/* Category Chips */}
+                <CategoryChips
                     className="mb-8"
                 />
 
@@ -390,7 +350,11 @@ const ConsumerHomeSearch = () => {
 
                     {/* Sort Options */}
                     <div className="flex items-center space-x-2">
-                        <select
+                        <button className="flex items-center space-x-2 px-3 py-2 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200">
+                            <span>Recomendados</span>
+                            <Icon name="ChevronDown" size={16} />
+                        </button>
+                        {/* <select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value)}
                             className="px-3 py-2 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -400,7 +364,7 @@ const ConsumerHomeSearch = () => {
                                     {option.label}
                                 </option>
                             ))}
-                        </select>
+                        </select> */}
                     </div>
                 </div>
 

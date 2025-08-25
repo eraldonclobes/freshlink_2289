@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import ProductModal from '../../components/ui/ProductModal';
+import FilterDropdown from '../../components/ui/FilterDropdown';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import Button from '../../components/ui/Button';
-import Select from '../../components/ui/Select';
 
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);
@@ -23,6 +23,7 @@ const ProductsPage = () => {
     const [recognition, setRecognition] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showProductModal, setShowProductModal] = useState(false);
+    const [categoryFilter, setCategoryFilter] = useState('');
 
     const PRODUCTS_PER_PAGE = 12;
 
@@ -40,6 +41,17 @@ const ProductsPage = () => {
         { value: 'price_desc', label: 'Maior preço' },
         { value: 'name', label: 'Nome A-Z' },
         { value: 'rating', label: 'Melhor avaliados' }
+    ];
+
+    const categoryOptions = [
+        { value: '', label: 'Todas as categorias' },
+        { value: 'frutas', label: 'Frutas' },
+        { value: 'verduras', label: 'Verduras' },
+        { value: 'legumes', label: 'Legumes' },
+        { value: 'organicos', label: 'Orgânicos' },
+        { value: 'temperos', label: 'Temperos' },
+        { value: 'laticinios', label: 'Laticínios' },
+        { value: 'carnes', label: 'Carnes' }
     ];
 
     // Mock products data
@@ -183,12 +195,19 @@ const ProductsPage = () => {
         // Load favorite products from localStorage
         const savedFavorites = JSON.parse(localStorage.getItem('favoriteProducts') || '[]');
         setFavoriteProducts(savedFavorites);
+        
+        // Check for category filter from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('category');
+        if (category) {
+            setCategoryFilter(category);
+        }
     }, []);
 
     // Filter and sort products
     useEffect(() => {
         filterAndSortProducts();
-    }, [products, searchQuery, selectedRadius, customRadius, sortBy]);
+    }, [products, searchQuery, selectedRadius, customRadius, sortBy, categoryFilter]);
 
     const loadProducts = async () => {
         setLoading(true);
@@ -207,6 +226,11 @@ const ProductsPage = () => {
                 product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 product.vendor.toLowerCase().includes(searchQuery.toLowerCase())
             );
+        }
+
+        // Filter by category
+        if (categoryFilter) {
+            filtered = filtered.filter(product => product.category === categoryFilter);
         }
 
         // Filter by radius
@@ -234,7 +258,7 @@ const ProductsPage = () => {
         setFilteredProducts(filtered);
         setCurrentPage(1);
         setHasMore(filtered.length > PRODUCTS_PER_PAGE);
-    }, [searchQuery, selectedRadius, customRadius, sortBy]);
+    }, [searchQuery, selectedRadius, customRadius, sortBy, categoryFilter]);
 
     const loadMoreProducts = async () => {
         setLoadingMore(true);
@@ -466,18 +490,23 @@ const ProductsPage = () => {
                 {/* Header Section */}
                 <div className="bg-card border-b border-border">
                     <div className="container mx-auto px-4 py-6">
-                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                            <div>
-                                <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
-                                    Produtos Próximos
-                                </h1>
-                                <p className="text-muted-foreground">
-                                    {filteredProducts.length} produtos encontrados
-                                </p>
-                            </div>
+                        <div>
+                            <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
+                                Produtos Próximos
+                            </h1>
+                            <p className="text-muted-foreground">
+                                {filteredProducts.length} produtos encontrados
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                            {/* Search and Voice */}
-                            <div className="flex items-center space-x-3">
+                {/* Search and Filters */}
+                <div className="bg-muted/50 border-b border-border">
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            {/* Search Bar */}
+                            <div className="flex-1">
                                 <div className="relative flex-1 lg:w-80">
                                     <Icon
                                         name="Search"
@@ -489,7 +518,7 @@ const ProductsPage = () => {
                                         placeholder="Buscar produtos..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-12 py-3 bg-muted border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                        className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                     />
                                     <button
                                         onClick={startVoiceSearch}
@@ -503,22 +532,24 @@ const ProductsPage = () => {
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Filters */}
-                <div className="bg-muted/50 border-b border-border">
-                    <div className="container mx-auto px-4 py-4">
-                        <div className="flex flex-col sm:flex-row gap-4">
+                            {/* Filters */}
                             <div className="flex items-center space-x-3">
-                                <Select
+                                <FilterDropdown
+                                    label="Categoria"
+                                    options={categoryOptions}
+                                    value={categoryFilter}
+                                    onChange={setCategoryFilter}
                                     placeholder="Raio"
+                                />
+                                
+                                <FilterDropdown
+                                    label="Raio"
                                     options={radiusOptions}
                                     value={selectedRadius}
                                     onChange={setSelectedRadius}
-                                    className="w-32"
                                 />
+                                
                                 {selectedRadius === 'custom' && (
                                     <input
                                         type="number"
@@ -528,15 +559,15 @@ const ProductsPage = () => {
                                         className="w-20 px-3 py-2 bg-background border border-border rounded-lg text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary"
                                     />
                                 )}
-                            </div>
 
-                            <Select
+                                <FilterDropdown
+                                    label="Ordenar"
+                                    options={sortOptions}
+                                    value={sortBy}
+                                    onChange={setSortBy}
                                 placeholder="Ordenar por"
-                                options={sortOptions}
-                                value={sortBy}
-                                onChange={setSortBy}
-                                className="w-48"
-                            />
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
+import FilterDropdown from '../../components/ui/FilterDropdown';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import Button from '../../components/ui/Button';
-import Select from '../../components/ui/Select';
 
 const VendorsPage = () => {
     const navigate = useNavigate();
@@ -21,6 +21,7 @@ const VendorsPage = () => {
     const [hasMore, setHasMore] = useState(true);
     const [isListening, setIsListening] = useState(false);
     const [recognition, setRecognition] = useState(null);
+    const [categoryFilter, setCategoryFilter] = useState('');
 
     const VENDORS_PER_PAGE = 8;
 
@@ -38,6 +39,16 @@ const VendorsPage = () => {
         { value: 'name', label: 'Nome A-Z' },
         { value: 'products', label: 'Mais produtos' },
         { value: 'reviews', label: 'Mais avaliações' }
+    ];
+
+    const categoryOptions = [
+        { value: '', label: 'Todas as categorias' },
+        { value: 'organicos', label: 'Orgânicos' },
+        { value: 'frutas', label: 'Frutas' },
+        { value: 'verduras', label: 'Verduras' },
+        { value: 'legumes', label: 'Legumes' },
+        { value: 'temperos', label: 'Temperos' },
+        { value: 'laticinios', label: 'Laticínios' }
     ];
 
     // Mock vendors data
@@ -140,6 +151,59 @@ const VendorsPage = () => {
         }
     ];
 
+    // Adicionar mais vendedores para mostrar todos, não apenas os em destaque
+    const allVendors = [
+        ...mockVendors,
+        {
+            id: 7,
+            name: "Quintal da Vovó",
+            image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop",
+            rating: 4.8,
+            reviewCount: 168,
+            distance: 3.8,
+            location: "Pompéia",
+            categories: ["Frutas", "Verduras", "Conservas"],
+            isOpen: true,
+            hours: "6:00 - 18:00",
+            phone: "11987654327",
+            isSponsored: false,
+            productCount: 28,
+            description: "Produtos caseiros e tradicionais"
+        },
+        {
+            id: 8,
+            name: "Feira do Produtor",
+            image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
+            rating: 4.3,
+            reviewCount: 67,
+            distance: 4.2,
+            location: "Barra Funda",
+            categories: ["Frutas", "Verduras", "Legumes", "Temperos"],
+            isOpen: true,
+            hours: "5:00 - 14:00",
+            phone: "11987654328",
+            isSponsored: false,
+            productCount: 15,
+            description: "Direto do produtor para sua mesa"
+        },
+        {
+            id: 9,
+            name: "Horta Comunitária",
+            image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=300&fit=crop",
+            rating: 4.6,
+            reviewCount: 92,
+            distance: 2.8,
+            location: "Vila Olímpia",
+            categories: ["Orgânicos", "Verduras", "Temperos"],
+            isOpen: false,
+            hours: "7:00 - 16:00",
+            phone: "11987654329",
+            isSponsored: false,
+            productCount: 20,
+            description: "Cultivo sustentável e comunitário"
+        }
+    ];
+
     // Initialize speech recognition
     useEffect(() => {
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -175,18 +239,18 @@ const VendorsPage = () => {
     // Filter and sort vendors
     useEffect(() => {
         filterAndSortVendors();
-    }, [vendors, searchQuery, selectedRadius, customRadius, sortBy]);
+    }, [vendors, searchQuery, selectedRadius, customRadius, sortBy, categoryFilter]);
 
     const loadVendors = async () => {
         setLoading(true);
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
-        setVendors(mockVendors);
+        setVendors(allVendors);
         setLoading(false);
     };
 
     const filterAndSortVendors = useCallback(() => {
-        let filtered = [...mockVendors];
+        let filtered = [...allVendors];
 
         // Filter by search query
         if (searchQuery.trim()) {
@@ -194,6 +258,13 @@ const VendorsPage = () => {
                 vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 vendor.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 vendor.categories.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()))
+            );
+        }
+
+        // Filter by category
+        if (categoryFilter) {
+            filtered = filtered.filter(vendor =>
+                vendor.categories.some(cat => cat.toLowerCase().includes(categoryFilter.toLowerCase()))
             );
         }
 
@@ -226,7 +297,7 @@ const VendorsPage = () => {
         setFilteredVendors(filtered);
         setCurrentPage(1);
         setHasMore(filtered.length > VENDORS_PER_PAGE);
-    }, [searchQuery, selectedRadius, customRadius, sortBy]);
+    }, [searchQuery, selectedRadius, customRadius, sortBy, categoryFilter]);
 
     const loadMoreVendors = async () => {
         setLoadingMore(true);
@@ -412,18 +483,23 @@ const VendorsPage = () => {
                 {/* Header Section */}
                 <div className="bg-card border-b border-border">
                     <div className="container mx-auto px-4 py-6">
-                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                            <div>
-                                <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
-                                    Vendedores em Destaque
-                                </h1>
-                                <p className="text-muted-foreground">
-                                    {filteredVendors.length} vendedores encontrados
-                                </p>
-                            </div>
+                        <div>
+                            <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
+                                Vendedores Próximos
+                            </h1>
+                            <p className="text-muted-foreground">
+                                {filteredVendors.length} vendedores encontrados
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                            {/* Search and Voice */}
-                            <div className="flex items-center space-x-3">
+                {/* Search and Filters */}
+                <div className="bg-muted/50 border-b border-border">
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            {/* Search Bar */}
+                            <div className="flex-1">
                                 <div className="relative flex-1 lg:w-80">
                                     <Icon
                                         name="Search"
@@ -435,7 +511,7 @@ const VendorsPage = () => {
                                         placeholder="Buscar vendedores..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-12 py-3 bg-muted border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                        className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                     />
                                     <button
                                         onClick={startVoiceSearch}
@@ -449,22 +525,24 @@ const VendorsPage = () => {
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Filters */}
-                <div className="bg-muted/50 border-b border-border">
-                    <div className="container mx-auto px-4 py-4">
-                        <div className="flex flex-col sm:flex-row gap-4">
+                            {/* Filters */}
                             <div className="flex items-center space-x-3">
-                                <Select
+                                <FilterDropdown
+                                    label="Categoria"
+                                    options={categoryOptions}
+                                    value={categoryFilter}
+                                    onChange={setCategoryFilter}
                                     placeholder="Raio"
+                                />
+                                
+                                <FilterDropdown
+                                    label="Raio"
                                     options={radiusOptions}
                                     value={selectedRadius}
                                     onChange={setSelectedRadius}
-                                    className="w-32"
                                 />
+                                
                                 {selectedRadius === 'custom' && (
                                     <input
                                         type="number"
@@ -474,15 +552,15 @@ const VendorsPage = () => {
                                         className="w-20 px-3 py-2 bg-background border border-border rounded-lg text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary"
                                     />
                                 )}
-                            </div>
 
-                            <Select
+                                <FilterDropdown
+                                    label="Ordenar"
+                                    options={sortOptions}
+                                    value={sortBy}
+                                    onChange={setSortBy}
                                 placeholder="Ordenar por"
-                                options={sortOptions}
-                                value={sortBy}
-                                onChange={setSortBy}
-                                className="w-48"
-                            />
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
