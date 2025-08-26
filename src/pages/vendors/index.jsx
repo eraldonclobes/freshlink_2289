@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import SearchBar from '../../components/ui/SearchBar';
@@ -10,7 +9,6 @@ import Image from '../../components/AppImage';
 import Button from '../../components/ui/Button';
 
 const VendorsPage = () => {
-    const navigate = useNavigate();
     const navigate = useNavigate();
     const [vendors, setVendors] = useState([]);
     const [filteredVendors, setFilteredVendors] = useState([]);
@@ -294,10 +292,10 @@ const VendorsPage = () => {
     };
 
     // Filter suggestions based on search query
-    const filteredSuggestions = searchQuery?.length > 1 
+    const filteredSuggestions = searchQuery?.length > 1
         ? mockSuggestions.filter(item =>
             item?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase())
-          ).slice(0, 5)
+        ).slice(0, 5)
         : [];
 
     const handleWhatsAppContact = (vendor) => {
