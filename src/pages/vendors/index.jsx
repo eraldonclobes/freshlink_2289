@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import SearchBar from '../../components/ui/SearchBar';
 import LocationSelector from '../../components/ui/LocationSelector';
-import FilterDropdown from '../../components/ui/FilterDropdown';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import Button from '../../components/ui/Button';
 
 const VendorsPage = () => {
+    const navigate = useNavigate();
     const navigate = useNavigate();
     const [vendors, setVendors] = useState([]);
     const [filteredVendors, setFilteredVendors] = useState([]);
@@ -495,22 +496,36 @@ const VendorsPage = () => {
                             </div>
 
                             {/* Category Filter */}
-                            <FilterDropdown
-                                label="Categoria"
-                                options={categoryOptions}
-                                value={categoryFilter}
-                                onChange={setCategoryFilter}
-                                placeholder="Categoria"
-                            />
+                            <div className="relative">
+                                <select
+                                    value={categoryFilter}
+                                    onChange={(e) => setCategoryFilter(e.target.value)}
+                                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap appearance-none pr-8"
+                                >
+                                    {categoryOptions.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <Icon name="ChevronDown" size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                            </div>
 
                             {/* Sort Filter */}
-                            <FilterDropdown
-                                label="Ordenar"
-                                options={sortOptions}
-                                value={sortBy}
-                                onChange={setSortBy}
-                                placeholder="Ordenar por"
-                            />
+                            <div className="relative">
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap appearance-none pr-8"
+                                >
+                                    {sortOptions.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <Icon name="ChevronDown" size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                            </div>
 
                             <LocationSelector
                                 currentLocation={currentLocation}
