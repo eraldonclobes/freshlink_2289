@@ -4,10 +4,10 @@ import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import ProductModal from '../../components/ui/ProductModal';
 import LocationSelector from '../../components/ui/LocationSelector';
-import SearchBar from './components/SearchBar';
+import HeroCarousel from './components/HeroCarousel';
 import CategoryChips from './components/CategoryChips';
+import FeaturedProducts from './components/FeaturedProducts';
 import VendorGrid from './components/VendorGrid';
-import FeaturedVendors from './components/FeaturedVendors';
 import LoadingSpinner from './components/LoadingSpinner';
 import Icon from '../../components/AppIcon';
 
@@ -19,6 +19,8 @@ const ConsumerHomeSearch = () => {
     const [vendors, setVendors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
     const [sortBy, setSortBy] = useState('sponsored');
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showProductModal, setShowProductModal] = useState(false);
@@ -201,6 +203,15 @@ const ConsumerHomeSearch = () => {
         setLoading(false);
     };
 
+    const handleLoadMore = async () => {
+        setLoadingMore(true);
+        // Simulate loading more vendors
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        // In real app, this would load more data
+        setLoadingMore(false);
+        setHasMore(false); // For demo purposes
+    };
+
     const filterVendors = useCallback(() => {
         let filtered = [...mockVendors];
 
@@ -315,43 +326,42 @@ const ConsumerHomeSearch = () => {
             {/* Navigation */}
             <ResponsiveHeader />
 
-            {/* Header with Location and Search */}
-            <div className="sticky top-16 z-40 bg-background border-b border-border mb-16">
-                <div className="container mx-auto px-4 py-4">
-                    {/* Search Bar with Location and Voice Button */}
-                    <div className="relative mb-4 flex items-center space-x-3">
-                        <div className="flex-1">
-                            <SearchBar
-                                onSearch={handleSearch}
-                                onSuggestionClick={handleSuggestionClick}
-                                suggestions={filteredSuggestions}
-                            />
-                        </div>
-                        
+            {/* Main Content */}
+            <main
+                className="container mx-auto px-4 py-6 pb-20 md:pb-12 pt-20"
+                onTouchStart={handlePullToRefresh}
+            >
+                {/* Hero Carousel */}
+                <HeroCarousel className="mb-8" />
+
+                {/* Category Chips */}
+                <div className="mb-8">
+                    <div className="mb-6">
+                        <h2 className="font-heading font-bold text-xl text-foreground mb-1">
+                            Busque por Categorias
+                        </h2>
+                        <p className="text-sm font-body text-muted-foreground">
+                            Encontre exatamente o que você procura
+                        </p>
+                    </div>
+                    <CategoryChips />
+                </div>
+
+                {/* Featured Products */}
+                <FeaturedProducts className="mb-8" />
+
+                {/* Location Selector */}
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-4">
                         <LocationSelector
                             currentLocation={currentLocation}
                             onLocationChange={handleLocationChange}
                         />
-                        
                         {refreshing && (
-                            <LoadingSpinner size="sm" className="ml-4" />
+                            <LoadingSpinner size="sm" />
                         )}
                     </div>
                 </div>
-            </div>
-
-            {/* Main Content */}
-            <main
-                className="container mx-auto px-4 py-6 pb-20 md:pb-6"
-                onTouchStart={handlePullToRefresh}
-            >
-                {/* Category Chips */}
-                <CategoryChips
-                    className="mb-8"
-                />
-
-                {/* Featured Vendors */}
-                <FeaturedVendors className="mb-8" />
 
                 {/* Results Header */}
                 <div className="flex items-center justify-between mb-6">
@@ -388,22 +398,12 @@ const ConsumerHomeSearch = () => {
                 <VendorGrid
                     vendors={vendors}
                     loading={loading}
+                    onLoadMore={handleLoadMore}
+                    hasMore={hasMore}
+                    loadingMore={loadingMore}
                     className="mb-8"
                     id="vendor-grid"
                 />
-
-                {/* Load More Button */}
-                {!loading && vendors?.length > 0 && vendors?.length >= 8 && (
-                    <div className="flex justify-center">
-                        <button
-                            onClick={loadVendors}
-                            className="flex items-center space-x-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-body font-medium hover:bg-primary/90 transition-colors duration-200"
-                        >
-                            <Icon name="Plus" size={18} />
-                            <span>Carregar mais vendedores</span>
-                        </button>
-                    </div>
-                )}
             </main>
 
             {/* Product Modal */}
