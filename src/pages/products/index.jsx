@@ -48,15 +48,6 @@ const ProductsPage = () => {
         { value: 'carnes', label: 'Carnes' }
     ];
 
-    // Mock suggestions for search
-    const mockSuggestions = [
-        { id: 1, type: 'product', name: 'Tomate Orgânico', category: 'Produto', productId: 1, vendorId: 1 },
-        { id: 2, type: 'product', name: 'Alface Americana', category: 'Produto', productId: 2, vendorId: 2 },
-        { id: 3, type: 'vendor', name: 'Fazenda Verde', category: 'Vendedor', vendorId: 1 },
-        { id: 4, type: 'product', name: 'Cenouras Frescas', category: 'Produto', productId: 3, vendorId: 3 },
-        { id: 5, type: 'vendor', name: 'Hortifruti do João', category: 'Vendedor', vendorId: 2 }
-    ];
-
     // Mock products data - Enhanced to match FeaturedProducts structure
     const mockProducts = [
         {
@@ -294,19 +285,93 @@ const ProductsPage = () => {
         setLoadingMore(false);
     };
 
+    // Função para verificar se uma string é similar a outra (busca aproximada)
+    const isSimilar = (text, query) => {
+        if (!text || !query) return false;
+        
+        const textLower = text.toLowerCase();
+        const queryLower = query.toLowerCase();
+        
+        // Verifica se contém a busca
+        if (textLower.includes(queryLower)) return true;
+        
+        // Busca por palavras similares (permite erros de digitação)
+        const words = textLower.split(' ');
+        return words.some(word => {
+            if (word.length <= 3) return word.includes(queryLower);
+            
+            // Para palavras maiores, permite 1-2 caracteres diferentes
+            let differences = 0;
+            const minLength = Math.min(word.length, queryLower.length);
+            const maxLength = Math.max(word.length, queryLower.length);
+            
+            for (let i = 0; i < minLength; i++) {
+                if (word[i] !== queryLower[i]) differences++;
+            }
+            differences += maxLength - minLength;
+            
+            return differences <= Math.floor(word.length * 0.3);
+        });
+    };
+
+    // Gerar sugestões dinâmicas baseadas nos produtos disponíveis
+    const generateSuggestions = (query) => {
+        if (!query.trim()) return [];
+
+        const suggestions = [];
+        const addedNames = new Set();
+
+        // Buscar produtos similares
+        mockProducts.forEach(product => {
+            if (isSimilar(product.name, query) && !addedNames.has(product.name)) {
+                suggestions.push({
+                    id: product.id,
+                    type: 'product',
+                    name: product.name,
+                    category: 'Produto',
+                    productId: product.id,
+                    vendorId: product.vendorId
+                });
+                addedNames.add(product.name);
+            }
+        });
+
+        // Buscar vendedores similares
+        const addedVendors = new Set();
+        mockProducts.forEach(product => {
+            if (isSimilar(product.vendor, query) && !addedVendors.has(product.vendor)) {
+                suggestions.push({
+                    id: `vendor_${product.vendorId}`,
+                    type: 'vendor',
+                    name: product.vendor,
+                    category: 'Vendedor',
+                    vendorId: product.vendorId
+                });
+                addedVendors.add(product.vendor);
+            }
+        });
+
+        return suggestions.slice(0, 5); // Limitar a 5 sugestões
+    };
+
     const handleSearch = (query) => {
         setSearchQuery(query);
-        // If query is empty, show all products
-        if (!query.trim()) {
-            setSearchQuery('');
-        }
+    };
+
+    const handleClearSearch = () => {
+        setSearchQuery('');
+    };
+
+    const handleSearchSubmit = (query) => {
+        // Quando der enter ou submeter, apenas definir a query
+        setSearchQuery(query);
     };
 
     const handleSuggestionClick = (suggestion) => {
         if (suggestion.type === 'vendor') {
             navigate('/vendor-profile-products', { state: { vendorId: suggestion.vendorId } });
         } else if (suggestion.type === 'product') {
-            // Instead of opening modal, search for the product name
+            // Definir a query de busca com o nome do produto
             setSearchQuery(suggestion.name);
         }
     };
@@ -315,18 +380,8 @@ const ProductsPage = () => {
         setCurrentLocation(location);
     };
 
-    // Filter suggestions based on search query - always show if products match
-    const filteredSuggestions = mockSuggestions.filter(item => {
-        if (!searchQuery.trim()) {
-            // If no search query, only show product suggestions that exist in mockProducts
-            if (item.type === 'product') {
-                return mockProducts.some(product => product.id === item.productId);
-            }
-            return item.type === 'vendor';
-        }
-        // If there's a search query, filter normally
-        return item?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase());
-    }).slice(0, 5);
+    // Filtrar sugestões baseadas na query atual
+    const filteredSuggestions = generateSuggestions(searchQuery);
 
     const handleProductInquiry = (product, e) => {
         e?.stopPropagation();
@@ -671,11 +726,12 @@ const ProductsPage = () => {
                             <div className="flex-1">
                                 <SearchBar
                                     onSearch={handleSearch}
+                                    onSearchSubmit={handleSearchSubmit}
                                     onSuggestionClick={handleSuggestionClick}
+                                    onClear={handleClearSearch}
                                     suggestions={filteredSuggestions}
                                     placeholder="Buscar produtos..."
                                     value={searchQuery}
-                                    onClear={() => setSearchQuery('')}
                                 />
                             </div>
 
