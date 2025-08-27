@@ -72,10 +72,10 @@ const ResponsiveHeader = ({ className = '' }) => {
 
     const getNavLinkClass = (path) => {
         const isActive = location.pathname === path;
-        return `flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm font-body transition-all duration-300 transform hover:scale-[1.02] ${
+        return `flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-body transition-all duration-200 transform hover:scale-[1.01] ${
             isActive
-                ? 'text-foreground bg-muted shadow-md font-semibold ring-1 ring-border/50'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/60 font-medium hover:shadow-sm'
+                ? 'text-foreground bg-muted shadow-sm font-semibold'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/60 font-medium'
         }`;
     };
 
@@ -135,9 +135,9 @@ const ResponsiveHeader = ({ className = '' }) => {
                             <div className="relative" ref={dropdownRef}>
                                 <button
                                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                                    className="flex items-center space-x-2 p-1.5 rounded-xl hover:bg-muted transition-all duration-300 transform hover:scale-105"
+                                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-muted transition-all duration-200"
                                 >
-                                    <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-muted transition-all duration-300 hover:ring-primary/50">
+                                    <div className="w-9 h-9 rounded-full overflow-hidden">
                                         <Image
                                             src={getProfileImage()}
                                             alt="Perfil"
@@ -147,14 +147,14 @@ const ResponsiveHeader = ({ className = '' }) => {
                                     <span className="hidden lg:inline text-sm font-body font-medium text-foreground">
                                         {getUserName()}
                                     </span>
-                                    <Icon name="ChevronDown" size={16} className="hidden lg:inline text-muted-foreground transition-transform duration-300" />
+                                    <Icon name="ChevronDown" size={16} className="hidden lg:inline text-muted-foreground" />
                                 </button>
 
                                 {/* Profile Dropdown */}
                                 {isProfileDropdownOpen && (
-                                    <div className="absolute right-0 top-full mt-3 w-64 bg-card/95 backdrop-blur-lg border border-border/80 rounded-xl shadow-2xl py-3 animate-fade-in z-50">
+                                    <div className="absolute right-0 top-full mt-2 w-60 bg-card border border-border rounded-lg shadow-lg py-2 z-50">
                                         {/* User Info Header */}
-                                        <div className="px-4 py-3 border-b border-border/50">
+                                        <div className="px-4 py-3 border-b border-border">
                                             <div className="flex items-center space-x-3">
                                                 <div className="w-10 h-10 rounded-full overflow-hidden">
                                                     <Image
@@ -174,7 +174,7 @@ const ResponsiveHeader = ({ className = '' }) => {
                                         <div className="py-2">
                                             <button
                                                 onClick={handleProfileClick}
-                                                className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted/80 transition-all duration-200 hover:translate-x-1"
+                                                className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors duration-200"
                                             >
                                                 <Icon name="User" size={18} className="text-muted-foreground" />
                                                 <span>Meu Perfil</span>
@@ -187,7 +187,7 @@ const ResponsiveHeader = ({ className = '' }) => {
                                                             navigate('/vendor-dashboard');
                                                             setIsProfileDropdownOpen(false);
                                                         }}
-                                                        className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted/80 transition-all duration-200 hover:translate-x-1"
+                                                        className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors duration-200"
                                                     >
                                                         <Icon name="BarChart3" size={18} className="text-muted-foreground" />
                                                         <span>Dashboard</span>
@@ -197,7 +197,7 @@ const ResponsiveHeader = ({ className = '' }) => {
                                                             navigate('/product-management');
                                                             setIsProfileDropdownOpen(false);
                                                         }}
-                                                        className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted/80 transition-all duration-200 hover:translate-x-1"
+                                                        className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors duration-200"
                                                     >
                                                         <Icon name="Package" size={18} className="text-muted-foreground" />
                                                         <span>Gerenciar Produtos</span>
@@ -206,10 +206,10 @@ const ResponsiveHeader = ({ className = '' }) => {
                                             )}
                                         </div>
 
-                                        <div className="border-t border-border/50 mt-2 pt-2">
+                                        <div className="border-t border-border pt-2">
                                             <button
                                                 onClick={handleLogout}
-                                                className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/10 transition-all duration-200 hover:translate-x-1"
+                                                className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors duration-200"
                                             >
                                                 <Icon name="LogOut" size={18} />
                                                 <span>Sair</span>
@@ -222,13 +222,13 @@ const ResponsiveHeader = ({ className = '' }) => {
                             <div className="hidden lg:flex items-center space-x-3">
                                 <button
                                     onClick={() => navigate('/auth')}
-                                    className="text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-all duration-300 hover:scale-105"
+                                    className="text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
                                 >
                                     Entrar
                                 </button>
                                 <button
                                     onClick={() => navigate('/auth?tab=register')}
-                                    className="px-4 py-2.5 bg-primary text-primary-foreground text-sm font-body font-semibold rounded-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                                    className="px-4 py-2.5 bg-primary text-primary-foreground text-sm font-body font-semibold rounded-lg hover:bg-primary/90 transition-colors duration-200"
                                 >
                                     Cadastrar-se
                                 </button>
@@ -239,14 +239,14 @@ const ResponsiveHeader = ({ className = '' }) => {
 
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden absolute top-16 left-0 right-0 bg-card/95 backdrop-blur-lg border-b border-border/80 shadow-2xl animate-slide-down max-h-96 overflow-y-auto">
+                    <div className="md:hidden absolute top-16 left-0 right-0 bg-card border-b border-border shadow-lg max-h-96 overflow-y-auto">
                         <nav className="px-4 py-6 space-y-1">
                             <button
                                 onClick={() => {
                                     navigate('/consumer-home-search');
                                     setIsMobileMenuOpen(false);
                                 }}
-                                className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-xl text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all duration-300 hover:translate-x-2"
+                                className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
                             >
                                 <Icon name="Home" size={20} />
                                 <span>Início</span>
@@ -257,7 +257,7 @@ const ResponsiveHeader = ({ className = '' }) => {
                                     navigate('/products');
                                     setIsMobileMenuOpen(false);
                                 }}
-                                className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-xl text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all duration-300 hover:translate-x-2"
+                                className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
                             >
                                 <Icon name="Package" size={20} />
                                 <span>Produtos</span>
@@ -268,20 +268,20 @@ const ResponsiveHeader = ({ className = '' }) => {
                                     navigate('/vendors');
                                     setIsMobileMenuOpen(false);
                                 }}
-                                className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-xl text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all duration-300 hover:translate-x-2"
+                                className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
                             >
                                 <Icon name="Store" size={20} />
                                 <span>Vendedores</span>
                             </button>
 
                             {!userAuth && (
-                                <div className="pt-6 border-t border-border/50 space-y-3">
+                                <div className="pt-6 border-t border-border space-y-3">
                                     <button
                                         onClick={() => {
                                             navigate('/auth');
                                             setIsMobileMenuOpen(false);
                                         }}
-                                        className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-xl text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all duration-300 hover:translate-x-2"
+                                        className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
                                     >
                                         <Icon name="LogIn" size={20} />
                                         <span>Entrar</span>
@@ -291,7 +291,7 @@ const ResponsiveHeader = ({ className = '' }) => {
                                             navigate('/auth?tab=register');
                                             setIsMobileMenuOpen(false);
                                         }}
-                                        className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-xl text-sm font-body font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg"
+                                        className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-lg text-sm font-body font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors duration-200"
                                     >
                                         <Icon name="UserPlus" size={20} />
                                         <span>Cadastrar-se</span>
