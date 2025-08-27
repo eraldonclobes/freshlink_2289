@@ -94,12 +94,20 @@ const ResponsiveHeader = ({ className = '' }) => {
                     {/* Logo */}
                     <button
                         onClick={handleLogoClick}
-                        className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200"
+                        className="hover:opacity-80 transition-opacity duration-200"
                     >
-                        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                            <Icon name="Leaf" size={20} color="white" />
-                        </div>
-                        <span className="font-heading font-bold text-xl text-foreground">FreshLink</span>
+                        {/* Logo para desktop (>767px) */}
+                        <img 
+                            src="/path-to-your-logotext.png" 
+                            alt="FreshLink" 
+                            className="hidden min-[768px]:block h-8"
+                        />
+                        {/* Logo para tablet/mobile (≤767px) quando menu está fechado */}
+                        <img 
+                            src="/path-to-your-logoicon.png" 
+                            alt="FreshLink" 
+                            className="block min-[768px]:hidden md:hidden h-8 w-8"
+                        />
                     </button>
 
                     {/* Navigation Links - Desktop */}
@@ -219,13 +227,27 @@ const ResponsiveHeader = ({ className = '' }) => {
                                 )}
                             </div>
                         ) : (
-                            <div className="hidden lg:flex items-center">
+                            <div className="flex items-center">
+                                {/* Botão de login desktop (>767px) */}
                                 <button
                                     onClick={() => navigate('/auth')}
-                                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
+                                    className="hidden min-[768px]:flex items-center space-x-2 px-3 py-2 bg-gray-100 rounded-full text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
                                 >
-                                    <Icon name="User" size={18} />
-                                    <span>Login / Cadastre-se</span>
+                                    <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                                        <Icon name="User" size={14} />
+                                    </div>
+                                    <div className="flex flex-col leading-tight">
+                                        <span className="text-xs">Entre ou</span>
+                                        <span className="text-xs">cadastre-se</span>
+                                    </div>
+                                </button>
+                                
+                                {/* Botão de login mobile/tablet (≤767px) */}
+                                <button
+                                    onClick={() => navigate('/auth')}
+                                    className="min-[768px]:hidden w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
+                                >
+                                    <Icon name="User" size={16} />
                                 </button>
                             </div>
                         )}
@@ -235,6 +257,15 @@ const ResponsiveHeader = ({ className = '' }) => {
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
                     <div className="md:hidden absolute top-16 left-0 right-0 bg-card border-b border-border shadow-lg max-h-96 overflow-y-auto">
+                        {/* Logo text no centro do menu mobile */}
+                        <div className="flex justify-center py-4 border-b border-border">
+                            <img 
+                                src="/path-to-your-logotext.png" 
+                                alt="FreshLink" 
+                                className="h-8"
+                            />
+                        </div>
+                        
                         <nav className="px-4 py-6 space-y-1">
                             <button
                                 onClick={() => {
@@ -279,7 +310,7 @@ const ResponsiveHeader = ({ className = '' }) => {
                                         className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
                                     >
                                         <Icon name="User" size={20} />
-                                        <span>Login / Cadastre-se</span>
+                                        <span>Entre ou cadastre-se</span>
                                     </button>
                                 </div>
                             )}
