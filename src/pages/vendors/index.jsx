@@ -347,6 +347,118 @@ const VendorsPage = () => {
         return stars;
     };
 
+    // Category Filter Component
+    const CategoryFilter = () => {
+        const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+
+        return (
+            <div className="relative">
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setShowCategoryDropdown(!showCategoryDropdown);
+                    }}
+                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
+                >
+                    <Icon name="Filter" size={16} className="text-primary" />
+                    <span className="hidden sm:inline">
+                        {categoryOptions.find(opt => opt.value === categoryFilter)?.label || 'Categoria'}
+                    </span>
+                    <Icon
+                        name="ChevronDown"
+                        size={16}
+                        className={`transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''
+                            }`}
+                    />
+                </button>
+
+                {showCategoryDropdown && (
+                    <>
+                        <div
+                            className="fixed inset-0 z-40"
+                            onClick={() => setShowCategoryDropdown(false)}
+                        />
+                        <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 min-w-64 animate-slide-down">
+                            <div className="max-h-60 overflow-y-auto">
+                                {categoryOptions.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        onClick={() => {
+                                            setCategoryFilter(option.value);
+                                            setShowCategoryDropdown(false);
+                                        }}
+                                        className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${categoryFilter === option.value
+                                            ? 'bg-primary/10 text-primary'
+                                            : 'text-foreground hover:bg-muted'
+                                            }`}
+                                    >
+                                        <span className="font-medium">{option.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+    };
+
+    // Sort Filter Component
+    const SortFilter = () => {
+        const [showSortDropdown, setShowSortDropdown] = useState(false);
+
+        return (
+            <div className="relative">
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSortDropdown(!showSortDropdown);
+                    }}
+                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
+                >
+                    <Icon name="ArrowUpDown" size={16} className="text-primary" />
+                    <span className="hidden sm:inline">
+                        {sortOptions.find(opt => opt.value === sortBy)?.label || 'Ordenar'}
+                    </span>
+                    <Icon
+                        name="ChevronDown"
+                        size={16}
+                        className={`transition-transform duration-200 ${showSortDropdown ? 'rotate-180' : ''
+                            }`}
+                    />
+                </button>
+
+                {showSortDropdown && (
+                    <>
+                        <div
+                            className="fixed inset-0 z-40"
+                            onClick={() => setShowSortDropdown(false)}
+                        />
+                        <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 min-w-64 animate-slide-down">
+                            <div className="max-h-60 overflow-y-auto">
+                                {sortOptions.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        onClick={() => {
+                                            setSortBy(option.value);
+                                            setShowSortDropdown(false);
+                                        }}
+                                        className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${sortBy === option.value
+                                            ? 'bg-primary/10 text-primary'
+                                            : 'text-foreground hover:bg-muted'
+                                            }`}
+                                    >
+                                        <span className="font-medium">{option.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+    };
+
     const VendorCard = ({ vendor, viewMode = 'grid' }) => {
         if (viewMode === 'list') {
             return (
@@ -445,104 +557,104 @@ const VendorsPage = () => {
         }
 
         return (
-        <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
-            {vendor.isSponsored && (
-                <div className="absolute top-3 left-3 z-10 bg-accent text-accent-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
-                    Patrocinado
-                </div>
-            )}
+            <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
+                {vendor.isSponsored && (
+                    <div className="absolute top-3 left-3 z-10 bg-accent text-accent-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
+                        Patrocinado
+                    </div>
+                )}
 
-            <div className="relative h-48 overflow-hidden">
-                <Image
-                    src={vendor.image}
-                    alt={vendor.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                <div className="absolute top-3 right-3 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-caption">
-                    {vendor.distance}km
+                <div className="relative h-48 overflow-hidden">
+                    <Image
+                        src={vendor.image}
+                        alt={vendor.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                    <div className="absolute top-3 right-3 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-caption">
+                        {vendor.distance}km
+                    </div>
                 </div>
-            </div>
 
-            <div className="p-4 flex-1 flex flex-col">
-                <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                        <h3 className="font-heading font-semibold text-lg text-foreground mb-1 line-clamp-1">
-                            {vendor.name}
-                        </h3>
-                        <div className="flex items-center space-x-1 mb-2">
-                            <Icon name="MapPin" size={14} className="text-muted-foreground" />
-                            <span className="text-sm font-caption text-muted-foreground">
-                                {vendor.location}
-                            </span>
+                <div className="p-4 flex-1 flex flex-col">
+                    <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                            <h3 className="font-heading font-semibold text-lg text-foreground mb-1 line-clamp-1">
+                                {vendor.name}
+                            </h3>
+                            <div className="flex items-center space-x-1 mb-2">
+                                <Icon name="MapPin" size={14} className="text-muted-foreground" />
+                                <span className="text-sm font-caption text-muted-foreground">
+                                    {vendor.location}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="flex items-center space-x-2 mb-3">
-                    <div className="flex items-center space-x-1">
-                        {renderStars(vendor.rating)}
+                    <div className="flex items-center space-x-2 mb-3">
+                        <div className="flex items-center space-x-1">
+                            {renderStars(vendor.rating)}
+                        </div>
+                        <span className="text-sm font-body font-medium text-foreground">
+                            {vendor.rating.toFixed(1)}
+                        </span>
+                        <span className="text-sm font-caption text-muted-foreground">
+                            ({vendor.reviewCount})
+                        </span>
                     </div>
-                    <span className="text-sm font-body font-medium text-foreground">
-                        {vendor.rating.toFixed(1)}
-                    </span>
-                    <span className="text-sm font-caption text-muted-foreground">
-                        ({vendor.reviewCount})
-                    </span>
-                </div>
 
-                <div className="flex flex-wrap gap-1 mb-4">
-                    {vendor.categories.slice(0, 3).map((category, index) => (
-                        <span
-                            key={index}
-                            className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full"
+                    <div className="flex flex-wrap gap-1 mb-4">
+                        {vendor.categories.slice(0, 3).map((category, index) => (
+                            <span
+                                key={index}
+                                className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full"
+                            >
+                                {category}
+                            </span>
+                        ))}
+                        {vendor.categories.length > 3 && (
+                            <span className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full">
+                                +{vendor.categories.length - 3}
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="flex items-center space-x-2 mb-4">
+                        <Icon
+                            name="Clock"
+                            size={14}
+                            className={vendor.isOpen ? 'text-success' : 'text-error'}
+                        />
+                        <span className={`text-sm font-caption ${vendor.isOpen ? 'text-success' : 'text-error'}`}>
+                            {vendor.isOpen ? 'Aberto agora' : 'Fechado'}
+                        </span>
+                        <span className="text-sm font-caption text-muted-foreground">
+                            • {vendor.hours}
+                        </span>
+                    </div>
+
+                    {/* Botões corrigidos */}
+                    <div className="flex gap-2 mt-auto">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate('/vendor-profile-products', { state: { vendorId: vendor.id } })}
+                            className="flex-1 text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30 text-sm px-3 py-5"
                         >
-                            {category}
-                        </span>
-                    ))}
-                    {vendor.categories.length > 3 && (
-                        <span className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full">
-                            +{vendor.categories.length - 3}
-                        </span>
-                    )}
-                </div>
-
-                <div className="flex items-center space-x-2 mb-4">
-                    <Icon
-                        name="Clock"
-                        size={14}
-                        className={vendor.isOpen ? 'text-success' : 'text-error'}
-                    />
-                    <span className={`text-sm font-caption ${vendor.isOpen ? 'text-success' : 'text-error'}`}>
-                        {vendor.isOpen ? 'Aberto agora' : 'Fechado'}
-                    </span>
-                    <span className="text-sm font-caption text-muted-foreground">
-                        • {vendor.hours}
-                    </span>
-                </div>
-
-                {/* Botões corrigidos */}
-                <div className="flex gap-2 mt-auto">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate('/vendor-profile-products', { state: { vendorId: vendor.id } })}
-                        className="flex-1 text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30 text-sm px-3 py-5"
-                    >
-                        Ver Produtos
-                    </Button>
-                    <Button
-                        variant="default"
-                        size="sm"
-                        iconName="MessageCircle"
-                        onClick={() => handleWhatsAppContact(vendor)}
-                        className="flex-1 bg-success hover:bg-success/90 text-sm px-3 py-5"
-                    >
-                        WhatsApp
-                    </Button>
+                            Ver Produtos
+                        </Button>
+                        <Button
+                            variant="default"
+                            size="sm"
+                            iconName="MessageCircle"
+                            onClick={() => handleWhatsAppContact(vendor)}
+                            className="flex-1 bg-success hover:bg-success/90 text-sm px-3 py-5"
+                        >
+                            WhatsApp
+                        </Button>
+                    </div>
                 </div>
             </div>
-        </div>
         );
     };
 
@@ -564,7 +676,6 @@ const VendorsPage = () => {
                 </div>
                 <div className="h-3 bg-muted rounded w-2/3" />
                 <div className="flex space-x-2">
-                    <div className="h-8 bg-muted rounded flex-1" />
                     <div className="h-8 bg-muted rounded flex-1" />
                 </div>
             </div>
@@ -666,122 +777,6 @@ const VendorsPage = () => {
                     )}
                 </div>
             </main>
-
-    // Category Filter Component
-    const CategoryFilter = () => {
-        const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-        
-        return (
-            <div className="relative">
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setShowCategoryDropdown(!showCategoryDropdown);
-                    }}
-                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
-                >
-                    <Icon name="Filter" size={16} className="text-primary" />
-                    <span className="hidden sm:inline">
-                        {categoryOptions.find(opt => opt.value === categoryFilter)?.label || 'Categoria'}
-                    </span>
-                    <Icon 
-                        name="ChevronDown" 
-                        size={16} 
-                        className={`transition-transform duration-200 ${
-                            showCategoryDropdown ? 'rotate-180' : ''
-                        }`} 
-                    />
-                </button>
-                
-                {showCategoryDropdown && (
-                    <>
-                        <div 
-                            className="fixed inset-0 z-40"
-                            onClick={() => setShowCategoryDropdown(false)}
-                        />
-                        <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 min-w-64 animate-slide-down">
-                            <div className="max-h-60 overflow-y-auto">
-                                {categoryOptions.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        onClick={() => {
-                                            setCategoryFilter(option.value);
-                                            setShowCategoryDropdown(false);
-                                        }}
-                                        className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${
-                                            categoryFilter === option.value
-                                                ? 'bg-primary/10 text-primary'
-                                                : 'text-foreground hover:bg-muted'
-                                        }`}
-                                    >
-                                        <span className="font-medium">{option.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
-        );
-    };
-
-    // Sort Filter Component
-    const SortFilter = () => {
-        const [showSortDropdown, setShowSortDropdown] = useState(false);
-        
-        return (
-            <div className="relative">
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setShowSortDropdown(!showSortDropdown);
-                    }}
-                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
-                >
-                    <Icon name="ArrowUpDown" size={16} className="text-primary" />
-                    <span className="hidden sm:inline">
-                        {sortOptions.find(opt => opt.value === sortBy)?.label || 'Ordenar'}
-                    </span>
-                    <Icon 
-                        name="ChevronDown" 
-                        size={16} 
-                        className={`transition-transform duration-200 ${
-                            showSortDropdown ? 'rotate-180' : ''
-                        }`} 
-                    />
-                </button>
-                
-                {showSortDropdown && (
-                    <>
-                        <div 
-                            className="fixed inset-0 z-40"
-                            onClick={() => setShowSortDropdown(false)}
-                        />
-                        <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 min-w-64 animate-slide-down">
-                            <div className="max-h-60 overflow-y-auto">
-                                {sortOptions.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        onClick={() => {
-                                            setSortBy(option.value);
-                                            setShowSortDropdown(false);
-                                        }}
-                                        className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${
-                                            sortBy === option.value
-                                                ? 'bg-primary/10 text-primary'
-                                                : 'text-foreground hover:bg-muted'
-                                        }`}
-                                    >
-                                        <span className="font-medium">{option.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
-        );
-    };
 
             {/* Footer */}
             <Footer />
