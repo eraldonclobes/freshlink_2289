@@ -373,7 +373,120 @@ const ProductsPage = () => {
     });
 
     // ProductCard component using FeaturedProducts styling
-    const ProductCard = ({ product }) => (
+    const ProductCard = ({ product, viewMode = 'grid' }) => {
+        if (viewMode === 'list') {
+            return (
+                <div
+                    className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                    onClick={() => handleProductClick(product)}
+                >
+                    <div className="flex">
+                        {/* Image */}
+                        <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
+                            <Image
+                                src={product?.image}
+                                alt={product?.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            
+                            {/* Discount Badge */}
+                            {product?.discount && (
+                                <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
+                                    -{product?.discount}%
+                                </div>
+                            )}
+
+                            {/* Availability Status */}
+                            {!product?.available && (
+                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                    <span className="text-white font-body font-medium text-xs">
+                                        Indisponível
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 className="font-heading font-semibold text-lg text-foreground mb-1 line-clamp-1">
+                                    {product?.name}
+                                </h3>
+                                <div className="flex items-center space-x-1 mb-2">
+                                    <Icon name="Store" size={14} className="text-muted-foreground" />
+                                    <button
+                                        onClick={(e) => handleVendorClick(product, e)}
+                                        className="text-sm text-primary hover:text-primary/80 hover:underline transition-colors duration-200"
+                                    >
+                                        {product?.vendor}
+                                    </button>
+                                </div>
+
+                                {/* Categories */}
+                                <div className="flex flex-wrap gap-1 mb-3">
+                                    {product?.categories?.slice(0, 2)?.map((category, index) => (
+                                        <span
+                                            key={index}
+                                            className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full"
+                                        >
+                                            {category}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                {/* Price */}
+                                <div className="flex items-center space-x-2">
+                                    <div className="flex items-baseline space-x-1">
+                                        <span className="text-xl font-heading font-bold text-foreground">
+                                            {formatPrice(product?.price)}
+                                        </span>
+                                        <span className="text-sm font-caption text-muted-foreground">
+                                            /{product?.unit}
+                                        </span>
+                                    </div>
+                                    {product?.originalPrice && (
+                                        <span className="text-sm font-caption text-muted-foreground line-through">
+                                            {formatPrice(product?.originalPrice)}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex items-center space-x-2">
+                                    <button
+                                        onClick={(e) => handleFavoriteToggle(product?.id, e)}
+                                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${favoriteProducts.includes(product?.id)
+                                            ? 'bg-error text-white'
+                                            : 'bg-muted text-muted-foreground hover:text-error hover:bg-error/10'
+                                            }`}
+                                    >
+                                        <Icon
+                                            name="Heart"
+                                            size={16}
+                                            className={favoriteProducts.includes(product?.id) ? 'fill-current' : ''}
+                                        />
+                                    </button>
+                                    <Button
+                                        variant="default"
+                                        size="sm"
+                                        iconName="MessageCircle"
+                                        onClick={(e) => handleProductInquiry(product, e)}
+                                        disabled={!product?.available}
+                                        className="bg-success hover:bg-success/90"
+                                    >
+                                        {product?.available ? 'Perguntar' : 'Indisponível'}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
         <div
             className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer flex flex-col h-full"
             onClick={() => handleProductClick(product)}
@@ -489,7 +602,8 @@ const ProductsPage = () => {
                 </div>
             </div>
         </div>
-    );
+        );
+    };
 
     const LoadingSkeleton = () => (
         <div className="bg-card border border-border rounded-lg overflow-hidden animate-pulse">
