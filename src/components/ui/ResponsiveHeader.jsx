@@ -92,41 +92,25 @@ const ResponsiveHeader = ({ className = '' }) => {
                     </button>
 
                     {/* Logo */}
-                    <div className="flex-1 md:flex-none">
+                    <div className="flex-1 flex justify-center min-[768px]:justify-start min-[768px]:flex-none">
                         <button
                             onClick={handleLogoClick}
                             className="hover:opacity-80 transition-opacity duration-200"
                         >
-                            {/* Logo para desktop/tablet (>767px) */}
+                            {/* Logo para desktop (>767px) - esquerda */}
                             <img 
                                 src="/path-to-your-logotext.png" 
                                 alt="FreshLink" 
                                 className="hidden min-[768px]:block h-8"
                             />
-                            {/* Logo para mobile (≤767px) - só quando menu fechado */}
+                            {/* Logo para mobile (≤767px) - centro */}
                             <img 
-                                src="/path-to-your-logoicon.png" 
+                                src="/path-to-your-logotext.png" 
                                 alt="FreshLink" 
-                                className="block min-[768px]:hidden h-8 w-8"
+                                className="block min-[768px]:hidden h-8"
                             />
                         </button>
                     </div>
-
-                    {/* Logo central para mobile quando menu está aberto */}
-                    {isMobileMenuOpen && (
-                        <div className="absolute left-1/2 transform -translate-x-1/2 md:hidden">
-                            <button
-                                onClick={handleLogoClick}
-                                className="hover:opacity-80 transition-opacity duration-200"
-                            >
-                                <img 
-                                    src="/path-to-your-logotext.png" 
-                                    alt="FreshLink" 
-                                    className="h-8"
-                                />
-                            </button>
-                        </div>
-                    )}
 
                     {/* Navigation Links - Desktop */}
                     <nav className="hidden md:flex items-center space-x-1 flex-1 justify-center">
@@ -247,28 +231,28 @@ const ResponsiveHeader = ({ className = '' }) => {
                         ) : (
                             <div className="flex items-center">
                                 {/* Botão de login desktop (>767px) */}
-                                <div className="hidden min-[768px]:flex items-center space-x-3">
+                                <div className="hidden min-[768px]:flex items-center space-x-2">
                                     <button
                                         onClick={() => navigate('/auth')}
-                                        className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-300 transition-colors duration-200"
+                                        className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-300 transition-colors duration-200"
                                     >
-                                        <Icon name="User" size={20} />
+                                        <Icon name="User" size={16} />
                                     </button>
                                     <button
                                         onClick={() => navigate('/auth')}
                                         className="flex flex-col leading-tight text-gray-700 hover:text-gray-900 transition-colors duration-200"
                                     >
-                                        <span className="text-sm font-medium">Entre ou</span>
-                                        <span className="text-sm font-medium">cadastre-se</span>
+                                        <span className="text-xs font-medium">Entre ou</span>
+                                        <span className="text-xs font-medium">cadastre-se</span>
                                     </button>
                                 </div>
                                 
                                 {/* Botão de login mobile/tablet (≤767px) */}
                                 <button
                                     onClick={() => navigate('/auth')}
-                                    className="min-[768px]:hidden w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-300 transition-colors duration-200"
+                                    className="min-[768px]:hidden w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-300 transition-colors duration-200"
                                 >
-                                    <Icon name="User" size={20} />
+                                    <Icon name="User" size={16} />
                                 </button>
                             </div>
                         )}
