@@ -24,6 +24,7 @@ const ProductsPage = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showProductModal, setShowProductModal] = useState(false);
     const [categoryFilter, setCategoryFilter] = useState('');
+    const [viewMode, setViewMode] = useState('grid');
 
     const PRODUCTS_PER_PAGE = 12;
 
@@ -536,11 +537,11 @@ const ProductsPage = () => {
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-muted/50">
+                <div className="bg-muted/50 border-b border-border">
                     <div className="container mx-auto px-4 py-4">
-                        <div className="flex items-center space-x-3 flex-wrap gap-3">
+                        <div className="flex items-center justify-between gap-4">
                             {/* Search Bar */}
-                            <div className="flex-1">
+                            <div className="flex-1 max-w-md">
                                 <SearchBar
                                     onSearch={handleSearch}
                                     onSuggestionClick={handleSuggestionClick}
@@ -549,42 +550,87 @@ const ProductsPage = () => {
                                 />
                             </div>
 
-                            {/* Category Filter */}
-                            <div className="relative">
-                                <select
-                                    value={categoryFilter}
-                                    onChange={(e) => setCategoryFilter(e.target.value)}
-                                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap appearance-none pr-8"
-                                >
-                                    {categoryOptions.map(option => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <Icon name="ChevronDown" size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                            </div>
+                            {/* Filters and Actions */}
+                            <div className="flex items-center space-x-3">
+                                {/* Category Filter */}
+                                <div className="relative">
+                                    <button
+                                        className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
+                                    >
+                                        <Icon name="Filter" size={16} className="text-primary" />
+                                        <span className="hidden sm:inline">
+                                            {categoryOptions.find(opt => opt.value === categoryFilter)?.label || 'Categoria'}
+                                        </span>
+                                        <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
+                                    </button>
+                                    <select
+                                        value={categoryFilter}
+                                        onChange={(e) => setCategoryFilter(e.target.value)}
+                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                    >
+                                        {categoryOptions.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            {/* Sort Filter */}
-                            <div className="relative">
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap appearance-none pr-8"
-                                >
-                                    {sortOptions.map(option => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <Icon name="ChevronDown" size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                            </div>
+                                {/* Sort Filter */}
+                                <div className="relative">
+                                    <button
+                                        className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
+                                    >
+                                        <Icon name="ArrowUpDown" size={16} className="text-primary" />
+                                        <span className="hidden sm:inline">
+                                            {sortOptions.find(opt => opt.value === sortBy)?.label || 'Ordenar'}
+                                        </span>
+                                        <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
+                                    </button>
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value)}
+                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                    >
+                                        {sortOptions.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            <LocationSelector
-                                currentLocation={currentLocation}
-                                onLocationChange={handleLocationChange}
-                            />
+                                {/* View Mode Toggle */}
+                                <div className="flex items-center bg-muted border border-border rounded-lg p-1">
+                                    <button
+                                        onClick={() => setViewMode('grid')}
+                                        className={`p-2 rounded-md transition-colors duration-200 ${
+                                            viewMode === 'grid' 
+                                                ? 'bg-card text-foreground shadow-sm' 
+                                                : 'text-muted-foreground hover:text-foreground'
+                                        }`}
+                                        title="Visualização em grade"
+                                    >
+                                        <Icon name="Grid3X3" size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode('list')}
+                                        className={`p-2 rounded-md transition-colors duration-200 ${
+                                            viewMode === 'list' 
+                                                ? 'bg-card text-foreground shadow-sm' 
+                                                : 'text-muted-foreground hover:text-foreground'
+                                        }`}
+                                        title="Visualização em lista"
+                                    >
+                                        <Icon name="List" size={16} />
+                                    </button>
+                                </div>
+
+                                <LocationSelector
+                                    currentLocation={currentLocation}
+                                    onLocationChange={handleLocationChange}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -611,11 +657,16 @@ const ProductsPage = () => {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <div className={
+                                viewMode === 'grid' 
+                                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                                    : "space-y-4"
+                            }>
                                 {sortedProducts.map((product) => (
                                     <ProductCard
                                         key={product.id}
                                         product={product}
+                                        viewMode={viewMode}
                                     />
                                 ))}
                             </div>

@@ -114,7 +114,6 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
         };
 
         // Pass the product with vendor data to parent component
-        // You'll need to pass onProductClick as a prop to this component
         if (typeof onProductClick === 'function') {
             onProductClick({ ...product, vendor: mockVendor });
         }

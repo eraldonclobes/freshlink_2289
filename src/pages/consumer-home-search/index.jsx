@@ -348,7 +348,7 @@ const ConsumerHomeSearch = () => {
                 </div>
 
                 {/* Featured Products */}
-                <FeaturedProducts className="mb-8" />
+                <FeaturedProducts className="mb-8" onProductClick={handleProductClick} />
 
                 {/* Location Selector */}
                 <div className="flex items-center justify-between mb-6">
