@@ -70,6 +70,15 @@ const ResponsiveHeader = ({ className = '' }) => {
         return userAuth?.name || userAuth?.businessName || 'Usuário';
     };
 
+    const getNavLinkClass = (path) => {
+        const isActive = location.pathname === path;
+        return `flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-body font-medium transition-all duration-200 ${
+            isActive
+                ? 'text-primary bg-muted shadow-sm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+        }`;
+    };
+
     return (
         <header className={`bg-card border-b border-border fixed top-0 left-0 right-0 z-50 ${className}`}>
             <div className="container mx-auto px-4">
@@ -93,21 +102,42 @@ const ResponsiveHeader = ({ className = '' }) => {
                         <span className="font-heading font-bold text-xl text-foreground">FreshLink</span>
                     </button>
 
-                    {/* Search Bar - Desktop */}
-                    <div className="hidden md:flex flex-1 max-w-md mx-8">
-                        <div className="w-full relative">
-                            <Icon
-                                name="Search"
-                                size={18}
-                                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                            />
-                            <input
-                                type="text"
-                                placeholder="Buscar produtos ou vendedores..."
-                                className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                            />
-                        </div>
-                    </div>
+                    {/* Navigation Links - Desktop */}
+                    <nav className="hidden md:flex items-center space-x-2 flex-1 justify-center max-w-2xl">
+                        <button
+                            onClick={() => navigate('/consumer-home-search')}
+                            className={getNavLinkClass('/consumer-home-search')}
+                        >
+                            <Icon name="Home" size={18} />
+                            <span>Início</span>
+                        </button>
+
+                        <button
+                            onClick={() => navigate('/products')}
+                            className={getNavLinkClass('/products')}
+                        >
+                            <Icon name="Package" size={18} />
+                            <span>Produtos</span>
+                        </button>
+
+                        <button
+                            onClick={() => navigate('/vendors')}
+                            className={getNavLinkClass('/vendors')}
+                        >
+                            <Icon name="Store" size={18} />
+                            <span>Vendedores</span>
+                        </button>
+
+                        {userAuth?.type === 'vendor' && (
+                            <button
+                                onClick={() => navigate('/vendor-dashboard')}
+                                className={getNavLinkClass('/vendor-dashboard')}
+                            >
+                                <Icon name="BarChart3" size={18} />
+                                <span>Dashboard</span>
+                            </button>
+                        )}
+                    </nav>
 
                     {/* User Profile or Auth Buttons */}
                     <div className="flex items-center space-x-4">
@@ -200,22 +230,6 @@ const ResponsiveHeader = ({ className = '' }) => {
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
                     <div className="md:hidden absolute top-16 left-0 right-0 bg-card border-b border-border shadow-lg animate-slide-down max-h-96 overflow-y-auto">
-                        {/* Mobile Search Bar */}
-                        <div className="px-4 py-4 border-b border-border">
-                            <div className="relative">
-                                <Icon
-                                    name="Search"
-                                    size={18}
-                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                                />
-                                <input
-                                    type="text"
-                                    placeholder="Buscar produtos ou vendedores..."
-                                    className="w-full pl-10 pr-4 py-3 bg-muted border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                                />
-                            </div>
-                        </div>
-
                         <nav className="px-4 py-4 space-y-2">
                             <button
                                 onClick={() => {
@@ -224,8 +238,8 @@ const ResponsiveHeader = ({ className = '' }) => {
                                 }}
                                 className="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
                             >
-                                <Icon name="Search" size={20} />
-                                <span>Buscar Produtos</span>
+                                <Icon name="Home" size={20} />
+                                <span>Início</span>
                             </button>
 
                             <button
@@ -300,97 +314,8 @@ const ResponsiveHeader = ({ className = '' }) => {
                                 </div>
                             )}
                         </nav>
-
-                        {/* Bottom Navigation Links - Mobile */}
-                        <div className="px-4 py-4 border-t border-border bg-muted/30">
-                            <div className="grid grid-cols-3 gap-2">
-                                <button
-                                    onClick={() => {
-                                        navigate('/consumer-home-search');
-                                        setIsMobileMenuOpen(false);
-                                    }}
-                                    className="flex flex-col items-center space-y-1 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
-                                >
-                                    <Icon name="Home" size={20} />
-                                    <span className="text-xs font-caption">Início</span>
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        navigate('/products');
-                                        setIsMobileMenuOpen(false);
-                                    }}
-                                    className="flex flex-col items-center space-y-1 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
-                                >
-                                    <Icon name="Package" size={20} />
-                                    <span className="text-xs font-caption">Produtos</span>
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        navigate('/vendors');
-                                        setIsMobileMenuOpen(false);
-                                    }}
-                                    className="flex flex-col items-center space-y-1 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
-                                >
-                                    <Icon name="Store" size={20} />
-                                    <span className="text-xs font-caption">Vendedores</span>
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 )}
-
-                {/* Desktop Bottom Navigation */}
-                <div className="hidden md:block border-t border-border bg-card">
-                    <div className="container mx-auto px-4">
-                        <div className="flex items-center justify-center space-x-8 py-3">
-                            <button
-                                onClick={() => navigate('/consumer-home-search')}
-                                className={`flex items-center space-x-2 text-sm font-body font-medium transition-colors duration-200 ${location.pathname === '/consumer-home-search'
-                                        ? 'text-primary'
-                                        : 'text-muted-foreground hover:text-foreground'
-                                    }`}
-                            >
-                                <Icon name="Home" size={16} />
-                                <span>Início</span>
-                            </button>
-
-                            <button
-                                onClick={() => navigate('/products')}
-                                className={`flex items-center space-x-2 text-sm font-body font-medium transition-colors duration-200 ${location.pathname === '/products'
-                                        ? 'text-primary'
-                                        : 'text-muted-foreground hover:text-foreground'
-                                    }`}
-                            >
-                                <Icon name="Package" size={16} />
-                                <span>Produtos</span>
-                            </button>
-
-                            <button
-                                onClick={() => navigate('/vendors')}
-                                className={`flex items-center space-x-2 text-sm font-body font-medium transition-colors duration-200 ${location.pathname === '/vendors'
-                                        ? 'text-primary'
-                                        : 'text-muted-foreground hover:text-foreground'
-                                    }`}
-                            >
-                                <Icon name="Store" size={16} />
-                                <span>Vendedores</span>
-                            </button>
-
-                            {userAuth?.type === 'vendor' && (
-                                <button
-                                    onClick={() => navigate('/vendor-dashboard')}
-                                    className={`flex items-center space-x-2 text-sm font-body font-medium transition-colors duration-200 ${location.pathname === '/vendor-dashboard'
-                                            ? 'text-primary'
-                                            : 'text-muted-foreground hover:text-foreground'
-                                        }`}
-                                >
-                                    <Icon name="BarChart3" size={16} />
-                                    <span>Dashboard</span>
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
             </div>
         </header>
     );
