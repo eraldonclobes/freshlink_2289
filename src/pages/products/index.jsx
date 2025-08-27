@@ -688,4 +688,68 @@ const ProductsPage = () => {
                 <div className="container mx-auto px-4 py-8">
                     {loading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {[...
+                            {[...Array(8)].map((_, index) => (
+                                <LoadingSkeleton key={index} />
+                            ))}
+                        </div>
+                    ) : displayedProducts.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-16">
+                            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
+                                <Icon name="Package" className="w-12 h-12 text-muted-foreground" />
+                            </div>
+                            <h3 className="font-heading font-semibold text-lg text-foreground mb-2">
+                                Nenhum produto encontrado
+                            </h3>
+                            <p className="text-sm font-body text-muted-foreground text-center max-w-md">
+                                Tente ajustar os filtros ou expandir o raio de busca
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {sortedProducts.map((product) => (
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Load More Button */}
+                            {hasMoreToShow && (
+                                <div className="text-center mt-12">
+                                    <Button
+                                        onClick={loadMoreProducts}
+                                        loading={loadingMore}
+                                        variant="outline"
+                                        size="lg"
+                                        iconName="Plus"
+                                        iconPosition="left"
+                                    >
+                                        Carregar mais produtos
+                                    </Button>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            </main>
+
+            {/* Product Modal */}
+            <ProductModal
+                product={selectedProduct}
+                vendor={selectedProduct?.vendor}
+                isOpen={showProductModal}
+                onClose={() => {
+                    setShowProductModal(false);
+                    setSelectedProduct(null);
+                }}
+            />
+
+            {/* Footer */}
+            <Footer />
+        </div>
+    );
+};
+
+export default ProductsPage;
