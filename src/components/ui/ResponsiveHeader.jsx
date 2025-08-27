@@ -72,7 +72,7 @@ const ResponsiveHeader = ({ className = '' }) => {
 
     const getNavLinkClass = (path) => {
         const isActive = location.pathname === path;
-        return `flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-body transition-all duration-200 transform hover:scale-[1.01] ${
+        return `flex items-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-body transition-colors duration-200 ${
             isActive
                 ? 'text-foreground bg-muted shadow-sm font-semibold'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/60 font-medium'
@@ -103,7 +103,7 @@ const ResponsiveHeader = ({ className = '' }) => {
                     </button>
 
                     {/* Navigation Links - Desktop */}
-                    <nav className="hidden md:flex items-center space-x-1 flex-1 justify-center max-w-2xl">
+                    <nav className="hidden md:flex items-center space-x-1 flex-1 justify-center">
                         <button
                             onClick={() => navigate('/consumer-home-search')}
                             className={getNavLinkClass('/consumer-home-search')}
@@ -129,8 +129,8 @@ const ResponsiveHeader = ({ className = '' }) => {
                         </button>
                     </nav>
 
-                    {/* User Profile or Auth Buttons */}
-                    <div className="flex items-center space-x-4">
+                    {/* User Profile or Login Button */}
+                    <div className="flex items-center">
                         {userAuth ? (
                             <div className="relative" ref={dropdownRef}>
                                 <button
@@ -219,18 +219,13 @@ const ResponsiveHeader = ({ className = '' }) => {
                                 )}
                             </div>
                         ) : (
-                            <div className="hidden lg:flex items-center space-x-3">
+                            <div className="hidden lg:flex items-center">
                                 <button
                                     onClick={() => navigate('/auth')}
-                                    className="text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
                                 >
-                                    Entrar
-                                </button>
-                                <button
-                                    onClick={() => navigate('/auth?tab=register')}
-                                    className="px-4 py-2.5 bg-primary text-primary-foreground text-sm font-body font-semibold rounded-lg hover:bg-primary/90 transition-colors duration-200"
-                                >
-                                    Cadastrar-se
+                                    <Icon name="User" size={18} />
+                                    <span>Login / Cadastre-se</span>
                                 </button>
                             </div>
                         )}
@@ -275,7 +270,7 @@ const ResponsiveHeader = ({ className = '' }) => {
                             </button>
 
                             {!userAuth && (
-                                <div className="pt-6 border-t border-border space-y-3">
+                                <div className="pt-6 border-t border-border">
                                     <button
                                         onClick={() => {
                                             navigate('/auth');
@@ -283,18 +278,8 @@ const ResponsiveHeader = ({ className = '' }) => {
                                         }}
                                         className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
                                     >
-                                        <Icon name="LogIn" size={20} />
-                                        <span>Entrar</span>
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            navigate('/auth?tab=register');
-                                            setIsMobileMenuOpen(false);
-                                        }}
-                                        className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-lg text-sm font-body font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors duration-200"
-                                    >
-                                        <Icon name="UserPlus" size={20} />
-                                        <span>Cadastrar-se</span>
+                                        <Icon name="User" size={20} />
+                                        <span>Login / Cadastre-se</span>
                                     </button>
                                 </div>
                             )}
