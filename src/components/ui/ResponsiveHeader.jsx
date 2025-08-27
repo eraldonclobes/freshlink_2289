@@ -92,23 +92,41 @@ const ResponsiveHeader = ({ className = '' }) => {
                     </button>
 
                     {/* Logo */}
-                    <button
-                        onClick={handleLogoClick}
-                        className="hover:opacity-80 transition-opacity duration-200"
-                    >
-                        {/* Logo para desktop (>767px) */}
-                        <img 
-                            src="/path-to-your-logotext.png" 
-                            alt="FreshLink" 
-                            className="hidden min-[768px]:block h-8"
-                        />
-                        {/* Logo para tablet/mobile (≤767px) quando menu está fechado */}
-                        <img 
-                            src="/path-to-your-logoicon.png" 
-                            alt="FreshLink" 
-                            className="block min-[768px]:hidden md:hidden h-8 w-8"
-                        />
-                    </button>
+                    <div className="flex-1 md:flex-none">
+                        <button
+                            onClick={handleLogoClick}
+                            className="hover:opacity-80 transition-opacity duration-200"
+                        >
+                            {/* Logo para desktop/tablet (>767px) */}
+                            <img 
+                                src="/path-to-your-logotext.png" 
+                                alt="FreshLink" 
+                                className="hidden min-[768px]:block h-8"
+                            />
+                            {/* Logo para mobile (≤767px) - só quando menu fechado */}
+                            <img 
+                                src="/path-to-your-logoicon.png" 
+                                alt="FreshLink" 
+                                className="block min-[768px]:hidden h-8 w-8"
+                            />
+                        </button>
+                    </div>
+
+                    {/* Logo central para mobile quando menu está aberto */}
+                    {isMobileMenuOpen && (
+                        <div className="absolute left-1/2 transform -translate-x-1/2 md:hidden">
+                            <button
+                                onClick={handleLogoClick}
+                                className="hover:opacity-80 transition-opacity duration-200"
+                            >
+                                <img 
+                                    src="/path-to-your-logotext.png" 
+                                    alt="FreshLink" 
+                                    className="h-8"
+                                />
+                            </button>
+                        </div>
+                    )}
 
                     {/* Navigation Links - Desktop */}
                     <nav className="hidden md:flex items-center space-x-1 flex-1 justify-center">
@@ -229,25 +247,28 @@ const ResponsiveHeader = ({ className = '' }) => {
                         ) : (
                             <div className="flex items-center">
                                 {/* Botão de login desktop (>767px) */}
-                                <button
-                                    onClick={() => navigate('/auth')}
-                                    className="hidden min-[768px]:flex items-center space-x-2 px-3 py-2 bg-gray-100 rounded-full text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
-                                >
-                                    <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-                                        <Icon name="User" size={14} />
-                                    </div>
-                                    <div className="flex flex-col leading-tight">
-                                        <span className="text-xs">Entre ou</span>
-                                        <span className="text-xs">cadastre-se</span>
-                                    </div>
-                                </button>
+                                <div className="hidden min-[768px]:flex items-center space-x-3">
+                                    <button
+                                        onClick={() => navigate('/auth')}
+                                        className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-300 transition-colors duration-200"
+                                    >
+                                        <Icon name="User" size={20} />
+                                    </button>
+                                    <button
+                                        onClick={() => navigate('/auth')}
+                                        className="flex flex-col leading-tight text-gray-700 hover:text-gray-900 transition-colors duration-200"
+                                    >
+                                        <span className="text-sm font-medium">Entre ou</span>
+                                        <span className="text-sm font-medium">cadastre-se</span>
+                                    </button>
+                                </div>
                                 
                                 {/* Botão de login mobile/tablet (≤767px) */}
                                 <button
                                     onClick={() => navigate('/auth')}
-                                    className="min-[768px]:hidden w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
+                                    className="min-[768px]:hidden w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-300 transition-colors duration-200"
                                 >
-                                    <Icon name="User" size={16} />
+                                    <Icon name="User" size={20} />
                                 </button>
                             </div>
                         )}
@@ -257,15 +278,6 @@ const ResponsiveHeader = ({ className = '' }) => {
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
                     <div className="md:hidden absolute top-16 left-0 right-0 bg-card border-b border-border shadow-lg max-h-96 overflow-y-auto">
-                        {/* Logo text no centro do menu mobile */}
-                        <div className="flex justify-center py-4 border-b border-border">
-                            <img 
-                                src="/path-to-your-logotext.png" 
-                                alt="FreshLink" 
-                                className="h-8"
-                            />
-                        </div>
-                        
                         <nav className="px-4 py-6 space-y-1">
                             <button
                                 onClick={() => {
