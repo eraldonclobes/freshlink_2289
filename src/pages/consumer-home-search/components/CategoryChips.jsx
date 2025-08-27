@@ -22,7 +22,7 @@ const CategoryChips = ({ className = '' }) => {
 
     return (
         <div className={`${className}`}>
-            <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-4">
                 {categories?.map((category) => (
                     <button
                         key={category?.id}

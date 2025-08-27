@@ -1,155 +1,150 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 
-const FeaturedProducts = ({ className = '' }) => {
+const FeaturedProducts = ({ className = '', onProductClick }) => {
     const navigate = useNavigate();
-    const [currentPage, setCurrentPage] = useState(0);
+    const [featuredProducts, setFeaturedProducts] = useState([]);
+    const [favoriteProducts, setFavoriteProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const featuredProducts = [
+    // Mock featured products data
+    const mockFeaturedProducts = [
         {
             id: 1,
-            name: "Tomates Orgânicos Premium",
-            vendor: "Fazenda Verde",
+            name: "Tomate Orgânico",
+            vendor: "Fazenda Verde Orgânicos",
             price: 8.50,
             unit: "kg",
             image: "https://images.unsplash.com/photo-1546470427-e5ac89c8ba37?w=300&h=300&fit=crop",
+            distance: 0.8,
             rating: 4.8,
+            reviewCount: 45,
             available: true,
             isOrganic: true,
             vendorId: 1,
-            isFeatured: true
+            discount: 15,
+            originalPrice: 10.00,
+            description: "Tomates frescos cultivados sem agrotóxicos, direto da nossa horta familiar.",
+            categories: ["Orgânicos", "Verduras", "Legumes"]
         },
         {
             id: 2,
-            name: "Alface Americana Hidropônica",
+            name: "Banana Prata",
+            vendor: "Sítio das Frutas",
+            price: 6.90,
+            unit: "kg",
+            image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=300&h=300&fit=crop",
+            distance: 2.1,
+            rating: 4.9,
+            reviewCount: 78,
+            available: true,
+            isOrganic: false,
+            vendorId: 3,
+            discount: 10,
+            originalPrice: 7.67,
+            description: "Bananas doces e maduras, ricas em potássio.",
+            categories: ["Frutas", "Natural"]
+        },
+        {
+            id: 3,
+            name: "Alface Hidropônica",
             vendor: "Hortifruti do João",
             price: 3.20,
             unit: "unidade",
             image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=300&fit=crop",
+            distance: 1.2,
             rating: 4.6,
+            reviewCount: 32,
             available: true,
             isOrganic: false,
             vendorId: 2,
-            isFeatured: true
-        },
-        {
-            id: 3,
-            name: "Cenouras Baby Orgânicas",
-            vendor: "Sítio das Frutas",
-            price: 6.80,
-            unit: "kg",
-            image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=300&h=300&fit=crop",
-            rating: 4.9,
-            available: true,
-            isOrganic: true,
-            vendorId: 3,
-            isFeatured: true
+            discount: null,
+            originalPrice: null,
+            description: "Alface fresca cultivada em sistema hidropônico, crocante e saborosa.",
+            categories: ["Verduras", "Hidropônico"]
         },
         {
             id: 4,
-            name: "Banana Prata Doce",
-            vendor: "Fazenda São José",
-            price: 6.90,
+            name: "Cenoura Orgânica",
+            vendor: "Fazenda Orgânica São José",
+            price: 5.80,
             unit: "kg",
-            image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=300&h=300&fit=crop",
-            rating: 4.5,
-            available: true,
-            isOrganic: false,
-            vendorId: 4,
-            isFeatured: true
-        },
-        {
-            id: 5,
-            name: "Manjericão Fresco",
-            vendor: "Horta Urbana",
-            price: 2.50,
-            unit: "maço",
-            image: "https://images.unsplash.com/photo-1618375569909-3c8616cf7733?w=300&h=300&fit=crop",
+            image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=300&h=300&fit=crop",
+            distance: 1.5,
             rating: 4.7,
+            reviewCount: 67,
             available: true,
             isOrganic: true,
             vendorId: 5,
-            isFeatured: true
-        },
-        {
-            id: 6,
-            name: "Maçã Fuji Premium",
-            vendor: "Pomar do Vale",
-            price: 9.90,
-            unit: "kg",
-            image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=300&h=300&fit=crop",
-            rating: 4.4,
-            available: true,
-            isOrganic: false,
-            vendorId: 6,
-            isFeatured: true
-        },
-        {
-            id: 7,
-            name: "Rúcula Orgânica",
-            vendor: "Verde Vida",
-            price: 4.00,
-            unit: "maço",
-            image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=300&h=300&fit=crop",
-            rating: 4.8,
-            available: true,
-            isOrganic: true,
-            vendorId: 7,
-            isFeatured: true
-        },
-        {
-            id: 8,
-            name: "Abóbora Cabotiá",
-            vendor: "Fazenda Orgânica",
-            price: 4.20,
-            unit: "kg",
-            image: "https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=300&h=300&fit=crop",
-            rating: 4.6,
-            available: true,
-            isOrganic: true,
-            vendorId: 8,
-            isFeatured: true
+            discount: 20,
+            originalPrice: 7.25,
+            description: "Cenouras orgânicas doces e crocantes, perfeitas para qualquer receita.",
+            categories: ["Orgânicos", "Legumes"]
         }
     ];
 
-    // Responsive pagination
-    const getProductsPerPage = () => {
-        if (window.innerWidth >= 1024) return 4; // Desktop
-        if (window.innerWidth >= 768) return 3; // Tablet
-        return 2; // Mobile
-    };
-
-    const [productsPerPage, setProductsPerPage] = useState(getProductsPerPage());
-
     useEffect(() => {
-        const handleResize = () => {
-            setProductsPerPage(getProductsPerPage());
-            setCurrentPage(0); // Reset to first page on resize
+        const loadFeaturedProducts = async () => {
+            setLoading(true);
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 800));
+            setFeaturedProducts(mockFeaturedProducts);
+            setLoading(false);
         };
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        loadFeaturedProducts();
+
+        // Load favorite products from localStorage (but don't use it in artifacts)
+        // const savedFavorites = JSON.parse(localStorage.getItem('favoriteProducts') || '[]');
+        // setFavoriteProducts(savedFavorites);
     }, []);
 
-    const totalPages = Math.ceil(featuredProducts.length / productsPerPage);
-    const currentProducts = featuredProducts.slice(
-        currentPage * productsPerPage,
-        (currentPage + 1) * productsPerPage
-    );
-
     const handleProductClick = (product) => {
-        // Navigate to product details or open modal
-        console.log('Product clicked:', product);
+        // Mock vendor data for the product modal
+        const mockVendor = {
+            id: product.vendorId,
+            name: product.vendor,
+            image: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&h=300&fit=crop",
+            location: "São Paulo, SP",
+            distance: `${product.distance}km`,
+            phone: "11999999999"
+        };
+
+        // Pass the product with vendor data to parent component
+        // You'll need to pass onProductClick as a prop to this component
+        if (typeof onProductClick === 'function') {
+            onProductClick({ ...product, vendor: mockVendor });
+        }
+    };
+
+    const handleVendorClick = (product, e) => {
+        e?.stopPropagation();
+        navigate('/vendor-profile-products', { state: { vendorId: product.vendorId } });
+    };
+
+    const handleCategoryClick = (category, e) => {
+        e?.stopPropagation();
+        navigate('/products', { state: { categoryFilter: category } });
     };
 
     const handleProductInquiry = (product, e) => {
         e?.stopPropagation();
-        const message = encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name} (${product.unit}). Está disponível?`);
+        const message = encodeURIComponent(`Olá ${product.vendor}! Vi o produto "${product.name}" no FreshLink e gostaria de saber mais informações.`);
         const whatsappUrl = `https://wa.me/5511999999999?text=${message}`;
         window.open(whatsappUrl, '_blank');
+    };
+
+    const handleFavoriteToggle = (productId, e) => {
+        e?.stopPropagation();
+        const updatedFavorites = favoriteProducts.includes(productId)
+            ? favoriteProducts.filter(id => id !== productId)
+            : [...favoriteProducts, productId];
+
+        setFavoriteProducts(updatedFavorites);
+        // localStorage.setItem('favoriteProducts', JSON.stringify(updatedFavorites));
     };
 
     const formatPrice = (price) => {
@@ -159,152 +154,241 @@ const FeaturedProducts = ({ className = '' }) => {
         }).format(price);
     };
 
+    const renderStars = (rating) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 !== 0;
+
+        for (let i = 0; i < fullStars; i++) {
+            stars?.push(
+                <Icon key={i} name="Star" size={14} className="text-warning fill-current" />
+            );
+        }
+
+        if (hasHalfStar) {
+            stars?.push(
+                <Icon key="half" name="StarHalf" size={14} className="text-warning fill-current" />
+            );
+        }
+
+        const emptyStars = 5 - Math.ceil(rating);
+        for (let i = 0; i < emptyStars; i++) {
+            stars?.push(
+                <Icon key={`empty-${i}`} name="Star" size={14} className="text-muted-foreground" />
+            );
+        }
+
+        return stars;
+    };
+
     const ProductCard = ({ product }) => (
         <div
-            className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col h-full"
+            className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer flex flex-col h-full"
             onClick={() => handleProductClick(product)}
         >
-            {/* Product Image */}
-            <div className="relative aspect-square bg-muted overflow-hidden">
+            {/* Discount Badge */}
+            {product?.discount && (
+                <div className="absolute top-3 left-3 z-10 bg-destructive text-destructive-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
+                    -{product?.discount}%
+                </div>
+            )}
+
+            {/* Favorite Button */}
+            <button
+                onClick={(e) => handleFavoriteToggle(product?.id, e)}
+                className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${favoriteProducts.includes(product?.id)
+                    ? 'bg-error text-white'
+                    : 'bg-white/80 backdrop-blur-sm text-muted-foreground hover:text-error hover:bg-white'
+                    }`}
+            >
+                <Icon
+                    name="Heart"
+                    size={16}
+                    className={favoriteProducts.includes(product?.id) ? 'fill-current' : ''}
+                />
+            </button>
+
+            {/* Image */}
+            <div className="relative h-48 overflow-hidden">
                 <Image
-                    src={product.image}
-                    alt={product.name}
+                    src={product?.image}
+                    alt={product?.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-
-                {/* Featured Badge */}
-                <div className="absolute top-3 left-3 bg-accent text-accent-foreground px-2 py-1 rounded-full text-xs font-caption font-medium">
-                    Destaque
-                </div>
-
-                {/* Organic Badge */}
-                {product.isOrganic && (
-                    <div className="absolute top-3 right-3 bg-success text-success-foreground px-2 py-1 rounded-full text-xs font-caption font-medium">
-                        Orgânico
-                    </div>
-                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
 
                 {/* Availability Status */}
-                {!product.available && (
+                {!product?.available && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="text-white text-sm font-body font-medium">Indisponível</span>
+                        <span className="text-white font-body font-medium bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                            Indisponível
+                        </span>
                     </div>
                 )}
             </div>
 
-            {/* Product Info */}
+            {/* Content */}
             <div className="p-4 flex-1 flex flex-col">
-                <h3 className="font-body font-medium text-foreground mb-1 line-clamp-2">
-                    {product.name}
-                </h3>
-
-                <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                        <span className="text-lg font-heading font-bold text-foreground">
-                            {formatPrice(product.price)}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                            /{product.unit}
-                        </span>
-                    </div>
-                    {product.available && (
-                        <div className="flex items-center space-x-1">
-                            <div className="w-2 h-2 bg-success rounded-full"></div>
-                            <span className="text-xs font-caption text-success">Disponível</span>
+                {/* Header */}
+                <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                        <h3 className="font-heading font-semibold text-lg text-foreground mb-1 line-clamp-1">
+                            {product?.name}
+                        </h3>
+                        <div className="flex items-center space-x-1 mb-2">
+                            <Icon name="Store" size={14} className="text-muted-foreground" />
+                            <button
+                                onClick={(e) => handleVendorClick(product, e)}
+                                className="text-sm text-primary pl-1 hover:text-primary/80 hover:underline transition-colors duration-200"
+                            >
+                                {product?.vendor}
+                            </button>
                         </div>
+                    </div>
+                </div>
+
+                {/* Categories */}
+                <div className="flex flex-wrap gap-1 mb-4">
+                    {product?.categories?.slice(0, 3)?.map((category, index) => (
+                        <button
+                            key={index}
+                            onClick={(e) => handleCategoryClick(category, e)}
+                            className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full hover:bg-primary/10 hover:text-primary hover:border-primary/30 border border-transparent transition-colors duration-200"
+                        >
+                            {category}
+                        </button>
+                    ))}
+                    {product?.categories?.length > 3 && (
+                        <span className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full">
+                            +{product?.categories?.length - 3}
+                        </span>
                     )}
                 </div>
 
-                {/* Vendor Name */}
-                <div className="text-sm text-muted-foreground mb-4">
-                    <span>{product.vendor}</span>
+                {/* Price */}
+                <div className="flex items-center space-x-2 mb-4">
+                    <div className="flex items-baseline space-x-1">
+                        <span className="text-2xl font-heading font-bold text-foreground">
+                            {formatPrice(product?.price)}
+                        </span>
+                        <span className="text-sm font-caption text-muted-foreground">
+                            /{product?.unit}
+                        </span>
+                    </div>
+                    {product?.originalPrice && (
+                        <span className="text-sm font-caption text-muted-foreground line-through">
+                            {formatPrice(product?.originalPrice)}
+                        </span>
+                    )}
                 </div>
 
-                {/* Action Button */}
+                {/* Actions */}
                 <div className="mt-auto">
                     <Button
                         variant="default"
                         size="sm"
                         iconName="MessageCircle"
                         fullWidth
-                        disabled={!product.available}
                         onClick={(e) => handleProductInquiry(product, e)}
-                        className="bg-success hover:bg-success/90 py-5"
+                        disabled={!product?.available}
+                        className="bg-success hover:bg-success/90"
                     >
-                        {product.available ? 'Perguntar' : 'Indisponível'}
+                        {product?.available ? 'Perguntar' : 'Indisponível'}
                     </Button>
                 </div>
             </div>
         </div>
     );
 
-    return (
-        <div className={`${className}`}>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <div>
+    const SkeletonCard = () => (
+        <div className="bg-card border border-border rounded-lg overflow-hidden animate-pulse">
+            <div className="h-48 bg-muted" />
+            <div className="p-4 space-y-3">
+                <div className="h-4 bg-muted rounded w-3/4" />
+                <div className="h-3 bg-muted rounded w-1/2" />
+                <div className="flex space-x-1">
+                    {[...Array(5)]?.map((_, i) => (
+                        <div key={i} className="w-3 h-3 bg-muted rounded" />
+                    ))}
+                </div>
+                <div className="flex space-x-1">
+                    {[...Array(2)]?.map((_, i) => (
+                        <div key={i} className="h-6 bg-muted rounded-full w-16" />
+                    ))}
+                </div>
+                <div className="h-6 bg-muted rounded w-20" />
+                <div className="h-3 bg-muted rounded w-2/3" />
+                <div className="flex space-x-2">
+                    <div className="h-8 bg-muted rounded flex-1" />
+                    <div className="h-8 bg-muted rounded w-20" />
+                </div>
+            </div>
+        </div>
+    );
+
+    if (loading) {
+        return (
+            <div className={`${className}`}>
+                <div className="mb-6">
                     <h2 className="font-heading font-bold text-xl text-foreground mb-1">
                         Produtos em Destaque
                     </h2>
                     <p className="text-sm font-body text-muted-foreground">
-                        Os melhores produtos selecionados especialmente para você
+                        Ofertas especiais selecionadas para você
                     </p>
                 </div>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigate('/products')}
-                    iconName="ArrowRight"
-                    iconPosition="right"
-                >
-                    Ver todos
-                </Button>
-            </div>
 
-            {/* Products Grid with Pagination */}
-            <div className="relative">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-                    {currentProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {[...Array(4)]?.map((_, index) => (
+                        <SkeletonCard key={index} />
                     ))}
                 </div>
+            </div>
+        );
+    }
 
-                {/* Pagination Controls */}
-                {totalPages > 1 && (
-                    <div className="flex items-center justify-center space-x-4 mt-6">
-                        <button
-                            onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                            disabled={currentPage === 0}
-                            className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <Icon name="ChevronLeft" size={16} />
-                        </button>
+    if (featuredProducts?.length === 0) {
+        return (
+            <div className={`${className}`}>
+                <div className="mb-6">
+                    <h2 className="font-heading font-bold text-xl text-foreground mb-1">
+                        Produtos em Destaque
+                    </h2>
+                    <p className="text-sm font-body text-muted-foreground">
+                        Ofertas especiais selecionadas para você
+                    </p>
+                </div>
 
-                        <div className="flex space-x-2">
-                            {Array.from({ length: totalPages }, (_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentPage(index)}
-                                    className={`w-8 h-8 rounded-full text-sm font-body font-medium transition-colors duration-200 ${
-                                        index === currentPage
-                                            ? 'bg-primary text-primary-foreground'
-                                            : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80'
-                                    }`}
-                                >
-                                    {index + 1}
-                                </button>
-                            ))}
-                        </div>
-
-                        <button
-                            onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
-                            disabled={currentPage === totalPages - 1}
-                            className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <Icon name="ChevronRight" size={16} />
-                        </button>
+                <div className="flex flex-col items-center justify-center py-16">
+                    <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
+                        <Icon name="Package" className="w-12 h-12 text-muted-foreground" />
                     </div>
-                )}
+                    <h3 className="font-heading font-semibold text-lg text-foreground mb-2">
+                        Nenhum produto em destaque
+                    </h3>
+                    <p className="text-sm font-body text-muted-foreground text-center max-w-md">
+                        Não há produtos em destaque no momento. Volte em breve para conferir nossas ofertas especiais.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className={`${className}`}>
+            <div className="mb-6">
+                <h2 className="font-heading font-bold text-xl text-foreground mb-1">
+                    Produtos em Destaque
+                </h2>
+                <p className="text-sm font-body text-muted-foreground">
+                    Ofertas especiais selecionadas para você
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {featuredProducts.map((product) => (
+                    <ProductCard key={product?.id} product={product} />
+                ))}
             </div>
         </div>
     );

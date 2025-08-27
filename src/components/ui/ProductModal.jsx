@@ -265,17 +265,6 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                                     )}
                                 </div>
 
-                                <div className="flex items-center space-x-4 mb-6">
-                                    <div className="text-3xl font-heading font-bold text-primary">
-                                        {formatPrice(displayProduct.price)}
-                                    </div>
-                                    <div className="text-muted-foreground">
-                                        por {displayProduct.unit}
-                                    </div>
-                                </div>
-
-                                <div className="border-b"></div>
-
                                 {displayProduct.description && (
                                     <p className="text-muted-foreground leading-relaxed mb-6">
                                         {displayProduct.description}
@@ -286,6 +275,17 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                                         )}
                                     </p>
                                 )}
+
+                                <div className="flex items-center space-x-4 mb-6">
+                                    <div className="text-3xl font-heading font-bold text-primary">
+                                        {formatPrice(displayProduct.price)}
+                                    </div>
+                                    <div className="text-muted-foreground">
+                                        por {displayProduct.unit}
+                                    </div>
+                                </div>
+
+                                <div className="border-b"></div>
                             </div>
 
                             {/* Vendor Info */}

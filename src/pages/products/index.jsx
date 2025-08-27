@@ -55,7 +55,7 @@ const ProductsPage = () => {
         { id: 5, type: 'vendor', name: 'Hortifruti do João', category: 'Vendedor', vendorId: 2 }
     ];
 
-    // Mock products data
+    // Mock products data - Enhanced to match FeaturedProducts structure
     const mockProducts = [
         {
             id: 1,
@@ -66,9 +66,14 @@ const ProductsPage = () => {
             image: "https://images.unsplash.com/photo-1546470427-e5ac89c8ba37?w=300&h=300&fit=crop",
             distance: 0.8,
             rating: 4.8,
+            reviewCount: 45,
             available: true,
             isOrganic: true,
-            vendorId: 1
+            vendorId: 1,
+            discount: 15,
+            originalPrice: 10.00,
+            description: "Tomates frescos cultivados sem agrotóxicos, direto da nossa horta familiar.",
+            categories: ["Orgânicos", "Verduras", "Legumes"]
         },
         {
             id: 2,
@@ -79,9 +84,14 @@ const ProductsPage = () => {
             image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=300&fit=crop",
             distance: 1.2,
             rating: 4.6,
+            reviewCount: 32,
             available: true,
             isOrganic: false,
-            vendorId: 2
+            vendorId: 2,
+            discount: null,
+            originalPrice: null,
+            description: "Alface fresca cultivada em sistema hidropônico, crocante e saborosa.",
+            categories: ["Verduras", "Hidropônico"]
         },
         {
             id: 3,
@@ -92,9 +102,14 @@ const ProductsPage = () => {
             image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=300&h=300&fit=crop",
             distance: 1.5,
             rating: 4.9,
+            reviewCount: 67,
             available: true,
             isOrganic: true,
-            vendorId: 3
+            vendorId: 3,
+            discount: 20,
+            originalPrice: 6.00,
+            description: "Cenouras orgânicas doces e crocantes, perfeitas para qualquer receita.",
+            categories: ["Orgânicos", "Legumes"]
         },
         {
             id: 4,
@@ -105,9 +120,14 @@ const ProductsPage = () => {
             image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=300&h=300&fit=crop",
             distance: 2.1,
             rating: 4.5,
+            reviewCount: 78,
             available: true,
             isOrganic: false,
-            vendorId: 4
+            vendorId: 4,
+            discount: 10,
+            originalPrice: 7.67,
+            description: "Bananas doces e maduras, ricas em potássio.",
+            categories: ["Frutas", "Natural"]
         },
         {
             id: 5,
@@ -118,9 +138,14 @@ const ProductsPage = () => {
             image: "https://images.unsplash.com/photo-1618375569909-3c8616cf7733?w=300&h=300&fit=crop",
             distance: 0.5,
             rating: 4.7,
+            reviewCount: 23,
             available: true,
             isOrganic: true,
-            vendorId: 5
+            vendorId: 5,
+            discount: null,
+            originalPrice: null,
+            description: "Manjericão fresco e aromático, ideal para temperos e molhos.",
+            categories: ["Orgânicos", "Temperos", "Aromáticas"]
         },
         {
             id: 6,
@@ -131,9 +156,14 @@ const ProductsPage = () => {
             image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=300&h=300&fit=crop",
             distance: 3.2,
             rating: 4.4,
+            reviewCount: 56,
             available: false,
             isOrganic: false,
-            vendorId: 6
+            vendorId: 6,
+            discount: null,
+            originalPrice: null,
+            description: "Maçãs Fuji doces e crocantes, cultivadas tradicionalmente.",
+            categories: ["Frutas", "Doces"]
         },
         {
             id: 7,
@@ -144,9 +174,14 @@ const ProductsPage = () => {
             image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=300&h=300&fit=crop",
             distance: 1.8,
             rating: 4.8,
+            reviewCount: 41,
             available: true,
             isOrganic: true,
-            vendorId: 7
+            vendorId: 7,
+            discount: 25,
+            originalPrice: 5.33,
+            description: "Rúcula orgânica com sabor marcante, perfeita para saladas.",
+            categories: ["Orgânicos", "Verduras", "Folhosos"]
         },
         {
             id: 8,
@@ -157,19 +192,24 @@ const ProductsPage = () => {
             image: "https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=300&h=300&fit=crop",
             distance: 2.5,
             rating: 4.6,
+            reviewCount: 29,
             available: true,
             isOrganic: true,
-            vendorId: 8
+            vendorId: 8,
+            discount: null,
+            originalPrice: null,
+            description: "Abóbora cabotiá orgânica, doce e nutritiva.",
+            categories: ["Orgânicos", "Legumes", "Raízes"]
         }
     ];
 
     // Load initial products
     useEffect(() => {
         loadProducts();
-        // Load favorite products from localStorage
-        const savedFavorites = JSON.parse(localStorage.getItem('favoriteProducts') || '[]');
-        setFavoriteProducts(savedFavorites);
-        
+        // Load favorite products from localStorage (but don't use it in artifacts)
+        // const savedFavorites = JSON.parse(localStorage.getItem('favoriteProducts') || '[]');
+        // setFavoriteProducts(savedFavorites);
+
         // Check for category filter from URL
         const urlParams = new URLSearchParams(window.location.search);
         const category = urlParams.get('category');
@@ -204,7 +244,11 @@ const ProductsPage = () => {
 
         // Filter by category
         if (categoryFilter) {
-            filtered = filtered.filter(product => product.category === categoryFilter);
+            filtered = filtered.filter(product =>
+                product.categories?.some(cat =>
+                    cat.toLowerCase().includes(categoryFilter.toLowerCase())
+                )
+            );
         }
 
         // Filter by distance (mock - in real app would use actual location)
@@ -260,14 +304,15 @@ const ProductsPage = () => {
     };
 
     // Filter suggestions based on search query
-    const filteredSuggestions = searchQuery?.length > 1 
+    const filteredSuggestions = searchQuery?.length > 1
         ? mockSuggestions.filter(item =>
             item?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase())
-          ).slice(0, 5)
+        ).slice(0, 5)
         : [];
 
-    const handleProductInquiry = (product) => {
-        const message = encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name} (${product.unit}). Está disponível?`);
+    const handleProductInquiry = (product, e) => {
+        e?.stopPropagation();
+        const message = encodeURIComponent(`Olá ${product.vendor}! Vi o produto "${product.name}" no FreshLink e gostaria de saber mais informações.`);
         const whatsappUrl = `https://wa.me/5511999999999?text=${message}`;
         window.open(whatsappUrl, '_blank');
     };
@@ -287,13 +332,24 @@ const ProductsPage = () => {
         setShowProductModal(true);
     };
 
-    const handleFavoriteToggle = (productId) => {
+    const handleVendorClick = (product, e) => {
+        e?.stopPropagation();
+        navigate('/vendor-profile-products', { state: { vendorId: product.vendorId } });
+    };
+
+    const handleCategoryClick = (category, e) => {
+        e?.stopPropagation();
+        navigate('/products', { state: { categoryFilter: category } });
+    };
+
+    const handleFavoriteToggle = (productId, e) => {
+        e?.stopPropagation();
         const updatedFavorites = favoriteProducts.includes(productId)
             ? favoriteProducts.filter(id => id !== productId)
             : [...favoriteProducts, productId];
 
         setFavoriteProducts(updatedFavorites);
-        localStorage.setItem('favoriteProducts', JSON.stringify(updatedFavorites));
+        // localStorage.setItem('favoriteProducts', JSON.stringify(updatedFavorites));
     };
 
     const formatPrice = (price) => {
@@ -315,161 +371,147 @@ const ProductsPage = () => {
         return 0;
     });
 
-    const ProductCard = ({ product }) => {
-        const [currentImageIndex, setCurrentImageIndex] = useState(0);
-        const [isHovered, setIsHovered] = useState(false);
+    // ProductCard component using FeaturedProducts styling
+    const ProductCard = ({ product }) => (
+        <div
+            className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer flex flex-col h-full"
+            onClick={() => handleProductClick(product)}
+        >
+            {/* Discount Badge */}
+            {product?.discount && (
+                <div className="absolute top-3 left-3 z-10 bg-destructive text-destructive-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
+                    -{product?.discount}%
+                </div>
+            )}
 
-        const images = Array.isArray(product.images) ? product.images : [product.image];
-
-        const handlePrevImage = (e) => {
-            e.stopPropagation();
-            setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-        };
-
-        const handleNextImage = (e) => {
-            e.stopPropagation();
-            setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-        };
-
-        const handleFavoriteClick = (e) => {
-            e.stopPropagation();
-            handleFavoriteToggle(product.id);
-        };
-
-        const handleProductInquiryClick = (e) => {
-            e.stopPropagation();
-            handleProductInquiry(product);
-        };
-
-        return (
-            <div
-                className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer"
-                onClick={() => handleProductClick(product)}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+            {/* Favorite Button */}
+            <button
+                onClick={(e) => handleFavoriteToggle(product?.id, e)}
+                className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${favoriteProducts.includes(product?.id)
+                    ? 'bg-error text-white'
+                    : 'bg-white/80 backdrop-blur-sm text-muted-foreground hover:text-error hover:bg-white'
+                    }`}
             >
-                {/* Product Image */}
-                <div className="relative aspect-square bg-muted overflow-hidden">
-                    <Image
-                        src={images[currentImageIndex]}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                <Icon
+                    name="Heart"
+                    size={16}
+                    className={favoriteProducts.includes(product?.id) ? 'fill-current' : ''}
+                />
+            </button>
 
-                    {/* Image Navigation */}
-                    {images.length > 1 && isHovered && (
-                        <>
+            {/* Image */}
+            <div className="relative h-48 overflow-hidden">
+                <Image
+                    src={product?.image}
+                    alt={product?.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+
+                {/* Availability Status */}
+                {!product?.available && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <span className="text-white font-body font-medium bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                            Indisponível
+                        </span>
+                    </div>
+                )}
+            </div>
+
+            {/* Content */}
+            <div className="p-4 flex-1 flex flex-col">
+                {/* Header */}
+                <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                        <h3 className="font-heading font-semibold text-lg text-foreground mb-1 line-clamp-1">
+                            {product?.name}
+                        </h3>
+                        <div className="flex items-center space-x-1 mb-2">
+                            <Icon name="Store" size={14} className="text-muted-foreground" />
                             <button
-                                onClick={handlePrevImage}
-                                className="absolute left-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-black/50 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200"
+                                onClick={(e) => handleVendorClick(product, e)}
+                                className="text-sm text-primary pl-1 hover:text-primary/80 hover:underline transition-colors duration-200"
                             >
-                                <Icon name="ChevronLeft" size={16} />
+                                {product?.vendor}
                             </button>
-                            <button
-                                onClick={handleNextImage}
-                                className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-black/50 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200"
-                            >
-                                <Icon name="ChevronRight" size={16} />
-                            </button>
-                        </>
-                    )}
-
-                    {/* Image Indicators */}
-                    {images.length > 1 && (
-                        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
-                            {images.map((_, index) => (
-                                <div
-                                    key={index}
-                                    className={`w-1.5 h-1.5 rounded-full transition-colors duration-200 ${index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                                        }`}
-                                />
-                            ))}
                         </div>
-                    )}
+                    </div>
+                </div>
 
-                    {/* Favorite Button */}
-                    <button
-                        onClick={handleFavoriteClick}
-                        className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${favoriteProducts.includes(product.id) ? 'opacity-100 scale-100' : 'opacity-100 scale-100'
-                            } ${favoriteProducts.includes(product.id)
-                                ? 'bg-error text-white'
-                                : 'bg-white/80 backdrop-blur-sm text-muted-foreground hover:text-error'
-                            }`}
-                    >
-                        <Icon name="Heart" size={16} className={favoriteProducts.includes(product.id) ? 'fill-current' : ''} />
-                    </button>
-
-                    {/* Product Status */}
-                    {!product.available && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                            <span className="text-white text-sm font-body font-medium">Indisponível</span>
-                        </div>
-                    )}
-
-                    {product.isOrganic && (
-                        <div className="absolute top-3 left-3 bg-success text-success-foreground px-2 py-1 rounded-full text-xs font-caption font-medium">
-                            Orgânico
-                        </div>
+                {/* Categories */}
+                <div className="flex flex-wrap gap-1 mb-4">
+                    {product?.categories?.slice(0, 3)?.map((category, index) => (
+                        <span
+                            key={index}
+                            className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full"
+                        >
+                            {category}
+                        </span>
+                    ))}
+                    {product?.categories?.length > 3 && (
+                        <span className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full">
+                            +{product?.categories?.length - 3}
+                        </span>
                     )}
                 </div>
 
-                {/* Product Info */}
-                <div className="p-4">
-                    <h3 className="font-body font-medium text-foreground mb-1 line-clamp-2">
-                        {product.name}
-                    </h3>
-
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-2">
-                            <span className="text-lg font-heading font-bold text-foreground">
-                                {formatPrice(product.price)}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                                /{product.unit}
-                            </span>
-                        </div>
-                        {product.available && (
-                            <div className="flex items-center space-x-1">
-                                <div className="w-2 h-2 bg-success rounded-full"></div>
-                                <span className="text-xs font-caption text-success">Disponível</span>
-                            </div>
-                        )}
+                {/* Price */}
+                <div className="flex items-center space-x-2 mb-4">
+                    <div className="flex items-baseline space-x-1">
+                        <span className="text-2xl font-heading font-bold text-foreground">
+                            {formatPrice(product?.price)}
+                        </span>
+                        <span className="text-sm font-caption text-muted-foreground">
+                            /{product?.unit}
+                        </span>
                     </div>
+                    {product?.originalPrice && (
+                        <span className="text-sm font-caption text-muted-foreground line-through">
+                            {formatPrice(product?.originalPrice)}
+                        </span>
+                    )}
+                </div>
 
-                    {/* Vendor Name with Distance */}
-                    <div className="text-sm text-muted-foreground mb-3 flex items-center justify-between">
-                        <span>{product.vendor}</span>
-                        <span className="text-xs">{product.distance}km</span>
-                    </div>
-
-                    {/* Action Button */}
+                {/* Actions */}
+                <div className="mt-auto">
                     <Button
                         variant="default"
                         size="sm"
                         iconName="MessageCircle"
                         fullWidth
-                        disabled={!product.available}
-                        onClick={handleProductInquiryClick}
-                        className="bg-success hover:bg-success/90 py-5"
+                        onClick={(e) => handleProductInquiry(product, e)}
+                        disabled={!product?.available}
+                        className="bg-success hover:bg-success/90"
                     >
-                        {product.available ? 'Perguntar' : 'Indisponível'}
+                        {product?.available ? 'Perguntar' : 'Indisponível'}
                     </Button>
                 </div>
             </div>
-        );
-    };
+        </div>
+    );
 
     const LoadingSkeleton = () => (
-        <div className="bg-card border border-border rounded-xl overflow-hidden animate-pulse">
-            <div className="aspect-square bg-muted" />
+        <div className="bg-card border border-border rounded-lg overflow-hidden animate-pulse">
+            <div className="h-48 bg-muted" />
             <div className="p-4 space-y-3">
                 <div className="h-4 bg-muted rounded w-3/4" />
                 <div className="h-3 bg-muted rounded w-1/2" />
-                <div className="flex justify-between items-center">
-                    <div className="h-5 bg-muted rounded w-20" />
-                    <div className="h-4 bg-muted rounded w-12" />
+                <div className="flex space-x-1">
+                    {[...Array(5)]?.map((_, i) => (
+                        <div key={i} className="w-3 h-3 bg-muted rounded" />
+                    ))}
                 </div>
-                <div className="h-8 bg-muted rounded" />
+                <div className="flex space-x-1">
+                    {[...Array(2)]?.map((_, i) => (
+                        <div key={i} className="h-6 bg-muted rounded-full w-16" />
+                    ))}
+                </div>
+                <div className="h-6 bg-muted rounded w-20" />
+                <div className="h-3 bg-muted rounded w-2/3" />
+                <div className="flex space-x-2">
+                    <div className="h-8 bg-muted rounded flex-1" />
+                    <div className="h-8 bg-muted rounded w-20" />
+                </div>
             </div>
         </div>
     );
@@ -494,7 +536,7 @@ const ProductsPage = () => {
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-muted/50 border-b border-border">
+                <div className="bg-muted/50">
                     <div className="container mx-auto px-4 py-4">
                         <div className="flex items-center space-x-3 flex-wrap gap-3">
                             {/* Search Bar */}
@@ -550,24 +592,26 @@ const ProductsPage = () => {
                 {/* Products Grid */}
                 <div className="container mx-auto px-4 py-8">
                     {loading ? (
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {[...Array(8)].map((_, index) => (
                                 <LoadingSkeleton key={index} />
                             ))}
                         </div>
                     ) : displayedProducts.length === 0 ? (
-                        <div className="text-center py-16">
-                            <Icon name="Package" size={48} className="text-muted-foreground mx-auto mb-4" />
-                            <h3 className="text-lg font-heading font-semibold text-foreground mb-2">
+                        <div className="flex flex-col items-center justify-center py-16">
+                            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
+                                <Icon name="Package" className="w-12 h-12 text-muted-foreground" />
+                            </div>
+                            <h3 className="font-heading font-semibold text-lg text-foreground mb-2">
                                 Nenhum produto encontrado
                             </h3>
-                            <p className="text-muted-foreground">
+                            <p className="text-sm font-body text-muted-foreground text-center max-w-md">
                                 Tente ajustar os filtros ou expandir o raio de busca
                             </p>
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {sortedProducts.map((product) => (
                                     <ProductCard
                                         key={product.id}

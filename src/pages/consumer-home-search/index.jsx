@@ -271,10 +271,10 @@ const ConsumerHomeSearch = () => {
     };
 
     // Filter suggestions based on search query
-    const filteredSuggestions = searchQuery?.length > 1 
+    const filteredSuggestions = searchQuery?.length > 1
         ? mockSuggestions.filter(item =>
             item?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase())
-          ).slice(0, 5)
+        ).slice(0, 5)
         : [];
 
     const handleRefresh = async () => {
