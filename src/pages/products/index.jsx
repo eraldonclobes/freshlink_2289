@@ -323,7 +323,7 @@ const ProductsPage = () => {
 
     // Gerar sugestões dinâmicas baseadas nos produtos disponíveis
     const generateSuggestions = (query) => {
-        if (!query.trim()) return [];
+        if (!query || !query.trim()) return [];
 
         const suggestions = [];
         const addedNames = new Set();
@@ -367,11 +367,16 @@ const ProductsPage = () => {
 
     const handleClearSearch = () => {
         setSearchQuery('');
+        filterAndSortProducts();
     };
 
     const handleSearchSubmit = (query) => {
-        // Quando der enter, definir a query (mesmo se vazia)
-        setSearchQuery(query.trim());
+        const trimmedQuery = query?.trim() || '';
+        setSearchQuery(trimmedQuery);
+        if (!trimmedQuery) {
+            // Se vazio, recarregar todos os produtos
+            filterAndSortProducts();
+        }
     };
 
     const handleSuggestionClick = (suggestion) => {
@@ -388,7 +393,7 @@ const ProductsPage = () => {
     };
 
     // Filtrar sugestões baseadas na query atual - só aparecem se há texto digitado
-    const filteredSuggestions = searchQuery.trim().length > 0 ? generateSuggestions(searchQuery) : [];
+    const filteredSuggestions = searchQuery && searchQuery.trim().length > 0 ? generateSuggestions(searchQuery) : [];
 
     const handleProductInquiry = (product, e) => {
         e?.stopPropagation();
@@ -744,12 +749,14 @@ const ProductsPage = () => {
                             </div>
 
                             {/* Filters and Actions */}
-                            <CategoryFilter />
-                            <SortFilter />
-                            <LocationSelector
-                                currentLocation={currentLocation}
-                                onLocationChange={handleLocationChange}
-                            />
+                            <div className="flex items-center space-x-3">
+                                <CategoryFilter />
+                                <SortFilter />
+                                <LocationSelector
+                                    currentLocation={currentLocation}
+                                    onLocationChange={handleLocationChange}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
