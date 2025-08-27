@@ -24,7 +24,8 @@ const ProductsPage = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showProductModal, setShowProductModal] = useState(false);
     const [categoryFilter, setCategoryFilter] = useState('');
-    const [viewMode, setViewMode] = useState('grid');
+    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+    const [showSortDropdown, setShowSortDropdown] = useState(false);
 
     const PRODUCTS_PER_PAGE = 12;
 
@@ -217,6 +218,14 @@ const ProductsPage = () => {
         if (category) {
             setCategoryFilter(category);
         }
+
+        // Close dropdowns when clicking outside
+        const handleClickOutside = () => {
+            setShowCategoryDropdown(false);
+            setShowSortDropdown(false);
+        };
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
     // Filter and sort products
@@ -287,16 +296,18 @@ const ProductsPage = () => {
 
     const handleSearch = (query) => {
         setSearchQuery(query);
+        // If query is empty, show all products
+        if (!query.trim()) {
+            setSearchQuery('');
+        }
     };
 
     const handleSuggestionClick = (suggestion) => {
         if (suggestion.type === 'vendor') {
             navigate('/vendor-profile-products', { state: { vendorId: suggestion.vendorId } });
         } else if (suggestion.type === 'product') {
-            const product = mockProducts.find(p => p.id === suggestion.productId);
-            if (product) {
-                handleProductClick(product);
-            }
+            // Instead of opening modal, search for the product name
+            setSearchQuery(suggestion.name);
         }
     };
 
@@ -372,121 +383,116 @@ const ProductsPage = () => {
         return 0;
     });
 
-    // ProductCard component using FeaturedProducts styling
-    const ProductCard = ({ product, viewMode = 'grid' }) => {
-        if (viewMode === 'list') {
-            return (
-                <div
-                    className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer"
-                    onClick={() => handleProductClick(product)}
-                >
-                    <div className="flex">
-                        {/* Image */}
-                        <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
-                            <Image
-                                src={product?.image}
-                                alt={product?.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                            
-                            {/* Discount Badge */}
-                            {product?.discount && (
-                                <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
-                                    -{product?.discount}%
-                                </div>
-                            )}
-
-                            {/* Availability Status */}
-                            {!product?.available && (
-                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                    <span className="text-white font-body font-medium text-xs">
-                                        Indisponível
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-4 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 className="font-heading font-semibold text-lg text-foreground mb-1 line-clamp-1">
-                                    {product?.name}
-                                </h3>
-                                <div className="flex items-center space-x-1 mb-2">
-                                    <Icon name="Store" size={14} className="text-muted-foreground" />
-                                    <button
-                                        onClick={(e) => handleVendorClick(product, e)}
-                                        className="text-sm text-primary hover:text-primary/80 hover:underline transition-colors duration-200"
-                                    >
-                                        {product?.vendor}
-                                    </button>
-                                </div>
-
-                                {/* Categories */}
-                                <div className="flex flex-wrap gap-1 mb-3">
-                                    {product?.categories?.slice(0, 2)?.map((category, index) => (
-                                        <span
-                                            key={index}
-                                            className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full"
-                                        >
-                                            {category}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                                {/* Price */}
-                                <div className="flex items-center space-x-2">
-                                    <div className="flex items-baseline space-x-1">
-                                        <span className="text-xl font-heading font-bold text-foreground">
-                                            {formatPrice(product?.price)}
-                                        </span>
-                                        <span className="text-sm font-caption text-muted-foreground">
-                                            /{product?.unit}
-                                        </span>
-                                    </div>
-                                    {product?.originalPrice && (
-                                        <span className="text-sm font-caption text-muted-foreground line-through">
-                                            {formatPrice(product?.originalPrice)}
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Actions */}
-                                <div className="flex items-center space-x-2">
-                                    <button
-                                        onClick={(e) => handleFavoriteToggle(product?.id, e)}
-                                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${favoriteProducts.includes(product?.id)
-                                            ? 'bg-error text-white'
-                                            : 'bg-muted text-muted-foreground hover:text-error hover:bg-error/10'
-                                            }`}
-                                    >
-                                        <Icon
-                                            name="Heart"
-                                            size={16}
-                                            className={favoriteProducts.includes(product?.id) ? 'fill-current' : ''}
-                                        />
-                                    </button>
-                                    <Button
-                                        variant="default"
-                                        size="sm"
-                                        iconName="MessageCircle"
-                                        onClick={(e) => handleProductInquiry(product, e)}
-                                        disabled={!product?.available}
-                                        className="bg-success hover:bg-success/90"
-                                    >
-                                        {product?.available ? 'Perguntar' : 'Indisponível'}
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    // Category Filter Component
+    const CategoryFilter = () => (
+        <div className="relative">
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setShowCategoryDropdown(!showCategoryDropdown);
+                    setShowSortDropdown(false);
+                }}
+                className="flex items-center justify-between w-full sm:w-auto px-4 py-3 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-all duration-200 min-w-[140px]"
+            >
+                <div className="flex items-center space-x-2">
+                    <Icon name="Filter" size={16} className="text-primary" />
+                    <span className="truncate">
+                        {categoryOptions.find(opt => opt.value === categoryFilter)?.label || 'Categoria'}
+                    </span>
                 </div>
-            );
-        }
+                <Icon 
+                    name="ChevronDown" 
+                    size={16} 
+                    className={`text-muted-foreground transition-transform duration-200 ${
+                        showCategoryDropdown ? 'rotate-180' : ''
+                    }`} 
+                />
+            </button>
+            
+            {/* Dropdown */}
+            <div className={`absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-50 transition-all duration-200 origin-top ${
+                showCategoryDropdown 
+                    ? 'opacity-100 scale-100 translate-y-0' 
+                    : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+            }`}>
+                <div className="py-1 max-h-60 overflow-y-auto">
+                    {categoryOptions.map((option, index) => (
+                        <button
+                            key={option.value}
+                            onClick={() => {
+                                setCategoryFilter(option.value);
+                                setShowCategoryDropdown(false);
+                            }}
+                            className={`w-full px-4 py-2 text-left text-sm transition-colors duration-150 ${
+                                categoryFilter === option.value
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'text-foreground hover:bg-muted'
+                            } ${index === 0 ? 'rounded-t-lg' : ''} ${index === categoryOptions.length - 1 ? 'rounded-b-lg' : ''}`}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
 
-        return (
+    // Sort Filter Component
+    const SortFilter = () => (
+        <div className="relative">
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSortDropdown(!showSortDropdown);
+                    setShowCategoryDropdown(false);
+                }}
+                className="flex items-center justify-between w-full sm:w-auto px-4 py-3 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-all duration-200 min-w-[140px]"
+            >
+                <div className="flex items-center space-x-2">
+                    <Icon name="ArrowUpDown" size={16} className="text-primary" />
+                    <span className="truncate">
+                        {sortOptions.find(opt => opt.value === sortBy)?.label || 'Ordenar'}
+                    </span>
+                </div>
+                <Icon 
+                    name="ChevronDown" 
+                    size={16} 
+                    className={`text-muted-foreground transition-transform duration-200 ${
+                        showSortDropdown ? 'rotate-180' : ''
+                    }`} 
+                />
+            </button>
+            
+            {/* Dropdown */}
+            <div className={`absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-50 transition-all duration-200 origin-top ${
+                showSortDropdown 
+                    ? 'opacity-100 scale-100 translate-y-0' 
+                    : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+            }`}>
+                <div className="py-1">
+                    {sortOptions.map((option, index) => (
+                        <button
+                            key={option.value}
+                            onClick={() => {
+                                setSortBy(option.value);
+                                setShowSortDropdown(false);
+                            }}
+                            className={`w-full px-4 py-2 text-left text-sm transition-colors duration-150 ${
+                                sortBy === option.value
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'text-foreground hover:bg-muted'
+                            } ${index === 0 ? 'rounded-t-lg' : ''} ${index === sortOptions.length - 1 ? 'rounded-b-lg' : ''}`}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+
+    // ProductCard component using FeaturedProducts styling
+    const ProductCard = ({ product }) => (
         <div
             className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer flex flex-col h-full"
             onClick={() => handleProductClick(product)}
@@ -602,8 +608,7 @@ const ProductsPage = () => {
                 </div>
             </div>
         </div>
-        );
-    };
+    );
 
     const LoadingSkeleton = () => (
         <div className="bg-card border border-border rounded-lg overflow-hidden animate-pulse">
@@ -653,7 +658,7 @@ const ProductsPage = () => {
                 {/* Search and Filters */}
                 <div className="bg-muted/50 border-b border-border">
                     <div className="container mx-auto px-4 py-4">
-                        <div className="flex items-center justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                             {/* Search Bar */}
                             <div className="flex-1 max-w-md">
                                 <SearchBar
@@ -661,85 +666,15 @@ const ProductsPage = () => {
                                     onSuggestionClick={handleSuggestionClick}
                                     suggestions={filteredSuggestions}
                                     placeholder="Buscar produtos..."
+                                    value={searchQuery}
+                                    onClear={() => setSearchQuery('')}
                                 />
                             </div>
 
                             {/* Filters and Actions */}
-                            <div className="flex items-center space-x-3">
-                                {/* Category Filter */}
-                                <div className="relative">
-                                    <button
-                                        className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
-                                    >
-                                        <Icon name="Filter" size={16} className="text-primary" />
-                                        <span className="hidden sm:inline">
-                                            {categoryOptions.find(opt => opt.value === categoryFilter)?.label || 'Categoria'}
-                                        </span>
-                                        <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
-                                    </button>
-                                    <select
-                                        value={categoryFilter}
-                                        onChange={(e) => setCategoryFilter(e.target.value)}
-                                        className="absolute inset-0 opacity-0 cursor-pointer"
-                                    >
-                                        {categoryOptions.map(option => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* Sort Filter */}
-                                <div className="relative">
-                                    <button
-                                        className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
-                                    >
-                                        <Icon name="ArrowUpDown" size={16} className="text-primary" />
-                                        <span className="hidden sm:inline">
-                                            {sortOptions.find(opt => opt.value === sortBy)?.label || 'Ordenar'}
-                                        </span>
-                                        <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
-                                    </button>
-                                    <select
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value)}
-                                        className="absolute inset-0 opacity-0 cursor-pointer"
-                                    >
-                                        {sortOptions.map(option => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* View Mode Toggle */}
-                                <div className="flex items-center bg-muted border border-border rounded-lg p-1">
-                                    <button
-                                        onClick={() => setViewMode('grid')}
-                                        className={`p-2 rounded-md transition-colors duration-200 ${
-                                            viewMode === 'grid' 
-                                                ? 'bg-card text-foreground shadow-sm' 
-                                                : 'text-muted-foreground hover:text-foreground'
-                                        }`}
-                                        title="Visualização em grade"
-                                    >
-                                        <Icon name="Grid3X3" size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode('list')}
-                                        className={`p-2 rounded-md transition-colors duration-200 ${
-                                            viewMode === 'list' 
-                                                ? 'bg-card text-foreground shadow-sm' 
-                                                : 'text-muted-foreground hover:text-foreground'
-                                        }`}
-                                        title="Visualização em lista"
-                                    >
-                                        <Icon name="List" size={16} />
-                                    </button>
-                                </div>
-
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+                                <CategoryFilter />
+                                <SortFilter />
                                 <LocationSelector
                                     currentLocation={currentLocation}
                                     onLocationChange={handleLocationChange}
@@ -753,73 +688,4 @@ const ProductsPage = () => {
                 <div className="container mx-auto px-4 py-8">
                     {loading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {[...Array(8)].map((_, index) => (
-                                <LoadingSkeleton key={index} />
-                            ))}
-                        </div>
-                    ) : displayedProducts.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-16">
-                            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
-                                <Icon name="Package" className="w-12 h-12 text-muted-foreground" />
-                            </div>
-                            <h3 className="font-heading font-semibold text-lg text-foreground mb-2">
-                                Nenhum produto encontrado
-                            </h3>
-                            <p className="text-sm font-body text-muted-foreground text-center max-w-md">
-                                Tente ajustar os filtros ou expandir o raio de busca
-                            </p>
-                        </div>
-                    ) : (
-                        <>
-                            <div className={
-                                viewMode === 'grid' 
-                                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                                    : "space-y-4"
-                            }>
-                                {sortedProducts.map((product) => (
-                                    <ProductCard
-                                        key={product.id}
-                                        product={product}
-                                        viewMode={viewMode}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* Load More Button */}
-                            {hasMoreToShow && (
-                                <div className="text-center mt-12">
-                                    <Button
-                                        onClick={loadMoreProducts}
-                                        loading={loadingMore}
-                                        variant="outline"
-                                        size="lg"
-                                        iconName="Plus"
-                                        iconPosition="left"
-                                    >
-                                        Carregar mais produtos
-                                    </Button>
-                                </div>
-                            )}
-                        </>
-                    )}
-                </div>
-            </main>
-
-            {/* Product Modal */}
-            <ProductModal
-                product={selectedProduct}
-                vendor={selectedProduct?.vendor}
-                isOpen={showProductModal}
-                onClose={() => {
-                    setShowProductModal(false);
-                    setSelectedProduct(null);
-                }}
-            />
-
-            {/* Footer */}
-            <Footer />
-        </div>
-    );
-};
-
-export default ProductsPage;
+                            {[...
