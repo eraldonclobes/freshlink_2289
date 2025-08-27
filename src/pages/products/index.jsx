@@ -224,6 +224,13 @@ const ProductsPage = () => {
         filterAndSortProducts();
     }, [products, searchQuery, currentLocation, sortBy, categoryFilter]);
 
+    // Garantir que quando searchQuery for vazio, recarregue todos os produtos
+    useEffect(() => {
+        if (searchQuery === '') {
+            filterAndSortProducts();
+        }
+    }, [searchQuery]);
+
     const loadProducts = async () => {
         setLoading(true);
         // Simulate API call
@@ -235,8 +242,8 @@ const ProductsPage = () => {
     const filterAndSortProducts = useCallback(() => {
         let filtered = [...mockProducts];
 
-        // Filter by search query
-        if (searchQuery.trim()) {
+        // Filter by search query - só filtra se houver texto
+        if (searchQuery && searchQuery.trim()) {
             filtered = filtered.filter(product =>
                 product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 product.vendor.toLowerCase().includes(searchQuery.toLowerCase())
@@ -363,8 +370,8 @@ const ProductsPage = () => {
     };
 
     const handleSearchSubmit = (query) => {
-        // Quando der enter ou submeter, apenas definir a query
-        setSearchQuery(query);
+        // Quando der enter, definir a query (mesmo se vazia)
+        setSearchQuery(query.trim());
     };
 
     const handleSuggestionClick = (suggestion) => {
@@ -380,8 +387,8 @@ const ProductsPage = () => {
         setCurrentLocation(location);
     };
 
-    // Filtrar sugestões baseadas na query atual
-    const filteredSuggestions = generateSuggestions(searchQuery);
+    // Filtrar sugestões baseadas na query atual - só aparecem se há texto digitado
+    const filteredSuggestions = searchQuery.trim().length > 0 ? generateSuggestions(searchQuery) : [];
 
     const handleProductInquiry = (product, e) => {
         e?.stopPropagation();
@@ -732,6 +739,7 @@ const ProductsPage = () => {
                                     suggestions={filteredSuggestions}
                                     placeholder="Buscar produtos..."
                                     value={searchQuery}
+                                    showSuggestionsOnFocus={false}
                                 />
                             </div>
 
