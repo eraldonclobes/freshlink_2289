@@ -20,7 +20,6 @@ const VendorsPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [categoryFilter, setCategoryFilter] = useState('');
-    const [viewMode, setViewMode] = useState('grid');
 
     const VENDORS_PER_PAGE = 8;
 
@@ -335,7 +334,104 @@ const VendorsPage = () => {
         return stars;
     };
 
-    const VendorCard = ({ vendor }) => (
+    const VendorCard = ({ vendor, viewMode = 'grid' }) => {
+        if (viewMode === 'list') {
+            return (
+                <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group">
+                    <div className="flex">
+                        {/* Image */}
+                        <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
+                            <Image
+                                src={vendor.image}
+                                alt={vendor.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            {vendor.isSponsored && (
+                                <div className="absolute top-2 left-2 bg-accent text-accent-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
+                                    Patrocinado
+                                </div>
+                            )}
+                            <div className="absolute top-2 right-2 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-caption">
+                                {vendor.distance}km
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 className="font-heading font-semibold text-lg text-foreground mb-1">
+                                    {vendor.name}
+                                </h3>
+                                <div className="flex items-center space-x-1 mb-2">
+                                    <Icon name="MapPin" size={14} className="text-muted-foreground" />
+                                    <span className="text-sm font-caption text-muted-foreground">
+                                        {vendor.location}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <div className="flex items-center space-x-1">
+                                        {renderStars(vendor.rating)}
+                                    </div>
+                                    <span className="text-sm font-body font-medium text-foreground">
+                                        {vendor.rating.toFixed(1)}
+                                    </span>
+                                    <span className="text-sm font-caption text-muted-foreground">
+                                        ({vendor.reviewCount})
+                                    </span>
+                                </div>
+
+                                <div className="flex flex-wrap gap-1 mb-3">
+                                    {vendor.categories.slice(0, 3).map((category, index) => (
+                                        <span
+                                            key={index}
+                                            className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full"
+                                        >
+                                            {category}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <Icon
+                                        name="Clock"
+                                        size={14}
+                                        className={vendor.isOpen ? 'text-success' : 'text-error'}
+                                    />
+                                    <span className={`text-sm font-caption ${vendor.isOpen ? 'text-success' : 'text-error'}`}>
+                                        {vendor.isOpen ? 'Aberto' : 'Fechado'}
+                                    </span>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => navigate('/vendor-profile-products', { state: { vendorId: vendor.id } })}
+                                        className="text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30"
+                                    >
+                                        Ver Produtos
+                                    </Button>
+                                    <Button
+                                        variant="default"
+                                        size="sm"
+                                        iconName="MessageCircle"
+                                        onClick={() => handleWhatsAppContact(vendor)}
+                                        className="bg-success hover:bg-success/90"
+                                    >
+                                        WhatsApp
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
         <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
             {vendor.isSponsored && (
                 <div className="absolute top-3 left-3 z-10 bg-accent text-accent-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
@@ -434,7 +530,8 @@ const VendorsPage = () => {
                 </div>
             </div>
         </div>
-    );
+        );
+    };
 
     const LoadingSkeleton = () => (
         <div className="bg-card border border-border rounded-xl overflow-hidden animate-pulse">
@@ -483,9 +580,9 @@ const VendorsPage = () => {
                 {/* Search and Filters */}
                 <div className="bg-muted/50 border-b border-border">
                     <div className="container mx-auto px-4 py-4">
-                        <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center space-x-3 flex-wrap gap-3">
                             {/* Search Bar */}
-                            <div className="flex-1 max-w-md">
+                            <div className="flex-1">
                                 <SearchBar
                                     onSearch={handleSearch}
                                     onSuggestionClick={handleSuggestionClick}
@@ -494,87 +591,42 @@ const VendorsPage = () => {
                                 />
                             </div>
 
-                            {/* Filters and Actions */}
-                            <div className="flex items-center space-x-3">
-                                {/* Category Filter */}
-                                <div className="relative">
-                                    <button
-                                        className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
-                                    >
-                                        <Icon name="Filter" size={16} className="text-primary" />
-                                        <span className="hidden sm:inline">
-                                            {categoryOptions.find(opt => opt.value === categoryFilter)?.label || 'Categoria'}
-                                        </span>
-                                        <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
-                                    </button>
-                                    <select
-                                        value={categoryFilter}
-                                        onChange={(e) => setCategoryFilter(e.target.value)}
-                                        className="absolute inset-0 opacity-0 cursor-pointer"
-                                    >
-                                        {categoryOptions.map(option => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* Sort Filter */}
-                                <div className="relative">
-                                    <button
-                                        className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
-                                    >
-                                        <Icon name="ArrowUpDown" size={16} className="text-primary" />
-                                        <span className="hidden sm:inline">
-                                            {sortOptions.find(opt => opt.value === sortBy)?.label || 'Ordenar'}
-                                        </span>
-                                        <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
-                                    </button>
-                                    <select
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value)}
-                                        className="absolute inset-0 opacity-0 cursor-pointer"
-                                    >
-                                        {sortOptions.map(option => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* View Mode Toggle */}
-                                <div className="flex items-center bg-muted border border-border rounded-lg p-1">
-                                    <button
-                                        onClick={() => setViewMode('grid')}
-                                        className={`p-2 rounded-md transition-colors duration-200 ${
-                                            viewMode === 'grid' 
-                                                ? 'bg-card text-foreground shadow-sm' 
-                                                : 'text-muted-foreground hover:text-foreground'
-                                        }`}
-                                        title="Visualização em grade"
-                                    >
-                                        <Icon name="Grid3X3" size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode('list')}
-                                        className={`p-2 rounded-md transition-colors duration-200 ${
-                                            viewMode === 'list' 
-                                                ? 'bg-card text-foreground shadow-sm' 
-                                                : 'text-muted-foreground hover:text-foreground'
-                                        }`}
-                                        title="Visualização em lista"
-                                    >
-                                        <Icon name="List" size={16} />
-                                    </button>
-                                </div>
-
-                                <LocationSelector
-                                    currentLocation={currentLocation}
-                                    onLocationChange={handleLocationChange}
-                                />
+                            {/* Category Filter */}
+                            <div className="relative">
+                                <select
+                                    value={categoryFilter}
+                                    onChange={(e) => setCategoryFilter(e.target.value)}
+                                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap appearance-none pr-8"
+                                >
+                                    {categoryOptions.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <Icon name="ChevronDown" size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none" />
                             </div>
+
+                            {/* Sort Filter */}
+                            <div className="relative">
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap appearance-none pr-8"
+                                >
+                                    {sortOptions.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <Icon name="ChevronDown" size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                            </div>
+
+                            <LocationSelector
+                                currentLocation={currentLocation}
+                                onLocationChange={handleLocationChange}
+                            />
                         </div>
                     </div>
                 </div>
@@ -599,13 +651,9 @@ const VendorsPage = () => {
                         </div>
                     ) : (
                         <>
-                            <div className={
-                                viewMode === 'grid' 
-                                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                                    : "space-y-4"
-                            }>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {displayedVendors.map((vendor) => (
-                                    <VendorCard key={vendor.id} vendor={vendor} viewMode={viewMode} />
+                                    <VendorCard key={vendor.id} vendor={vendor} />
                                 ))}
                             </div>
 

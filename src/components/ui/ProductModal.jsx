@@ -147,7 +147,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-card rounded-2xl shadow-modal max-w-6xl w-full max-h-[90vh] overflow-hidden animate-fade-in">
+            <div className="bg-card rounded-2xl shadow-modal max-w-6xl w-full max-h-[90vh] overflow-hidden animate-fade-in flex flex-col">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-border">
                     <h2 className="text-xl font-bold text-foreground">
@@ -161,15 +161,15 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                     </button>
                 </div>
 
-                <div className="flex flex-col lg:flex-row min-h-0">
+                <div className="flex flex-col lg:flex-row min-h-0 flex-1 overflow-hidden">
                     {/* Image Section */}
-                    <div className="lg:w-3/5 p-6 bg-muted/30">
+                    <div className="lg:w-1/2 p-4 lg:p-6 bg-muted/30">
                         {/* Main Image */}
                         <div className="relative"
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}>
                             <div
-                                className="aspect-square bg-background rounded-xl overflow-hidden mb-4 cursor-zoom-in shadow-sm relative"
+                                className="aspect-square bg-background rounded-xl overflow-hidden mb-4 cursor-zoom-in shadow-sm relative max-h-80 lg:max-h-none"
                                 onMouseMove={handleMouseMove}
                                 onMouseEnter={() => setIsZoomed(true)}
                                 onMouseLeave={() => setIsZoomed(false)}
@@ -210,12 +210,12 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
 
                             {/* Thumbnail Images */}
                             {images.length > 1 && (
-                                <div className="flex space-x-3 justify-center">
+                                <div className="flex space-x-2 justify-center overflow-x-auto scrollbar-hide">
                                     {images.map((image, index) => (
                                         <button
                                             key={index}
                                             onClick={() => setCurrentImageIndex(index)}
-                                            className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 bg-background shadow-sm ${index === currentImageIndex
+                                            className={`w-16 h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 bg-background shadow-sm flex-shrink-0 ${index === currentImageIndex
                                                 ? 'border-primary ring-2 ring-primary/20'
                                                 : 'border-border hover:border-primary/50'
                                                 }`}
@@ -233,11 +233,11 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                     </div>
 
                     {/* Content Section */}
-                    <div className="lg:w-3/5 p-6 overflow-y-auto">
+                    <div className="lg:w-1/2 p-4 lg:p-6 overflow-y-auto flex-1">
                         <div className="space-y-6">
                             {/* Product Title and Rating */}
                             <div>
-                                <h1 className="text-3xl font-heading font-bold text-foreground mb-2">
+                                <h1 className="text-2xl lg:text-3xl font-heading font-bold text-foreground mb-2">
                                     {displayProduct.name}
                                 </h1>
 
@@ -276,8 +276,8 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                                     </p>
                                 )}
 
-                                <div className="flex items-center space-x-4 mb-6">
-                                    <div className="text-3xl font-heading font-bold text-primary">
+                                <div className="flex items-center space-x-4 mb-4">
+                                    <div className="text-2xl lg:text-3xl font-heading font-bold text-primary">
                                         {formatPrice(displayProduct.price)}
                                     </div>
                                     <div className="text-muted-foreground">
@@ -290,7 +290,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
 
                             {/* Vendor Info */}
                             {vendor && (
-                                <div className="bg-muted/50 rounded-xl p-2">
+                                <div className="bg-muted/50 rounded-xl p-4">
                                     <h3 className="font-body font-semibold text-foreground mb-3">
                                         Vendedor
                                     </h3>
@@ -315,25 +315,27 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                                                 )}
                                             </div>
                                         </div>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                        >
-                                            Ver Perfil
-                                        </Button>
+                                        <div className="hidden lg:block">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                            >
+                                                Ver Perfil
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             )}
 
                             {/* Action Buttons */}
-                            <div className="pt-4 border-border transition-all duration-200">
-                                <div className="flex space-x-3">
+                            <div className="pt-4 border-t border-border">
+                                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                                     <Button
                                         variant="default"
                                         size="sm"
                                         iconName="MessageCircle"
                                         onClick={handleWhatsAppContact}
-                                        className="bg-success hover:bg-success/90 flex-1 py-5"
+                                        className="bg-success hover:bg-success/90 flex-1 py-3"
                                     >
                                         Perguntar
                                     </Button>
@@ -342,7 +344,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                                         size="sm"
                                         iconName="Share"
                                         onClick={handleShare}
-                                        className="text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30 flex-1 py-5"
+                                        className="text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30 flex-1 py-3"
                                     >
                                         Compartilhar
                                     </Button>
@@ -367,6 +369,108 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                             )}
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        );
+    };
+
+    return (
+        <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
+            {vendor.isSponsored && (
+                <div className="absolute top-3 left-3 z-10 bg-accent text-accent-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
+                    Patrocinado
+                </div>
+            )}
+
+            <div className="relative h-48 overflow-hidden">
+                <Image
+                    src={vendor.image}
+                    alt={vendor.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                <div className="absolute top-3 right-3 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-caption">
+                    {vendor.distance}km
+                </div>
+            </div>
+
+            <div className="p-4 flex-1 flex flex-col">
+                <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                        <h3 className="font-heading font-semibold text-lg text-foreground mb-1 line-clamp-1">
+                            {vendor.name}
+                        </h3>
+                        <div className="flex items-center space-x-1 mb-2">
+                            <Icon name="MapPin" size={14} className="text-muted-foreground" />
+                            <span className="text-sm font-caption text-muted-foreground">
+                                {vendor.location}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex items-center space-x-2 mb-3">
+                    <div className="flex items-center space-x-1">
+                        {renderStars(vendor.rating)}
+                    </div>
+                    <span className="text-sm font-body font-medium text-foreground">
+                        {vendor.rating.toFixed(1)}
+                    </span>
+                    <span className="text-sm font-caption text-muted-foreground">
+                        ({vendor.reviewCount})
+                    </span>
+                </div>
+
+                <div className="flex flex-wrap gap-1 mb-4">
+                    {vendor.categories.slice(0, 3).map((category, index) => (
+                        <span
+                            key={index}
+                            className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full"
+                        >
+                            {category}
+                        </span>
+                    ))}
+                    {vendor.categories.length > 3 && (
+                        <span className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full">
+                            +{vendor.categories.length - 3}
+                        </span>
+                    )}
+                </div>
+
+                <div className="flex items-center space-x-2 mb-4">
+                    <Icon
+                        name="Clock"
+                        size={14}
+                        className={vendor.isOpen ? 'text-success' : 'text-error'}
+                    />
+                    <span className={`text-sm font-caption ${vendor.isOpen ? 'text-success' : 'text-error'}`}>
+                        {vendor.isOpen ? 'Aberto agora' : 'Fechado'}
+                    </span>
+                    <span className="text-sm font-caption text-muted-foreground">
+                        • {vendor.hours}
+                    </span>
+                </div>
+
+                {/* Botões corrigidos */}
+                <div className="flex gap-2 mt-auto">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate('/vendor-profile-products', { state: { vendorId: vendor.id } })}
+                        className="flex-1 text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30 text-sm px-3 py-5"
+                    >
+                        Ver Produtos
+                    </Button>
+                    <Button
+                        variant="default"
+                        size="sm"
+                        iconName="MessageCircle"
+                        onClick={() => handleWhatsAppContact(vendor)}
+                        className="flex-1 bg-success hover:bg-success/90 text-sm px-3 py-5"
+                    >
+                        WhatsApp
+                    </Button>
                 </div>
             </div>
         </div>
