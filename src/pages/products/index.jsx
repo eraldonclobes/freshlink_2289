@@ -212,6 +212,51 @@ const ProductsPage = () => {
         }
     ];
 
+const renderStars = (rating) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 !== 0;
+        
+        // Estrelas preenchidas
+        for (let i = 0; i < fullStars; i++) {
+            stars.push(
+                <Icon
+                    key={`full-${i}`}
+                    name="Star"
+                    size={14}
+                    className="text-warning fill-current"
+                />
+            );
+        }
+        
+        // Meia estrela
+        if (hasHalfStar) {
+            stars.push(
+                <Icon
+                    key="half"
+                    name="Star"
+                    size={14}
+                    className="text-warning fill-current opacity-50"
+                />
+            );
+        }
+        
+        // Estrelas vazias
+        const emptyStars = 5 - Math.ceil(rating);
+        for (let i = 0; i < emptyStars; i++) {
+            stars.push(
+                <Icon
+                    key={`empty-${i}`}
+                    name="Star"
+                    size={14}
+                    className="text-muted-foreground"
+                />
+            );
+        }
+        
+        return stars;
+    };
+  
     // Load initial products
     useEffect(() => {
         loadProducts();
