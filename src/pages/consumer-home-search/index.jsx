@@ -4,6 +4,7 @@ import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import ProductModal from '../../components/ui/ProductModal';
 import LocationSelector from '../../components/ui/LocationSelector';
+import Button from '../../components/ui/Button';
 import HeroCarousel from './components/HeroCarousel';
 import CategoryChips from './components/CategoryChips';
 import PromotionalBanners from './components/PromotionalBanners';
