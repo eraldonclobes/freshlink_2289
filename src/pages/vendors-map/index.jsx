@@ -1,16 +1,61 @@
 import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
+import SearchBar from '../../components/ui/SearchBar';
+import LocationSelector from '../../components/ui/LocationSelector';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 
+// Fix for default markers in react-leaflet
+import L from 'leaflet';
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Custom marker icons
+const createCustomIcon = (vendor) => {
+  const color = vendor.isOpen ? '#10B981' : '#EF4444'; // success or error color
+  const svgIcon = `
+    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="14" fill="${color}" stroke="white" stroke-width="3"/>
+      <circle cx="16" cy="16" r="8" fill="white"/>
+    </svg>
+  `;
+  
+  return L.divIcon({
+    html: svgIcon,
+    className: 'custom-marker',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+};
+
+// Component to handle map events
+const MapController = ({ center, onMapClick }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+
+  return null;
+};
+
 const VendorsMap = () => {
     const [vendors, setVendors] = useState([]);
     const [selectedVendor, setSelectedVendor] = useState(null);
+    const [filteredVendors, setFilteredVendors] = useState([]);
     const [mapCenter, setMapCenter] = useState({ lat: -23.5505, lng: -46.6333 }); // São Paulo
     const [userLocation, setUserLocation] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentLocation, setCurrentLocation] = useState({ id: 1, name: "São Paulo, SP", distance: "Atual" });
     const [filters, setFilters] = useState({
         category: '',
         isOpen: false,
@@ -96,8 +141,18 @@ const VendorsMap = () => {
         }
     ];
 
+    // Mock suggestions for search
+    const mockSuggestions = [
+        { id: 1, type: 'vendor', name: 'Fazenda Verde Orgânicos', category: 'Vendedor', vendorId: 1 },
+        { id: 2, type: 'vendor', name: 'Hortifruti do João', category: 'Vendedor', vendorId: 2 },
+        { id: 3, type: 'vendor', name: 'Sítio das Frutas', category: 'Vendedor', vendorId: 3 },
+        { id: 4, type: 'location', name: 'Vila Madalena', category: 'Localização' },
+        { id: 5, type: 'vendor', name: 'Mercado da Terra', category: 'Vendedor', vendorId: 4 }
+    ];
+
     useEffect(() => {
         setVendors(mockVendors);
+        setFilteredVendors(mockVendors);
         
         // Get user location
         if (navigator.geolocation) {
@@ -114,23 +169,58 @@ const VendorsMap = () => {
         }
     }, []);
 
-    const filteredVendors = vendors.filter(vendor => {
+    useEffect(() => {
+        filterVendors();
+    }, [vendors, searchQuery, filters]);
+
+    const filterVendors = () => {
+        let filtered = [...vendors];
+
+        // Search filter
+        if (searchQuery.trim()) {
+            filtered = filtered.filter(vendor =>
+                vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                vendor.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                vendor.categories.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()))
+            );
+        }
+
+        // Category filter
         if (filters.category && !vendor.categories.some(cat => 
             cat.toLowerCase().includes(filters.category.toLowerCase())
         )) {
             return false;
         }
         
+        // Open filter
         if (filters.isOpen && !vendor.isOpen) {
             return false;
         }
         
-        return true;
-    });
+        setFilteredVendors(filtered);
+    };
 
     const handleVendorClick = (vendor) => {
         setSelectedVendor(vendor);
         setMapCenter(vendor.coordinates);
+    };
+
+    const handleSearch = (query) => {
+        setSearchQuery(query);
+    };
+
+    const handleSuggestionClick = (suggestion) => {
+        if (suggestion.type === 'vendor') {
+            const vendor = vendors.find(v => v.id === suggestion.vendorId);
+            if (vendor) {
+                handleVendorClick(vendor);
+            }
+        }
+    };
+
+    const handleLocationChange = (location) => {
+        setCurrentLocation(location);
+        // In a real app, this would update the map center and reload vendors
     };
 
     const handleWhatsAppContact = (vendor) => {
@@ -138,6 +228,17 @@ const VendorsMap = () => {
         const whatsappUrl = `https://wa.me/55${vendor.phone}?text=${message}`;
         window.open(whatsappUrl, '_blank');
     };
+
+    const handleVendorProfileClick = (vendor) => {
+        window.open(`/vendor-profile-products?id=${vendor.id}`, '_blank');
+    };
+
+    // Filter suggestions based on search query
+    const filteredSuggestions = searchQuery && searchQuery.trim().length > 0
+        ? mockSuggestions.filter(item =>
+            item?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase())
+        ).slice(0, 5)
+        : [];
 
     const renderStars = (rating) => {
         const stars = [];
@@ -152,48 +253,71 @@ const VendorsMap = () => {
         return stars;
     };
 
-    const VendorMarker = ({ vendor, isSelected, onClick }) => (
-        <div
-            className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-200 ${
-                isSelected ? 'z-20 scale-110' : 'z-10 hover:scale-105'
-            }`}
-            style={{
-                left: `${((vendor.coordinates.lng + 46.8) / 0.4) * 100}%`,
-                top: `${((23.7 - vendor.coordinates.lat) / 0.3) * 100}%`
-            }}
-            onClick={() => onClick(vendor)}
-        >
-            <div className={`relative ${isSelected ? 'animate-bounce-in' : ''}`}>
-                {/* Vendor Avatar */}
-                <div className={`w-12 h-12 rounded-full border-3 overflow-hidden shadow-lg ${
-                    vendor.isOpen 
-                        ? 'border-success' 
-                        : 'border-error'
-                } ${isSelected ? 'ring-4 ring-primary/30' : ''}`}>
-                    <Image
-                        src={vendor.image}
-                        alt={vendor.name}
-                        className="w-full h-full object-cover"
+    // Category Filter Component
+    const CategoryFilter = () => {
+        const categoryOptions = [
+            { value: '', label: 'Todas as categorias' },
+            { value: 'organicos', label: 'Orgânicos' },
+            { value: 'frutas', label: 'Frutas' },
+            { value: 'verduras', label: 'Verduras' },
+            { value: 'legumes', label: 'Legumes' },
+            { value: 'temperos', label: 'Temperos' },
+            { value: 'laticinios', label: 'Laticínios' }
+        ];
+
+        const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+
+        return (
+            <div className="relative">
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setShowCategoryDropdown(!showCategoryDropdown);
+                    }}
+                    className="flex items-center space-x-2 px-3 py-2 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
+                >
+                    <Icon name="Filter" size={16} className="text-primary" />
+                    <span className="hidden sm:inline">
+                        {categoryOptions.find(opt => opt.value === filters.category)?.label || 'Categoria'}
+                    </span>
+                    <Icon
+                        name="ChevronDown"
+                        size={16}
+                        className={`transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}
                     />
-                </div>
-                
-                {/* Status Indicator */}
-                <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-                    vendor.isOpen ? 'bg-success' : 'bg-error'
-                }`} />
-                
-                {/* Tooltip on hover */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                    <div className="bg-card border border-border rounded-lg p-2 shadow-lg whitespace-nowrap">
-                        <p className="text-sm font-medium text-foreground">{vendor.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                            {vendor.isOpen ? 'Aberto' : 'Fechado'} • {vendor.productCount} produtos
-                        </p>
-                    </div>
-                </div>
+                </button>
+
+                {showCategoryDropdown && (
+                    <>
+                        <div
+                            className="fixed inset-0 z-40"
+                            onClick={() => setShowCategoryDropdown(false)}
+                        />
+                        <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 min-w-64">
+                            <div className="max-h-60 overflow-y-auto">
+                                {categoryOptions.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        onClick={() => {
+                                            setFilters(prev => ({ ...prev, category: option.value }));
+                                            setShowCategoryDropdown(false);
+                                        }}
+                                        className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${
+                                            filters.category === option.value
+                                                ? 'bg-primary/10 text-primary'
+                                                : 'text-foreground hover:bg-muted'
+                                        }`}
+                                    >
+                                        <span className="font-medium">{option.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
-        </div>
-    );
+        );
+    };
 
     const VendorCard = ({ vendor }) => (
         <div className="bg-card border border-border rounded-xl p-4 hover:shadow-lg transition-all duration-300">
@@ -248,7 +372,7 @@ const VendorsMap = () => {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleVendorClick(vendor)}
+                            onClick={() => handleVendorProfileClick(vendor)}
                             className="flex-1 text-xs"
                         >
                             Ver Produtos
@@ -276,7 +400,7 @@ const VendorsMap = () => {
                 {/* Header */}
                 <div className="bg-card border-b border-border">
                     <div className="container mx-auto px-4 py-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mb-4">
                             <div>
                                 <h1 className="text-xl font-heading font-bold text-foreground">
                                     Mapa de Vendedores
@@ -285,7 +409,29 @@ const VendorsMap = () => {
                                     {filteredVendors.length} vendedores próximos
                                 </p>
                             </div>
-                            
+                        </div>
+
+                        {/* Search and Filters */}
+                        <div className="flex items-center gap-3">
+                            {/* Search Bar */}
+                            <div className="flex-1">
+                                <SearchBar
+                                    onSearch={handleSearch}
+                                    onSuggestionClick={handleSuggestionClick}
+                                    suggestions={filteredSuggestions}
+                                    placeholder="Buscar vendedores..."
+                                    value={searchQuery}
+                                    showSuggestionsOnFocus={false}
+                                />
+                            </div>
+
+                            {/* Filters */}
+                            <div className="flex items-center space-x-3">
+                                <CategoryFilter />
+                                <LocationSelector
+                                    currentLocation={currentLocation}
+                                    onLocationChange={handleLocationChange}
+                                />
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -294,45 +440,29 @@ const VendorsMap = () => {
                             >
                                 Filtros
                             </Button>
+                            </div>
                         </div>
                         
                         {/* Filters */}
                         {showFilters && (
-                            <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-foreground mb-2">
-                                            Categoria
-                                        </label>
-                                        <select
-                                            value={filters.category}
-                                            onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-                                            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm"
-                                        >
-                                            <option value="">Todas</option>
-                                            <option value="organicos">Orgânicos</option>
-                                            <option value="frutas">Frutas</option>
-                                            <option value="verduras">Verduras</option>
-                                            <option value="legumes">Legumes</option>
-                                        </select>
-                                    </div>
-                                    
+                            <div className="mt-4 bg-card border border-border rounded-lg p-4">
+                                <div className="flex items-center space-x-4">
                                     <div className="flex items-center space-x-2">
                                         <input
                                             type="checkbox"
                                             id="openOnly"
                                             checked={filters.isOpen}
                                             onChange={(e) => setFilters(prev => ({ ...prev, isOpen: e.target.checked }))}
-                                            className="w-4 h-4 text-primary border-border rounded"
+                                            className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
                                         />
-                                        <label htmlFor="openOnly" className="text-sm font-medium text-foreground">
+                                        <label htmlFor="openOnly" className="text-sm font-body font-medium text-foreground">
                                             Apenas abertos agora
                                         </label>
                                     </div>
                                     
-                                    <div>
-                                        <label className="block text-sm font-medium text-foreground mb-2">
-                                            Distância máxima: {filters.distance}km
+                                    <div className="flex items-center space-x-3">
+                                        <label className="text-sm font-body font-medium text-foreground">
+                                            Raio: {filters.distance}km
                                         </label>
                                         <input
                                             type="range"
@@ -340,7 +470,7 @@ const VendorsMap = () => {
                                             max="20"
                                             value={filters.distance}
                                             onChange={(e) => setFilters(prev => ({ ...prev, distance: parseInt(e.target.value) }))}
-                                            className="w-full"
+                                            className="w-24"
                                         />
                                     </div>
                                 </div>
@@ -352,89 +482,109 @@ const VendorsMap = () => {
                 <div className="flex-1 flex">
                     {/* Map Container */}
                     <div className="flex-1 relative">
-                        {/* Mock Map Background */}
-                        <div className="w-full h-full bg-gradient-to-br from-green-100 to-blue-100 relative overflow-hidden">
-                            {/* Map Grid Lines */}
-                            <div className="absolute inset-0 opacity-20">
-                                {[...Array(20)].map((_, i) => (
-                                    <div
-                                        key={`v-${i}`}
-                                        className="absolute top-0 bottom-0 w-px bg-gray-300"
-                                        style={{ left: `${(i / 20) * 100}%` }}
-                                    />
-                                ))}
-                                {[...Array(15)].map((_, i) => (
-                                    <div
-                                        key={`h-${i}`}
-                                        className="absolute left-0 right-0 h-px bg-gray-300"
-                                        style={{ top: `${(i / 15) * 100}%` }}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* User Location */}
+                        {/* Real Interactive Map */}
+                        <MapContainer
+                            center={[mapCenter.lat, mapCenter.lng]}
+                            zoom={13}
+                            style={{ height: '100%', width: '100%' }}
+                            className="z-10"
+                        >
+                            <TileLayer
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            />
+                            
+                            <MapController center={[mapCenter.lat, mapCenter.lng]} />
+                            
+                            {/* User Location Marker */}
                             {userLocation && (
-                                <div
-                                    className="absolute transform -translate-x-1/2 -translate-y-1/2 z-30"
-                                    style={{
-                                        left: `${((userLocation.lng + 46.8) / 0.4) * 100}%`,
-                                        top: `${((23.7 - userLocation.lat) / 0.3) * 100}%`
-                                    }}
+                                <Marker
+                                    position={[userLocation.lat, userLocation.lng]}
+                                    icon={L.divIcon({
+                                        html: `
+                                            <div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg animate-pulse"></div>
+                                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-blue-500/20 rounded-full animate-ping"></div>
+                                        `,
+                                        className: 'user-location-marker',
+                                        iconSize: [16, 16],
+                                        iconAnchor: [8, 8],
+                                    })}
                                 >
-                                    <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg animate-pulse" />
-                                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-blue-500/20 rounded-full animate-ping" />
-                                </div>
+                                    <Popup>
+                                        <div className="text-center">
+                                            <p className="font-medium">Sua localização</p>
+                                        </div>
+                                    </Popup>
+                                </Marker>
                             )}
-
+                            
                             {/* Vendor Markers */}
                             {filteredVendors.map((vendor) => (
-                                <div key={vendor.id} className="group">
-                                    <VendorMarker
-                                        vendor={vendor}
-                                        isSelected={selectedVendor?.id === vendor.id}
-                                        onClick={handleVendorClick}
-                                    />
-                                </div>
-                            ))}
-
-                            {/* Map Controls */}
-                            <div className="absolute top-4 right-4 flex flex-col space-y-2">
-                                <button className="w-10 h-10 bg-card border border-border rounded-lg shadow-lg flex items-center justify-center hover:bg-muted transition-colors duration-200">
-                                    <Icon name="Plus" size={20} />
-                                </button>
-                                <button className="w-10 h-10 bg-card border border-border rounded-lg shadow-lg flex items-center justify-center hover:bg-muted transition-colors duration-200">
-                                    <Icon name="Minus" size={20} />
-                                </button>
-                                <button 
-                                    onClick={() => {
-                                        if (userLocation) {
-                                            setMapCenter(userLocation);
-                                        }
+                                <Marker
+                                    key={vendor.id}
+                                    position={[vendor.coordinates.lat, vendor.coordinates.lng]}
+                                    icon={createCustomIcon(vendor)}
+                                    eventHandlers={{
+                                        click: () => handleVendorClick(vendor),
                                     }}
-                                    className="w-10 h-10 bg-card border border-border rounded-lg shadow-lg flex items-center justify-center hover:bg-muted transition-colors duration-200"
                                 >
-                                    <Icon name="Navigation" size={20} />
-                                </button>
-                            </div>
-
-                            {/* Legend */}
-                            <div className="absolute bottom-4 left-4 bg-card border border-border rounded-lg p-3 shadow-lg">
-                                <div className="space-y-2">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-success rounded-full" />
-                                        <span className="text-xs text-foreground">Aberto</span>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-error rounded-full" />
-                                        <span className="text-xs text-foreground">Fechado</span>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-blue-500 rounded-full" />
-                                        <span className="text-xs text-foreground">Sua localização</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    <Popup>
+                                        <div className="p-2 min-w-64">
+                                            <div className="flex items-start space-x-3">
+                                                <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                                                    <Image
+                                                        src={vendor.image}
+                                                        alt={vendor.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="font-body font-medium text-foreground mb-1">
+                                                        {vendor.name}
+                                                    </h3>
+                                                    <div className="flex items-center space-x-1 mb-2">
+                                                        <Icon name="MapPin" size={12} className="text-muted-foreground" />
+                                                        <span className="text-xs text-muted-foreground">{vendor.location}</span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-1 mb-2">
+                                                        {renderStars(vendor.rating).slice(0, 5)}
+                                                        <span className="text-xs font-medium text-foreground ml-1">
+                                                            {vendor.rating.toFixed(1)}
+                                                        </span>
+                                                    </div>
+                                                    <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                                        vendor.isOpen 
+                                                            ? 'bg-success/10 text-success' 
+                                                            : 'bg-error/10 text-error'
+                                                    }`}>
+                                                        {vendor.isOpen ? 'Aberto' : 'Fechado'}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex space-x-2 mt-3">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleVendorProfileClick(vendor)}
+                                                    className="flex-1 text-xs"
+                                                >
+                                                    Ver Produtos
+                                                </Button>
+                                                <Button
+                                                    variant="default"
+                                                    size="sm"
+                                                    iconName="MessageCircle"
+                                                    onClick={() => handleWhatsAppContact(vendor)}
+                                                    className="bg-success hover:bg-success/90 text-xs"
+                                                >
+                                                    WhatsApp
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </Popup>
+                                </Marker>
+                            ))}
+                        </MapContainer>
                     </div>
 
                     {/* Sidebar */}
@@ -496,7 +646,7 @@ const VendorsMap = () => {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => window.location.href = `/vendor-profile-products?id=${selectedVendor.id}`}
+                                        onClick={() => handleVendorProfileClick(selectedVendor)}
                                     >
                                         Ver Produtos
                                     </Button>

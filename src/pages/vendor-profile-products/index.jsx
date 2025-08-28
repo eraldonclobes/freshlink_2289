@@ -84,7 +84,12 @@ const VendorProfileProducts = () => {
       unit: "kg",
       image: "https://images.unsplash.com/photo-1546470427-e5ac89c8ba37?w=300&h=300&fit=crop",
       available: true,
-      isOrganic: true
+      isOrganic: true,
+      rating: 4.8,
+      reviewCount: 23,
+      categories: ["Orgânicos", "Legumes"],
+      discount: 15,
+      originalPrice: 10.00
     },
     {
       id: "prod-002",
@@ -94,7 +99,10 @@ const VendorProfileProducts = () => {
       unit: "maço",
       image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=300&h=300&fit=crop",
       available: true,
-      isOrganic: true
+      isOrganic: true,
+      rating: 4.6,
+      reviewCount: 18,
+      categories: ["Orgânicos", "Verduras"]
     },
     {
       id: "prod-003",
@@ -104,7 +112,10 @@ const VendorProfileProducts = () => {
       unit: "kg",
       image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=300&h=300&fit=crop",
       available: true,
-      isOrganic: false
+      isOrganic: false,
+      rating: 4.5,
+      reviewCount: 34,
+      categories: ["Frutas", "Natural"]
     },
     {
       id: "prod-004",
@@ -114,7 +125,10 @@ const VendorProfileProducts = () => {
       unit: "kg",
       image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=300&h=300&fit=crop",
       available: false,
-      isOrganic: true
+      isOrganic: true,
+      rating: 4.7,
+      reviewCount: 29,
+      categories: ["Orgânicos", "Legumes"]
     },
     {
       id: "prod-005",
@@ -124,7 +138,10 @@ const VendorProfileProducts = () => {
       unit: "maço",
       image: "https://images.unsplash.com/photo-1618375569909-3c8616cf7733?w=300&h=300&fit=crop",
       available: true,
-      isOrganic: true
+      isOrganic: true,
+      rating: 4.9,
+      reviewCount: 15,
+      categories: ["Orgânicos", "Temperos"]
     },
     {
       id: "prod-006",
@@ -134,7 +151,10 @@ const VendorProfileProducts = () => {
       unit: "kg",
       image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=300&h=300&fit=crop",
       available: true,
-      isOrganic: false
+      isOrganic: false,
+      rating: 4.4,
+      reviewCount: 41,
+      categories: ["Frutas", "Doces"]
     },
     {
       id: "prod-007",
@@ -144,7 +164,10 @@ const VendorProfileProducts = () => {
       unit: "maço",
       image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=300&h=300&fit=crop",
       available: true,
-      isOrganic: true
+      isOrganic: true,
+      rating: 4.6,
+      reviewCount: 22,
+      categories: ["Orgânicos", "Verduras"]
     },
     {
       id: "prod-008",
@@ -154,7 +177,10 @@ const VendorProfileProducts = () => {
       unit: "kg",
       image: "https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=300&h=300&fit=crop",
       available: true,
-      isOrganic: true
+      isOrganic: true,
+      rating: 4.3,
+      reviewCount: 8,
+      categories: ["Orgânicos", "Legumes"]
     }
   ];
 
@@ -260,8 +286,6 @@ const VendorProfileProducts = () => {
               <ProductGrid
                 products={filteredProducts}
                 vendor={vendorData}
-                onProductInquiry={handleProductInquiry}
-                onProductClick={handleProductClick}
                 onFavoriteToggle={handleFavoriteToggle}
                 favoriteProducts={favoriteProducts}
               />
