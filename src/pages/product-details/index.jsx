@@ -3,6 +3,8 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import ShareModal from '../../components/ui/ShareModal';
+import NutritionalInfoModal from '../../components/ui/NutritionalInfoModal';
+import ProductReviewsSection from '../../components/ui/ProductReviewsSection';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
@@ -16,6 +18,7 @@ const ProductDetails = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [showShareModal, setShowShareModal] = useState(false);
+    const [showNutritionalModal, setShowNutritionalModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [favoriteProducts, setFavoriteProducts] = useState([]);
 
@@ -46,8 +49,18 @@ const ProductDetails = () => {
             vendorId: 1,
             nutritionalInfo: {
                 calories: "18 kcal por 100g",
+                protein: 0.9,
+                carbs: 3.9,
+                fat: 0.2,
+                fiber: 1.2,
                 vitamins: ["Vitamina C", "Vitamina K", "Folato"],
-                minerals: ["Potássio", "Licopeno"]
+                minerals: ["Potássio", "Licopeno"],
+                benefits: [
+                    "Rico em licopeno, um poderoso antioxidante",
+                    "Fonte de vitamina C para fortalecer a imunidade",
+                    "Baixo em calorias e rico em água",
+                    "Contém folato, importante para a saúde cardiovascular"
+                ]
             },
             harvestDate: "2024-01-15",
             shelfLife: "7-10 dias refrigerado"
@@ -114,6 +127,54 @@ const ProductDetails = () => {
         
         setFavoriteProducts(updatedFavorites);
         localStorage.setItem('favoriteProducts', JSON.stringify(updatedFavorites));
+    };
+
+    // Mock reviews data for the product
+    const mockProductReviews = [
+        {
+            id: 1,
+            customerName: "Maria Silva",
+            customerAvatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+            rating: 5,
+            date: "2024-01-20",
+            comment: "Tomates incríveis! Muito saborosos e frescos. Chegaram no ponto perfeito de maturação."
+        },
+        {
+            id: 2,
+            customerName: "João Santos",
+            customerAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+            rating: 4,
+            date: "2024-01-18",
+            comment: "Ótima qualidade, mas achei um pouco caro. Mesmo assim, vale a pena pela qualidade orgânica."
+        },
+        {
+            id: 3,
+            customerName: "Ana Costa",
+            customerAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+            rating: 5,
+            date: "2024-01-15",
+            comment: "Perfeitos para fazer molho caseiro! Sabor intenso e textura ideal."
+        }
+    ];
+
+    const averageRating = mockProductReviews.reduce((acc, review) => acc + review.rating, 0) / mockProductReviews.length;
+
+    const getProductTypeLabel = (type) => {
+        const types = {
+            'organic': 'Orgânico',
+            'natural': 'Natural',
+            'conventional': 'Convencional'
+        };
+        return types[type] || 'Não informado';
+    };
+
+    const getProductTypeColor = (type) => {
+        const colors = {
+            'organic': 'bg-success/10 text-success border-success/20',
+            'natural': 'bg-primary/10 text-primary border-primary/20',
+            'conventional': 'bg-muted text-muted-foreground border-border'
+        };
+        return colors[type] || 'bg-muted text-muted-foreground border-border';
     };
 
     const handleVendorClick = () => {
@@ -349,6 +410,18 @@ const ProductDetails = () => {
                                 )}
                             </div>
 
+                            {/* Product Type Label */}
+                            {product.isOrganic && (
+                                <div className="mb-6">
+                                    <div className={`inline-flex items-center space-x-2 px-3 py-2 rounded-lg border ${getProductTypeColor('organic')}`}>
+                                        <Icon name="Leaf" size={16} />
+                                        <span className="text-sm font-body font-medium">
+                                            {getProductTypeLabel('organic')}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Product Details */}
                             <div className="bg-muted/50 rounded-xl p-6 space-y-4">
                                 <h3 className="font-body font-semibold text-foreground">
@@ -384,42 +457,24 @@ const ProductDetails = () => {
 
                             {/* Nutritional Info */}
                             {product.nutritionalInfo && (
-                                <div className="bg-muted/50 rounded-xl p-6 space-y-4">
-                                    <h3 className="font-body font-semibold text-foreground">
-                                        Informações Nutricionais
-                                    </h3>
-                                    <div className="space-y-3">
-                                        {product.nutritionalInfo.calories && (
-                                            <div className="flex items-center space-x-2">
-                                                <Icon name="Zap" size={16} className="text-warning" />
-                                                <span className="text-sm text-foreground">{product.nutritionalInfo.calories}</span>
-                                            </div>
-                                        )}
-                                        {product.nutritionalInfo.vitamins && (
-                                            <div>
-                                                <p className="text-sm font-medium text-foreground mb-2">Vitaminas:</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {product.nutritionalInfo.vitamins.map((vitamin, index) => (
-                                                        <span key={index} className="px-2 py-1 bg-success/10 text-success text-xs rounded-full">
-                                                            {vitamin}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                        {product.nutritionalInfo.minerals && (
-                                            <div>
-                                                <p className="text-sm font-medium text-foreground mb-2">Minerais:</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {product.nutritionalInfo.minerals.map((mineral, index) => (
-                                                        <span key={index} className="px-2 py-1 bg-accent/10 text-accent text-xs rounded-full">
-                                                            {mineral}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
+                                <div className="bg-muted/50 rounded-xl p-6">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-body font-semibold text-foreground">
+                                            Informações Nutricionais
+                                        </h3>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            iconName="Info"
+                                            iconPosition="left"
+                                            onClick={() => setShowNutritionalModal(true)}
+                                        >
+                                            Ver Detalhes
+                                        </Button>
                                     </div>
+                                    <p className="text-sm text-muted-foreground mt-2">
+                                        Clique para ver informações detalhadas sobre vitaminas, minerais e benefícios
+                                    </p>
                                 </div>
                             )}
 
@@ -472,6 +527,15 @@ const ProductDetails = () => {
                                 </div>
                             )}
 
+                            {/* Product Reviews */}
+                            <ProductReviewsSection
+                                productId={product.id}
+                                productName={product.name}
+                                reviews={mockProductReviews}
+                                averageRating={averageRating}
+                                totalReviews={mockProductReviews.length}
+                            />
+
                             {/* Action Buttons */}
                             <div className="space-y-4">
                                 <div className="flex space-x-3">
@@ -515,6 +579,14 @@ const ProductDetails = () => {
                 product={product}
                 vendor={vendor}
                 type="product"
+            />
+
+            {/* Nutritional Info Modal */}
+            <NutritionalInfoModal
+                isOpen={showNutritionalModal}
+                onClose={() => setShowNutritionalModal(false)}
+                nutritionalInfo={product?.nutritionalInfo}
+                productName={product?.name}
             />
 
             <Footer />

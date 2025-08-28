@@ -183,4 +183,29 @@
   .auth-form .card-hover {
     @apply hover:shadow-none hover:translate-y-0;
   }
+
+  /* Leaflet map styles */
+  .leaflet-container {
+    @apply rounded-lg;
+  }
+
+  .leaflet-popup-content-wrapper {
+    @apply bg-card border border-border rounded-lg shadow-lg;
+  }
+
+  .leaflet-popup-content {
+    @apply text-foreground;
+  }
+
+  .leaflet-popup-tip {
+    @apply bg-card;
+  }
+
+  .custom-marker {
+    @apply transition-all duration-200 hover:scale-110;
+  }
+
+  .user-location-marker {
+    @apply z-50;
+  }
 }

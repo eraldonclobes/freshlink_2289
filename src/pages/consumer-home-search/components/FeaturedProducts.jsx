@@ -28,7 +28,9 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
             discount: 15,
             originalPrice: 10.00,
             description: "Tomates frescos cultivados sem agrotóxicos, direto da nossa horta familiar.",
-            categories: ["Orgânicos", "Verduras", "Legumes"]
+            categories: ["Orgânicos", "Verduras", "Legumes"],
+            rating: 4.8,
+            reviewCount: 23
         },
         {
             id: 2,
@@ -46,7 +48,9 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
             discount: 10,
             originalPrice: 7.67,
             description: "Bananas doces e maduras, ricas em potássio.",
-            categories: ["Frutas", "Natural"]
+            categories: ["Frutas", "Natural"],
+            rating: 4.5,
+            reviewCount: 34
         },
         {
             id: 3,
@@ -64,7 +68,9 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
             discount: null,
             originalPrice: null,
             description: "Alface fresca cultivada em sistema hidropônico, crocante e saborosa.",
-            categories: ["Verduras", "Hidropônico"]
+            categories: ["Verduras", "Hidropônico"],
+            rating: 4.6,
+            reviewCount: 18
         },
         {
             id: 4,
@@ -82,7 +88,9 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
             discount: 20,
             originalPrice: 7.25,
             description: "Cenouras orgânicas doces e crocantes, perfeitas para qualquer receita.",
-            categories: ["Orgânicos", "Legumes"]
+            categories: ["Orgânicos", "Legumes"],
+            rating: 4.7,
+            reviewCount: 29
         }
     ];
 
@@ -244,6 +252,19 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
                             </button>
                         </div>
                     </div>
+                </div>
+
+                {/* Rating */}
+                <div className="flex items-center space-x-2 mb-3">
+                    <div className="flex items-center space-x-1">
+                        {renderStars(product?.rating || 4.5)}
+                    </div>
+                    <span className="text-sm font-body font-medium text-foreground">
+                        {(product?.rating || 4.5).toFixed(1)}
+                    </span>
+                    <span className="text-sm font-caption text-muted-foreground">
+                        ({product?.reviewCount || 12})
+                    </span>
                 </div>
 
                 {/* Categories */}
