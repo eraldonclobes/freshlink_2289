@@ -103,20 +103,20 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
     }, []);
 
     const handleProductClick = (product) => {
-        // Mock vendor data for the product modal
-        const mockVendor = {
-            id: product.vendorId,
-            name: product.vendor,
-            image: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&h=300&fit=crop",
-            location: "São Paulo, SP",
-            distance: `${product.distance}km`,
-            phone: "11999999999"
-        };
-
-        // Pass the product with vendor data to parent component
-        if (typeof onProductClick === 'function') {
-            onProductClick({ ...product, vendor: mockVendor });
-        }
+        // Navigate to product details page instead of opening modal
+        navigate(`/product-details/${product.id}`, {
+            state: {
+                product,
+                vendor: {
+                    id: product.vendorId,
+                    name: product.vendor,
+                    image: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&h=300&fit=crop",
+                    location: "São Paulo, SP",
+                    distance: `${product.distance}km`,
+                    phone: "11999999999"
+                }
+            }
+        });
     };
 
     const handleVendorClick = (product, e) => {

@@ -137,6 +137,14 @@ const ResponsiveHeader = ({ className = '' }) => {
                             <Icon name="Store" size={18} />
                             <span className="font-medium">Vendedores</span>
                         </button>
+
+                        <button
+                            onClick={() => navigate('/vendors-map')}
+                            className={getNavLinkClass('/vendors-map')}
+                        >
+                            <Icon name="Map" size={18} />
+                            <span className="font-medium">Mapa</span>
+                        </button>
                     </nav>
 
                     {/* User Profile or Login Button */}
@@ -294,6 +302,17 @@ const ResponsiveHeader = ({ className = '' }) => {
                             >
                                 <Icon name="Store" size={20} />
                                 <span>Vendedores</span>
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    navigate('/vendors-map');
+                                    setIsMobileMenuOpen(false);
+                                }}
+                                className="w-full flex items-center space-x-4 px-4 py-3.5 rounded-lg text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-200"
+                            >
+                                <Icon name="Map" size={20} />
+                                <span>Mapa</span>
                             </button>
 
                             {!userAuth && (

@@ -12,6 +12,10 @@ import VendorProfileProducts from './pages/vendor-profile-products';
 import VendorProfile from './pages/vendor-profile';
 import Auth from './pages/auth';
 import ClientProfile from './pages/client-profile';
+import ProductDetails from './pages/product-details';
+import VendorsMap from './pages/vendors-map';
+import RecipePage from './pages/recipes';
+import ProductBenefitsPage from './pages/product-benefits';
 import ProductsPage from './pages/products';
 import VendorsPage from './pages/vendors';
 
@@ -27,7 +31,13 @@ const Routes = () => {
                     {/* Main consumer routes */}
                     <Route path="/consumer-home-search" element={<ConsumerHomeSearch />} />
                     <Route path="/products" element={<ProductsPage />} />
+                    <Route path="/product-details/:productId" element={<ProductDetails />} />
                     <Route path="/vendors" element={<VendorsPage />} />
+                    <Route path="/vendors-map" element={<VendorsMap />} />
+
+                    {/* Content routes */}
+                    <Route path="/recipes/:recipeId" element={<RecipePage />} />
+                    <Route path="/benefits/:productType" element={<ProductBenefitsPage />} />
 
                     {/* Authentication routes */}
                     <Route path="/auth" element={<Auth />} />

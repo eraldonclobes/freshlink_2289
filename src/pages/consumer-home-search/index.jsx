@@ -6,6 +6,7 @@ import ProductModal from '../../components/ui/ProductModal';
 import LocationSelector from '../../components/ui/LocationSelector';
 import HeroCarousel from './components/HeroCarousel';
 import CategoryChips from './components/CategoryChips';
+import PromotionalBanners from './components/PromotionalBanners';
 import FeaturedProducts from './components/FeaturedProducts';
 import VendorGrid from './components/VendorGrid';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -350,6 +351,9 @@ const ConsumerHomeSearch = () => {
                 {/* Featured Products */}
                 <FeaturedProducts className="mb-8" onProductClick={handleProductClick} />
 
+                {/* Promotional Banners */}
+                <PromotionalBanners className="mb-8" />
+
                 {/* Location Selector */}
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-4">
@@ -376,6 +380,15 @@ const ConsumerHomeSearch = () => {
 
                     {/* Sort Options */}
                     <div className="flex items-center space-x-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            iconName="Map"
+                            onClick={() => navigate('/vendors-map')}
+                            className="hidden md:flex"
+                        >
+                            Ver no Mapa
+                        </Button>
                         <button className="flex items-center space-x-2 px-3 py-2 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200">
                             <span>Recomendados</span>
                             <Icon name="ChevronDown" size={16} />
