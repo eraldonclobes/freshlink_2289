@@ -1062,7 +1062,6 @@ const renderStars = (rating) => {
                             </div>
                         </div>
                     </div>
-                    </div>
                 </div>
 
                 {/* Products Grid */}
