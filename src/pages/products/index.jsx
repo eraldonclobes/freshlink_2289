@@ -628,49 +628,7 @@ const ProductsPage = () => {
                             />
                         </div>
 
-                        {/* Categories with arrows */}
-                        <div className="relative">
-                            {showCategoryArrows && (
-                                <button
-                                    onClick={() => scrollCategories('left')}
-                                    className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 bg-card border border-border rounded-full flex items-center justify-center shadow-sm hover:bg-muted transition-colors duration-200"
-                                >
-                                    <Icon name="ChevronLeft" size={16} />
-                                </button>
-                            )}
-                            
-                            <div 
-                                ref={categoriesRef}
-                                className="flex space-x-3 overflow-x-auto scrollbar-hide pb-2"
-                                style={{ 
-                                    paddingLeft: showCategoryArrows ? '2.5rem' : '0',
-                                    paddingRight: showCategoryArrows ? '2.5rem' : '0'
-                                }}
-                            >
-                                {categories.map((category) => (
-                                    <button
-                                        key={category.id}
-                                        onClick={() => setActiveCategory(category.id)}
-                                        className={`flex items-center space-x-2 px-4 py-2.5 rounded-full text-sm font-body font-medium whitespace-nowrap transition-all duration-200 border ${
-                                            activeCategory === category.id
-                                                ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                                                : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground hover:border-primary/30'
-                                        }`}
-                                    >
-                                        <Icon name={category.icon} size={16} />
-                                        <span>{category.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-
-                            {showCategoryArrows && (
-                                <button
-                                    onClick={() => scrollCategories('right')}
-                                    className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 bg-card border border-border rounded-full flex items-center justify-center shadow-sm hover:bg-muted transition-colors duration-200"
-                                >
-                                    <Icon name="ChevronRight" size={16} />
-                                </button>
-                            )}
+                        
                         </div>
                     </div>
                 </div>
