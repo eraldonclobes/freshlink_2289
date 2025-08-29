@@ -10,6 +10,8 @@ const ResponsiveHeader = ({ className = '' }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [userAuth, setUserAuth] = useState(null);
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
     const dropdownRef = useRef(null);
 
     useEffect(() => {
@@ -34,6 +36,47 @@ const ResponsiveHeader = ({ className = '' }) => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    // Controle de scroll para esconder/mostrar navbar
+    useEffect(() => {
+        const controlNavbar = () => {
+            const currentScrollY = window.scrollY;
+            
+            // Se scrollar para baixo e passou de 100px, esconde
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                setIsVisible(false);
+                // Fecha menus abertos quando esconde
+                setIsMobileMenuOpen(false);
+                setIsProfileDropdownOpen(false);
+            }
+            // Se scrollar para cima, mostra
+            else if (currentScrollY < lastScrollY) {
+                setIsVisible(true);
+            }
+            
+            // Se estiver no topo da página, sempre mostra
+            if (currentScrollY < 10) {
+                setIsVisible(true);
+            }
+            
+            setLastScrollY(currentScrollY);
+        };
+
+        // Throttle function para melhor performance
+        let ticking = false;
+        const handleScroll = () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    controlNavbar();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastScrollY]);
 
     const handleLogoClick = () => {
         navigate('/consumer-home-search');
@@ -80,7 +123,11 @@ const ResponsiveHeader = ({ className = '' }) => {
     };
 
     return (
-        <header className={`bg-card border-b border-border fixed top-0 left-0 right-0 z-50 ${className}`}>
+        <header 
+            className={`bg-card border-b border-border fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${
+                isVisible ? 'translate-y-0' : '-translate-y-full'
+            } ${className}`}
+        >
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
                     {/* Mobile Menu Button */}
@@ -268,7 +315,7 @@ const ResponsiveHeader = ({ className = '' }) => {
                 </div>
 
                 {/* Mobile Menu */}
-                {isMobileMenuOpen && (
+                {isMobileMenuOpen && isVisible && (
                     <div className="md:hidden absolute top-16 left-0 right-0 bg-card border-b border-border shadow-lg max-h-96 overflow-y-auto">
                         <nav className="px-4 py-6 space-y-1">
                             <button
