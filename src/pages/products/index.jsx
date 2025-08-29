@@ -781,40 +781,40 @@ const renderStars = (rating) => {
             <ResponsiveHeader />
 
             <main className="pt-16 flex-1">
-                 {/* Fixed Header with Categories and Filters */}
+                {/* Fixed Header with Categories and Filters */}
                 <div className="bg-card border-b border-border sticky top-16 z-40">
-                    <div className="container mx-auto px-4 py-6">
-                        {/* Main Categories - Card Style */}
-                        <div className="mb-6">
-                            <div className="flex items-center space-x-3">
+                    <div className="container mx-auto px-4 py-3">
+                        {/* Main Categories - Compact Card Style */}
+                        <div className="mb-3">
+                            <div className="flex items-center space-x-2">
                                 {mainCategoryStartIndex > 0 && (
                                     <button
                                         onClick={() => navigateMainCategories('prev')}
-                                        className="w-10 h-10 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
+                                        className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
                                     >
-                                        <Icon name="ChevronLeft" size={16} />
+                                        <Icon name="ChevronLeft" size={14} />
                                     </button>
                                 )}
                                 
-                                <div className="flex space-x-3 overflow-hidden flex-1">
+                                <div className="flex space-x-2 overflow-hidden flex-1">
                                     {visibleMainCategories.map((category) => (
                                         <button
                                             key={category.id}
                                             onClick={() => handleMainCategoryChange(category.id)}
-                                            className={`flex flex-col items-center space-y-2 p-3 rounded-lg text-xs font-body font-medium whitespace-nowrap transition-all duration-200 border min-w-[80px] ${
+                                            className={`flex flex-col items-center space-y-1 p-2 rounded-lg text-xs font-body font-medium whitespace-nowrap transition-all duration-200 border min-w-[70px] ${
                                                 activeMainCategory === category.id
                                                     ? 'bg-primary text-primary-foreground border-primary shadow-sm'
                                                     : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground hover:border-primary/30'
                                             }`}
                                         >
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                            <div className={`w-6 h-6 rounded-md flex items-center justify-center ${
                                                 activeMainCategory === category.id
                                                     ? 'bg-primary-foreground/20'
                                                     : 'bg-muted'
                                             }`}>
-                                                <Icon name={category.icon} size={18} />
+                                                <Icon name={category.icon} size={14} />
                                             </div>
-                                            <span className="text-center leading-tight">{category.label}</span>
+                                            <span className="text-center leading-tight text-[10px]">{category.label}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -822,90 +822,87 @@ const renderStars = (rating) => {
                                 {mainCategoryStartIndex + CATEGORIES_PER_VIEW < mainCategories.length && (
                                     <button
                                         onClick={() => navigateMainCategories('next')}
-                                        className="w-10 h-10 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
+                                        className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
                                     >
-                                        <Icon name="ChevronRight" size={16} />
+                                        <Icon name="ChevronRight" size={14} />
                                     </button>
                                 )}
                             </div>
                         </div>
 
-                        {/* Search and Filters */}
-                        <div className="flex items-center gap-3 mb-4">
-                            {/* Search Bar */}
-                            <div className="flex-1 max-w-md">
+                        {/* Filters Row */}
+                        <div className="flex items-center gap-2">
+                            {/* Filter Button */}
+                            <button className="flex items-center space-x-1 px-3 py-2 bg-muted border border-border rounded-lg text-xs font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200">
+                                <Icon name="Filter" size={14} className="text-primary" />
+                                <span>Filtrar</span>
+                            </button>
+
+                            {/* Sort Filter */}
+                            <SortFilter />
+                            
+                            {/* Sub Categories */}
+                            <div className="flex items-center space-x-1">
+                                {subCategoryStartIndex > 0 && (
+                                    <button
+                                        onClick={() => navigateSubCategories('prev')}
+                                        className="w-6 h-6 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
+                                    >
+                                        <Icon name="ChevronLeft" size={12} />
+                                    </button>
+                                )}
+                                
+                                <div className="flex space-x-1 overflow-hidden">
+                                    {visibleSubCategories.map((subCategory) => (
+                                        <button
+                                            key={subCategory.id}
+                                            onClick={() => handleSubCategoryChange(subCategory.id)}
+                                            className={`px-2 py-1 rounded-full text-xs font-body font-medium whitespace-nowrap transition-all duration-200 border ${
+                                                activeSubCategory === subCategory.id
+                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                    : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground'
+                                            }`}
+                                        >
+                                            {subCategory.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                {subCategoryStartIndex + SUB_CATEGORIES_PER_VIEW < currentSubCategories.length && (
+                                    <button
+                                        onClick={() => navigateSubCategories('next')}
+                                        className="w-6 h-6 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
+                                    >
+                                        <Icon name="ChevronRight" size={12} />
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Search Bar - Moved to end */}
+                            <div className="flex-1 max-w-sm ml-auto">
                                 <div className="relative">
                                     <Icon 
                                         name="Search" 
-                                        size={16} 
-                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+                                        size={14} 
+                                        className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
                                     />
                                     <input
                                         type="text"
                                         placeholder="Buscar produtos..."
                                         value={searchQuery}
                                         onChange={(e) => handleSearch(e.target.value)}
-                                        className="w-full pl-9 pr-4 py-3 bg-background border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent h-12"
+                                        className="w-full pl-8 pr-3 py-2 bg-background border border-border rounded-lg text-xs font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                     />
                                     {searchQuery && (
                                         <button
                                             onClick={handleClearSearch}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                         >
-                                            <Icon name="X" size={14} />
+                                            <Icon name="X" size={12} />
                                         </button>
                                     )}
                                 </div>
                             </div>
-
-                            {/* Sort Filter */}
-                            <div className="flex items-center space-x-3">
-                                <SortFilter />
-                                
-                                {/* Sub Categories */}
-                                <div className="flex items-center space-x-2">
-                                    {subCategoryStartIndex > 0 && (
-                                        <button
-                                            onClick={() => navigateSubCategories('prev')}
-                                            className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
-                                        >
-                                            <Icon name="ChevronLeft" size={14} />
-                                        </button>
-                                    )}
-                                    
-                                    <div className="flex space-x-2 overflow-hidden">
-                                        {visibleSubCategories.map((subCategory) => (
-                                            <button
-                                                key={subCategory.id}
-                                                onClick={() => handleSubCategoryChange(subCategory.id)}
-                                                className={`px-3 py-2 rounded-full text-xs font-body font-medium whitespace-nowrap transition-all duration-200 border ${
-                                                    activeSubCategory === subCategory.id
-                                                        ? 'bg-primary text-primary-foreground border-primary'
-                                                        : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground'
-                                                }`}
-                                            >
-                                                {subCategory.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                    
-                                    {subCategoryStartIndex + SUB_CATEGORIES_PER_VIEW < currentSubCategories.length && (
-                                        <button
-                                            onClick={() => navigateSubCategories('next')}
-                                            className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
-                                        >
-                                            <Icon name="ChevronRight" size={14} />
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Results Count */}
-                        <div className="mt-4">
-                            <p className="text-sm text-muted-foreground">
-                                {filteredProducts.length} produtos encontrados
-                            </p>
                         </div>
                     </div>
                 </div>
