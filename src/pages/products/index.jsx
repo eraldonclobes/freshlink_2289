@@ -1063,7 +1063,6 @@ const renderStars = (rating) => {
                         </div>
                     </div>
                 </div>
-                </div>
 
                 {/* Products Grid */}
                 <div className="container mx-auto px-4 py-8">
