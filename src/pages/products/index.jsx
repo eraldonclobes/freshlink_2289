@@ -667,17 +667,7 @@ const ProductsPage = () => {
                                     </>
                                 )}
                             </div>
-
-                            <LocationSelector
-                                currentLocation={currentLocation}
-                                onLocationChange={handleLocationChange}
-                            />
                         </div>
-
-                        {/* Results Count */}
-                        <p className="text-sm text-muted-foreground mt-4">
-                            {filteredProducts.length} produtos encontrados
-                        </p>
                     </div>
                 </div>
 
