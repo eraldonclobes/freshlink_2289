@@ -16,9 +16,9 @@ const ProductDetails = () => {
     const [product, setProduct] = useState(null);
     const [vendor, setVendor] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [quantity, setQuantity] = useState(1);
     const [showShareModal, setShowShareModal] = useState(false);
     const [showNutritionalModal, setShowNutritionalModal] = useState(false);
+    const [showImageModal, setShowImageModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [favoriteProducts, setFavoriteProducts] = useState([]);
 
@@ -67,6 +67,57 @@ const ProductDetails = () => {
         }
     ];
 
+    // Mock related products
+    const mockRelatedProducts = [
+        {
+            id: 2,
+            name: "Tomate Cereja Orgânico",
+            vendor: "Fazenda Verde",
+            price: 12.50,
+            unit: "bandeja",
+            image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=300&h=300&fit=crop",
+            rating: 4.6,
+            reviewCount: 18,
+            available: true,
+            isOrganic: true
+        },
+        {
+            id: 3,
+            name: "Manjericão Fresco",
+            vendor: "Horta Urbana",
+            price: 3.50,
+            unit: "maço",
+            image: "https://images.unsplash.com/photo-1618375569909-3c8616cf7733?w=300&h=300&fit=crop",
+            rating: 4.9,
+            reviewCount: 12,
+            available: true,
+            isOrganic: true
+        },
+        {
+            id: 4,
+            name: "Alface Orgânica",
+            vendor: "Verde Vida",
+            price: 4.20,
+            unit: "unidade",
+            image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=300&h=300&fit=crop",
+            rating: 4.7,
+            reviewCount: 25,
+            available: true,
+            isOrganic: true
+        },
+        {
+            id: 5,
+            name: "Rúcula Orgânica",
+            vendor: "Fazenda Verde",
+            price: 5.80,
+            unit: "maço",
+            image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=300&h=300&fit=crop",
+            rating: 4.5,
+            reviewCount: 14,
+            available: true,
+            isOrganic: true
+        }
+    ];
     // Mock vendor data
     const mockVendor = {
         id: 1,
@@ -127,6 +178,14 @@ const ProductDetails = () => {
         
         setFavoriteProducts(updatedFavorites);
         localStorage.setItem('favoriteProducts', JSON.stringify(updatedFavorites));
+    };
+
+    const handleImageClick = () => {
+        setShowImageModal(true);
+    };
+
+    const handleRelatedProductClick = (relatedProduct) => {
+        navigate(`/product-details/${relatedProduct.id}`);
     };
 
     // Mock reviews data for the product
@@ -215,6 +274,13 @@ const ProductDetails = () => {
         return stars;
     };
 
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(price);
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-background flex flex-col">
@@ -286,7 +352,7 @@ const ProductDetails = () => {
                         {/* Image Section */}
                         <div className="space-y-4">
                             {/* Main Image */}
-                            <div className="aspect-square bg-background rounded-xl overflow-hidden border border-border relative group">
+                            <div className="aspect-square bg-background rounded-xl overflow-hidden border border-border relative group cursor-pointer" onClick={handleImageClick}>
                                 <Image
                                     src={images[currentImageIndex]}
                                     alt={product.name}
@@ -297,12 +363,20 @@ const ProductDetails = () => {
                                 {images.length > 1 && (
                                     <>
                                         <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+                                            }}
                                             onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
                                             className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-background transition-all duration-200 opacity-0 group-hover:opacity-100"
                                         >
                                             <Icon name="ChevronLeft" size={20} className="text-foreground" />
                                         </button>
                                         <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setCurrentImageIndex((prev) => (prev + 1) % images.length);
+                                            }}
                                             onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
                                             className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-background transition-all duration-200 opacity-0 group-hover:opacity-100"
                                         >
@@ -342,6 +416,11 @@ const ProductDetails = () => {
                                     </div>
                                 )}
                             </div>
+
+                            {/* Click to zoom hint */}
+                            <p className="text-xs text-muted-foreground text-center">
+                                Clique na imagem para ampliar
+                            </p>
 
                             {/* Thumbnail Images */}
                             {images.length > 1 && (
@@ -569,8 +648,116 @@ const ProductDetails = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Related Products Section */}
+                    <div className="container mx-auto px-4 py-8">
+                        <div className="mb-6">
+                            <h2 className="text-xl font-heading font-bold text-foreground mb-2">
+                                Produtos Relacionados
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                                Outros produtos que você pode gostar
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {mockRelatedProducts.map((relatedProduct) => (
+                                <div
+                                    key={relatedProduct.id}
+                                    className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-all duration-300 group cursor-pointer"
+                                    onClick={() => handleRelatedProductClick(relatedProduct)}
+                                >
+                                    <div className="relative h-32 overflow-hidden">
+                                        <Image
+                                            src={relatedProduct.image}
+                                            alt={relatedProduct.name}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                    </div>
+                                    <div className="p-3">
+                                        <h3 className="font-heading font-medium text-sm text-foreground mb-1 line-clamp-1">
+                                            {relatedProduct.name}
+                                        </h3>
+                                        <div className="flex items-center space-x-1 mb-2">
+                                            {renderStars(relatedProduct.rating).slice(0, 5).map((star, index) => 
+                                                React.cloneElement(star, { key: index, size: 12 })
+                                            )}
+                                            <span className="text-xs text-muted-foreground ml-1">
+                                                ({relatedProduct.reviewCount})
+                                            </span>
+                                        </div>
+                                        <div className="flex items-baseline space-x-1">
+                                            <span className="text-lg font-heading font-bold text-foreground">
+                                                {formatPrice(relatedProduct.price)}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">
+                                                /{relatedProduct.unit}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Product Reviews Section - Full Width */}
+                    <div className="bg-muted/30 py-8">
+                        <div className="container mx-auto px-4">
+                            <ProductReviewsSection
+                                productId={product.id}
+                                productName={product.name}
+                                reviews={mockProductReviews}
+                                averageRating={averageRating}
+                                totalReviews={mockProductReviews.length}
+                            />
+                        </div>
+                    </div>
                 </div>
             </main>
+
+            {/* Image Modal */}
+            {showImageModal && (
+                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+                    <div className="relative max-w-4xl max-h-full">
+                        <button
+                            onClick={() => setShowImageModal(false)}
+                            className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors duration-200 z-10"
+                        >
+                            <Icon name="X" size={20} />
+                        </button>
+                        
+                        <div className="relative">
+                            <Image
+                                src={images[currentImageIndex]}
+                                alt={product.name}
+                                className="max-w-full max-h-[80vh] object-contain"
+                            />
+                            
+                            {images.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors duration-200"
+                                    >
+                                        <Icon name="ChevronLeft" size={24} />
+                                    </button>
+                                    <button
+                                        onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors duration-200"
+                                    >
+                                        <Icon name="ChevronRight" size={24} />
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                        
+                        {/* Image counter */}
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
+                            {currentImageIndex + 1} / {images.length}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Share Modal */}
             <ShareModal

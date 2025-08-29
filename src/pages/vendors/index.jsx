@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
-import SearchBar from '../../components/ui/SearchBar';
 import LocationSelector from '../../components/ui/LocationSelector';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
@@ -19,7 +18,8 @@ const VendorsPage = () => {
     const [sortBy, setSortBy] = useState('distance');
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-    const [categoryFilter, setCategoryFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+    const [showSortDropdown, setShowSortDropdown] = useState(false);
 
     const VENDORS_PER_PAGE = 8;
 
@@ -211,7 +211,7 @@ const VendorsPage = () => {
     // Filter and sort vendors
     useEffect(() => {
         filterAndSortVendors();
-    }, [vendors, searchQuery, currentLocation, sortBy, categoryFilter]);
+    }, [vendors, searchQuery, currentLocation, sortBy, statusFilter]);
 
     const loadVendors = async () => {
         setLoading(true);
@@ -233,11 +233,11 @@ const VendorsPage = () => {
             );
         }
 
-        // Filter by category
-        if (categoryFilter) {
-            filtered = filtered.filter(vendor =>
-                vendor.categories.some(cat => cat.toLowerCase().includes(categoryFilter.toLowerCase()))
-            );
+        // Filter by status
+        if (statusFilter === 'open') {
+            filtered = filtered.filter(vendor => vendor.isOpen);
+        } else if (statusFilter === 'closed') {
+            filtered = filtered.filter(vendor => !vendor.isOpen);
         }
 
         // Filter by distance (mock - in real app would use actual location)
@@ -268,7 +268,7 @@ const VendorsPage = () => {
         setFilteredVendors(filtered);
         setCurrentPage(1);
         setHasMore(filtered.length > VENDORS_PER_PAGE);
-    }, [searchQuery, currentLocation, sortBy, categoryFilter]);
+    }, [searchQuery, sortBy, statusFilter]);
 
     const loadMoreVendors = async () => {
         setLoadingMore(true);
@@ -278,7 +278,8 @@ const VendorsPage = () => {
     };
 
     const handleSearch = (query) => {
-        setSearchQuery(query);
+        const trimmedQuery = query?.trim() || '';
+        setSearchQuery(trimmedQuery);
     };
 
     const handleClearSearch = () => {
@@ -286,30 +287,9 @@ const VendorsPage = () => {
         filterAndSortVendors();
     };
 
-    const handleSearchSubmit = (query) => {
-        const trimmedQuery = query?.trim() || '';
-        setSearchQuery(trimmedQuery);
-        if (!trimmedQuery) {
-            filterAndSortVendors();
-        }
-    };
-
-    const handleSuggestionClick = (suggestion) => {
-        if (suggestion.type === 'vendor') {
-            navigate('/vendor-profile-products', { state: { vendorId: suggestion.vendorId } });
-        }
-    };
-
     const handleLocationChange = (location) => {
         setCurrentLocation(location);
     };
-
-    // Filter suggestions based on search query
-    const filteredSuggestions = searchQuery && searchQuery.trim().length > 0
-        ? mockSuggestions.filter(item =>
-            item?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase())
-        ).slice(0, 5)
-        : [];
 
     const handleWhatsAppContact = (vendor) => {
         const message = encodeURIComponent(`Olá ${vendor.name}! Vi seu perfil no FreshLink e gostaria de saber mais sobre seus produtos.`);
@@ -347,47 +327,53 @@ const VendorsPage = () => {
         return stars;
     };
 
-    // Category Filter Component
-    const CategoryFilter = () => {
-        const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+    // Status Filter Component
+    const StatusFilter = () => {
+        const statusOptions = [
+            { value: '', label: 'Todos' },
+            { value: 'open', label: 'Aberto' },
+            { value: 'closed', label: 'Fechado' }
+        ];
+
+        const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
         return (
             <div className="relative">
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        setShowCategoryDropdown(!showCategoryDropdown);
+                        setShowStatusDropdown(!showStatusDropdown);
                     }}
-                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
+                    className="flex items-center space-x-2 px-3 py-2 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
                 >
-                    <Icon name="Filter" size={16} className="text-primary" />
+                    <Icon name="Clock" size={16} className="text-primary" />
                     <span className="hidden sm:inline">
-                        {categoryOptions.find(opt => opt.value === categoryFilter)?.label || 'Categoria'}
+                        {statusOptions.find(opt => opt.value === statusFilter)?.label || 'Status'}
                     </span>
                     <Icon
                         name="ChevronDown"
                         size={16}
-                        className={`transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''
+                        className={`transition-transform duration-200 ${showStatusDropdown ? 'rotate-180' : ''
                             }`}
                     />
                 </button>
 
-                {showCategoryDropdown && (
+                {showStatusDropdown && (
                     <>
                         <div
                             className="fixed inset-0 z-40"
-                            onClick={() => setShowCategoryDropdown(false)}
+                            onClick={() => setShowStatusDropdown(false)}
                         />
                         <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 min-w-64 animate-slide-down">
                             <div className="max-h-60 overflow-y-auto">
-                                {categoryOptions.map((option) => (
+                                {statusOptions.map((option) => (
                                     <button
                                         key={option.value}
                                         onClick={() => {
-                                            setCategoryFilter(option.value);
-                                            setShowCategoryDropdown(false);
+                                            setStatusFilter(option.value);
+                                            setShowStatusDropdown(false);
                                         }}
-                                        className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${categoryFilter === option.value
+                                        className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${statusFilter === option.value
                                             ? 'bg-primary/10 text-primary'
                                             : 'text-foreground hover:bg-muted'
                                             }`}
@@ -686,42 +672,47 @@ const VendorsPage = () => {
         <div className="min-h-screen bg-background flex flex-col">
             <ResponsiveHeader />
 
-            <main className="pt-16">
-                {/* Header Section */}
-                <div className="bg-card border-b border-border">
+            <main className="pt-16 flex-1">
+                {/* Fixed Header */}
+                <div className="bg-card border-b border-border sticky top-16 z-40">
                     <div className="container mx-auto px-4 py-6">
                         <div>
-                            <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
+                            <h1 className="text-xl font-heading font-bold text-foreground mb-4">
                                 Vendedores Próximos
                             </h1>
-                            <p className="text-muted-foreground">
-                                {filteredVendors.length} vendedores encontrados
-                            </p>
                         </div>
-                    </div>
-                </div>
 
-                {/* Search and Filters */}
-                <div className="bg-muted/50 border-b border-border">
-                    <div className="container mx-auto px-4 py-4">
-                        <div className="flex items-center gap-3">
+                        {/* Search and Filters */}
+                        <div className="flex items-center gap-3 mb-4">
                             {/* Search Bar */}
-                            <div className="flex-1">
-                                <SearchBar
-                                    onSearch={handleSearch}
-                                    onSearchSubmit={handleSearchSubmit}
-                                    onSuggestionClick={handleSuggestionClick}
-                                    onClear={handleClearSearch}
-                                    suggestions={filteredSuggestions}
-                                    placeholder="Buscar vendedores..."
-                                    value={searchQuery}
-                                    showSuggestionsOnFocus={false}
-                                />
+                            <div className="flex-1 max-w-md">
+                                <div className="relative">
+                                    <Icon 
+                                        name="Search" 
+                                        size={16} 
+                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar vendedores..."
+                                        value={searchQuery}
+                                        onChange={(e) => handleSearch(e.target.value)}
+                                        className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            onClick={handleClearSearch}
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        >
+                                            <Icon name="X" size={14} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Filters and Actions */}
                             <div className="flex items-center space-x-3">
-                                <CategoryFilter />
+                                <StatusFilter />
                                 <SortFilter />
                                 <LocationSelector
                                     currentLocation={currentLocation}
@@ -729,13 +720,18 @@ const VendorsPage = () => {
                                 />
                             </div>
                         </div>
+
+                        {/* Results Count */}
+                        <p className="text-sm text-muted-foreground">
+                            {filteredVendors.length} vendedores encontrados
+                        </p>
                     </div>
                 </div>
 
                 {/* Vendors Grid */}
                 <div className="container mx-auto px-4 py-8">
                     {loading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {[...Array(8)].map((_, index) => (
                                 <LoadingSkeleton key={index} />
                             ))}
@@ -752,7 +748,7 @@ const VendorsPage = () => {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {displayedVendors.map((vendor) => (
                                     <VendorCard key={vendor.id} vendor={vendor} />
                                 ))}

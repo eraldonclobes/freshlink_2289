@@ -9,6 +9,9 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [favoriteProducts, setFavoriteProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const PRODUCTS_PER_VIEW = 4;
 
     // Mock featured products data
     const mockFeaturedProducts = [
@@ -154,6 +157,17 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
         // localStorage.setItem('favoriteProducts', JSON.stringify(updatedFavorites));
     };
 
+    const navigateProducts = (direction) => {
+        const maxIndex = Math.max(0, featuredProducts.length - PRODUCTS_PER_VIEW);
+        if (direction === 'prev') {
+            setCurrentIndex(Math.max(0, currentIndex - 1));
+        } else {
+            setCurrentIndex(Math.min(maxIndex, currentIndex + 1));
+        }
+    };
+
+    const visibleProducts = featuredProducts.slice(currentIndex, currentIndex + PRODUCTS_PER_VIEW);
+
     const formatPrice = (price) => {
         return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
@@ -235,18 +249,18 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
             </div>
 
             {/* Content */}
-            <div className="p-4 flex-1 flex flex-col">
+            <div className="p-3 flex-1 flex flex-col">
                 {/* Header */}
-                <div className="flex items-start justify-between mb-2">
+                <div className="flex items-start justify-between mb-1">
                     <div className="flex-1">
-                        <h3 className="font-heading font-semibold text-lg text-foreground mb-1 line-clamp-1">
+                        <h3 className="font-heading font-medium text-sm text-foreground mb-1 line-clamp-1">
                             {product?.name}
                         </h3>
-                        <div className="flex items-center space-x-1 mb-2">
-                            <Icon name="Store" size={14} className="text-muted-foreground" />
+                        <div className="flex items-center space-x-1 mb-1">
+                            <Icon name="Store" size={12} className="text-muted-foreground" />
                             <button
                                 onClick={(e) => handleVendorClick(product, e)}
-                                className="text-sm text-primary pl-1 hover:text-primary/80 hover:underline transition-colors duration-200"
+                                className="text-xs text-primary pl-1 hover:text-primary/80 hover:underline transition-colors duration-200"
                             >
                                 {product?.vendor}
                             </button>
@@ -255,48 +269,32 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
                 </div>
 
                 {/* Rating */}
-                <div className="flex items-center space-x-2 mb-3">
+                <div className="flex items-center space-x-1 mb-2">
                     <div className="flex items-center space-x-1">
-                        {renderStars(product?.rating || 4.5)}
+                        {renderStars(product?.rating || 4.5).slice(0, 5).map((star, index) => 
+                            React.cloneElement(star, { key: index, size: 12 })
+                        )}
                     </div>
-                    <span className="text-sm font-body font-medium text-foreground">
+                    <span className="text-xs font-body font-medium text-foreground">
                         {(product?.rating || 4.5).toFixed(1)}
                     </span>
-                    <span className="text-sm font-caption text-muted-foreground">
+                    <span className="text-xs font-caption text-muted-foreground">
                         ({product?.reviewCount || 12})
                     </span>
                 </div>
 
-                {/* Categories */}
-                <div className="flex flex-wrap gap-1 mb-4">
-                    {product?.categories?.slice(0, 3)?.map((category, index) => (
-                        <button
-                            key={index}
-                            onClick={(e) => handleCategoryClick(category, e)}
-                            className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full hover:bg-primary/10 hover:text-primary hover:border-primary/30 border border-transparent transition-colors duration-200"
-                        >
-                            {category}
-                        </button>
-                    ))}
-                    {product?.categories?.length > 3 && (
-                        <span className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full">
-                            +{product?.categories?.length - 3}
-                        </span>
-                    )}
-                </div>
-
                 {/* Price */}
-                <div className="flex items-center space-x-2 mb-4">
+                <div className="flex items-center space-x-2 mb-3">
                     <div className="flex items-baseline space-x-1">
-                        <span className="text-2xl font-heading font-bold text-foreground">
+                        <span className="text-lg font-heading font-bold text-foreground">
                             {formatPrice(product?.price)}
                         </span>
-                        <span className="text-sm font-caption text-muted-foreground">
+                        <span className="text-xs font-caption text-muted-foreground">
                             /{product?.unit}
                         </span>
                     </div>
                     {product?.originalPrice && (
-                        <span className="text-sm font-caption text-muted-foreground line-through">
+                        <span className="text-xs font-caption text-muted-foreground line-through">
                             {formatPrice(product?.originalPrice)}
                         </span>
                     )}
@@ -306,14 +304,18 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
                 <div className="mt-auto">
                     <Button
                         variant="default"
-                        size="sm"
-                        iconName="MessageCircle"
+                        size="xs"
                         fullWidth
                         onClick={(e) => handleProductInquiry(product, e)}
                         disabled={!product?.available}
-                        className="bg-success hover:bg-success/90"
+                        className="bg-success hover:bg-success/90 text-xs py-2"
                     >
-                        {product?.available ? 'Perguntar' : 'Indisponível'}
+                        <div className="flex items-center justify-center space-x-1">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                            </svg>
+                            <span>{product?.available ? 'Comprar por' : 'Indisponível'}</span>
+                        </div>
                     </Button>
                 </div>
             </div>
@@ -321,9 +323,9 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
     );
 
     const SkeletonCard = () => (
-        <div className="bg-card border border-border rounded-lg overflow-hidden animate-pulse">
-            <div className="h-48 bg-muted" />
-            <div className="p-4 space-y-3">
+        <div className="bg-card border border-border rounded-lg overflow-hidden animate-pulse h-full">
+            <div className="h-32 bg-muted" />
+            <div className="p-3 space-y-2">
                 <div className="h-4 bg-muted rounded w-3/4" />
                 <div className="h-3 bg-muted rounded w-1/2" />
                 <div className="flex space-x-1">
@@ -332,15 +334,7 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
                     ))}
                 </div>
                 <div className="flex space-x-1">
-                    {[...Array(2)]?.map((_, i) => (
-                        <div key={i} className="h-6 bg-muted rounded-full w-16" />
-                    ))}
-                </div>
-                <div className="h-6 bg-muted rounded w-20" />
-                <div className="h-3 bg-muted rounded w-2/3" />
-                <div className="flex space-x-2">
-                    <div className="h-8 bg-muted rounded flex-1" />
-                    <div className="h-8 bg-muted rounded w-20" />
+                    <div className="h-6 bg-muted rounded" />
                 </div>
             </div>
         </div>
@@ -349,6 +343,24 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
     if (loading) {
         return (
             <div className={`${className}`}>
+                <div className="flex items-center justify-between mb-6">
+                    <div className="mb-6">
+                        <h2 className="font-heading font-bold text-xl text-foreground mb-1">
+                            Produtos em Destaque
+                        </h2>
+                        <p className="text-sm font-body text-muted-foreground">
+                            Ofertas especiais selecionadas para você
+                        </p>
+                    </div>
+                    <div className="flex space-x-2">
+                        <button className="w-8 h-8 rounded-full bg-muted flex items-center justify-center opacity-50">
+                            <Icon name="ChevronLeft" size={16} />
+                        </button>
+                        <button className="w-8 h-8 rounded-full bg-muted flex items-center justify-center opacity-50">
+                            <Icon name="ChevronRight" size={16} />
+                        </button>
+                    </div>
+                </div>
                 <div className="mb-6">
                     <h2 className="font-heading font-bold text-xl text-foreground mb-1">
                         Produtos em Destaque
@@ -358,7 +370,7 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {[...Array(4)]?.map((_, index) => (
                         <SkeletonCard key={index} />
                     ))}
@@ -370,6 +382,18 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
     if (featuredProducts?.length === 0) {
         return (
             <div className={`${className}`}>
+                <div className="flex items-center justify-between mb-6">
+                    <div className="mb-6">
+                        <h2 className="font-heading font-bold text-xl text-foreground mb-1">
+                            Produtos em Destaque
+                        </h2>
+                        <p className="text-sm font-body text-muted-foreground">
+                            Ofertas especiais selecionadas para você
+                        </p>
+                    </div>
+                    <div className="w-16"></div>
+                </div>
+
                 <div className="mb-6">
                     <h2 className="font-heading font-bold text-xl text-foreground mb-1">
                         Produtos em Destaque
@@ -396,17 +420,37 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
 
     return (
         <div className={`${className}`}>
-            <div className="mb-6">
-                <h2 className="font-heading font-bold text-xl text-foreground mb-1">
-                    Produtos em Destaque
-                </h2>
-                <p className="text-sm font-body text-muted-foreground">
-                    Ofertas especiais selecionadas para você
-                </p>
+            <div className="flex items-center justify-between mb-6">
+                <div>
+                    <h2 className="font-heading font-bold text-xl text-foreground mb-1">
+                        Produtos em Destaque
+                    </h2>
+                    <p className="text-sm font-body text-muted-foreground">
+                        Ofertas especiais selecionadas para você
+                    </p>
+                </div>
+                
+                {/* Navigation Arrows */}
+                <div className="flex space-x-2">
+                    <button
+                        onClick={() => navigateProducts('prev')}
+                        disabled={currentIndex === 0}
+                        className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                    >
+                        <Icon name="ChevronLeft" size={16} />
+                    </button>
+                    <button
+                        onClick={() => navigateProducts('next')}
+                        disabled={currentIndex + PRODUCTS_PER_VIEW >= featuredProducts.length}
+                        className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                    >
+                        <Icon name="ChevronRight" size={16} />
+                    </button>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {featuredProducts.map((product) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {visibleProducts.map((product) => (
                     <ProductCard key={product?.id} product={product} />
                 ))}
             </div>

@@ -2,9 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
-import ProductModal from '../../components/ui/ProductModal';
-import SearchBar from '../../components/ui/SearchBar';
-import LocationSelector from '../../components/ui/LocationSelector';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import Button from '../../components/ui/Button';
@@ -17,17 +14,19 @@ const ProductsPage = () => {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [currentLocation, setCurrentLocation] = useState({ id: 1, name: "São Paulo, SP", distance: "Atual" });
     const [sortBy, setSortBy] = useState('distance');
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [showProductModal, setShowProductModal] = useState(false);
     const [categoryFilter, setCategoryFilter] = useState('');
-    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [showSortDropdown, setShowSortDropdown] = useState(false);
+    const [activeMainCategory, setActiveMainCategory] = useState('all');
+    const [activeSubCategory, setActiveSubCategory] = useState('all');
+    const [mainCategoryStartIndex, setMainCategoryStartIndex] = useState(0);
+    const [subCategoryStartIndex, setSubCategoryStartIndex] = useState(0);
 
     const PRODUCTS_PER_PAGE = 12;
+    const CATEGORIES_PER_VIEW = 6;
+    const SUB_CATEGORIES_PER_VIEW = 8;
 
     const sortOptions = [
         { value: 'distance', label: 'Mais próximos' },
@@ -37,16 +36,68 @@ const ProductsPage = () => {
         { value: 'rating', label: 'Melhor avaliados' }
     ];
 
-    const categoryOptions = [
-        { value: '', label: 'Todas as categorias' },
-        { value: 'frutas', label: 'Frutas' },
-        { value: 'verduras', label: 'Verduras' },
-        { value: 'legumes', label: 'Legumes' },
-        { value: 'organicos', label: 'Orgânicos' },
-        { value: 'temperos', label: 'Temperos' },
-        { value: 'laticinios', label: 'Laticínios' },
-        { value: 'carnes', label: 'Carnes' }
+    const mainCategories = [
+        { id: 'all', label: 'Tudo', icon: 'Grid3X3' },
+        { id: 'ofertas', label: 'Ofertas até 30%', icon: 'Tag' },
+        { id: 'organicos', label: 'Orgânicos', icon: 'Leaf' },
+        { id: 'frutas', label: 'Frutas', icon: 'Apple' },
+        { id: 'verduras', label: 'Verduras', icon: 'Carrot' },
+        { id: 'legumes', label: 'Legumes', icon: 'Wheat' },
+        { id: 'temperos', label: 'Temperos', icon: 'Flower2' },
+        { id: 'laticinios', label: 'Laticínios', icon: 'Milk' }
     ];
+
+    const subCategories = {
+        all: [
+            { id: 'all', label: 'Tudo' },
+            { id: 'ofertas', label: 'Ofertas' },
+            { id: 'novos', label: 'Novos' },
+            { id: 'populares', label: 'Populares' }
+        ],
+        ofertas: [
+            { id: 'all', label: 'Todas ofertas' },
+            { id: '10-20', label: '10-20% off' },
+            { id: '20-30', label: '20-30% off' },
+            { id: 'promocao', label: 'Promoção' }
+        ],
+        organicos: [
+            { id: 'all', label: 'Todos orgânicos' },
+            { id: 'certificados', label: 'Certificados' },
+            { id: 'biodinamicos', label: 'Biodinâmicos' },
+            { id: 'naturais', label: 'Naturais' }
+        ],
+        frutas: [
+            { id: 'all', label: 'Todas frutas' },
+            { id: 'citricas', label: 'Cítricas' },
+            { id: 'tropicais', label: 'Tropicais' },
+            { id: 'vermelhas', label: 'Vermelhas' },
+            { id: 'doces', label: 'Doces' }
+        ],
+        verduras: [
+            { id: 'all', label: 'Todas verduras' },
+            { id: 'folhosas', label: 'Folhosas' },
+            { id: 'cruciferas', label: 'Crucíferas' },
+            { id: 'aromáticas', label: 'Aromáticas' }
+        ],
+        legumes: [
+            { id: 'all', label: 'Todos legumes' },
+            { id: 'raizes', label: 'Raízes' },
+            { id: 'tuberculos', label: 'Tubérculos' },
+            { id: 'bulbos', label: 'Bulbos' }
+        ],
+        temperos: [
+            { id: 'all', label: 'Todos temperos' },
+            { id: 'frescos', label: 'Frescos' },
+            { id: 'secos', label: 'Secos' },
+            { id: 'especiarias', label: 'Especiarias' }
+        ],
+        laticinios: [
+            { id: 'all', label: 'Todos laticínios' },
+            { id: 'queijos', label: 'Queijos' },
+            { id: 'iogurtes', label: 'Iogurtes' },
+            { id: 'leites', label: 'Leites' }
+        ]
+    };
 
     // Mock products data - Enhanced to match FeaturedProducts structure
     const mockProducts = [
@@ -273,7 +324,6 @@ const renderStars = (rating) => {
 
         // Close dropdowns when clicking outside
         const handleClickOutside = () => {
-            setShowCategoryDropdown(false);
             setShowSortDropdown(false);
         };
         document.addEventListener('click', handleClickOutside);
@@ -283,7 +333,7 @@ const renderStars = (rating) => {
     // Filter and sort products
     useEffect(() => {
         filterAndSortProducts();
-    }, [products, searchQuery, currentLocation, sortBy, categoryFilter]);
+    }, [products, searchQuery, sortBy, activeMainCategory, activeSubCategory]);
 
     // Garantir que quando searchQuery for vazio, recarregue todos os produtos
     useEffect(() => {
@@ -311,11 +361,24 @@ const renderStars = (rating) => {
             );
         }
 
-        // Filter by category
-        if (categoryFilter) {
+        // Filter by main category
+        if (activeMainCategory && activeMainCategory !== 'all') {
+            if (activeMainCategory === 'ofertas') {
+                filtered = filtered.filter(product => product.discount);
+            } else {
+                filtered = filtered.filter(product =>
+                    product.categories?.some(cat =>
+                        cat.toLowerCase().includes(activeMainCategory.toLowerCase())
+                    )
+                );
+            }
+        }
+
+        // Filter by sub category
+        if (activeSubCategory && activeSubCategory !== 'all') {
             filtered = filtered.filter(product =>
                 product.categories?.some(cat =>
-                    cat.toLowerCase().includes(categoryFilter.toLowerCase())
+                    cat.toLowerCase().includes(activeSubCategory.toLowerCase())
                 )
             );
         }
@@ -344,7 +407,7 @@ const renderStars = (rating) => {
         setFilteredProducts(filtered);
         setCurrentPage(1);
         setHasMore(filtered.length > PRODUCTS_PER_PAGE);
-    }, [searchQuery, currentLocation, sortBy, categoryFilter]);
+    }, [searchQuery, sortBy, activeMainCategory, activeSubCategory]);
 
     const loadMoreProducts = async () => {
         setLoadingMore(true);
@@ -423,38 +486,14 @@ const renderStars = (rating) => {
     };
 
     const handleSearch = (query) => {
-        setSearchQuery(query);
+        const trimmedQuery = query?.trim() || '';
+        setSearchQuery(trimmedQuery);
     };
 
     const handleClearSearch = () => {
         setSearchQuery('');
         filterAndSortProducts();
     };
-
-    const handleSearchSubmit = (query) => {
-        const trimmedQuery = query?.trim() || '';
-        setSearchQuery(trimmedQuery);
-        if (!trimmedQuery) {
-            // Se vazio, recarregar todos os produtos
-            filterAndSortProducts();
-        }
-    };
-
-    const handleSuggestionClick = (suggestion) => {
-        if (suggestion.type === 'vendor') {
-            navigate('/vendor-profile-products', { state: { vendorId: suggestion.vendorId } });
-        } else if (suggestion.type === 'product') {
-            // Definir a query de busca com o nome do produto
-            setSearchQuery(suggestion.name);
-        }
-    };
-
-    const handleLocationChange = (location) => {
-        setCurrentLocation(location);
-    };
-
-    // Filtrar sugestões baseadas na query atual - só aparecem se há texto digitado
-    const filteredSuggestions = searchQuery && searchQuery.trim().length > 0 ? generateSuggestions(searchQuery) : [];
 
     const handleProductInquiry = (product, e) => {
         e?.stopPropagation();
@@ -507,72 +546,48 @@ const renderStars = (rating) => {
         }).format(price);
     };
 
+    const handleMainCategoryChange = (categoryId) => {
+        setActiveMainCategory(categoryId);
+        setActiveSubCategory('all');
+        setSubCategoryStartIndex(0);
+    };
+
+    const handleSubCategoryChange = (subCategoryId) => {
+        setActiveSubCategory(subCategoryId);
+    };
+
+    const navigateMainCategories = (direction) => {
+        const maxIndex = Math.max(0, mainCategories.length - CATEGORIES_PER_VIEW);
+        if (direction === 'prev') {
+            setMainCategoryStartIndex(Math.max(0, mainCategoryStartIndex - 1));
+        } else {
+            setMainCategoryStartIndex(Math.min(maxIndex, mainCategoryStartIndex + 1));
+        }
+    };
+
+    const navigateSubCategories = (direction) => {
+        const currentSubCategories = subCategories[activeMainCategory] || [];
+        const maxIndex = Math.max(0, currentSubCategories.length - SUB_CATEGORIES_PER_VIEW);
+        if (direction === 'prev') {
+            setSubCategoryStartIndex(Math.max(0, subCategoryStartIndex - 1));
+        } else {
+            setSubCategoryStartIndex(Math.min(maxIndex, subCategoryStartIndex + 1));
+        }
+    };
+
+    const visibleMainCategories = mainCategories.slice(
+        mainCategoryStartIndex, 
+        mainCategoryStartIndex + CATEGORIES_PER_VIEW
+    );
+
+    const currentSubCategories = subCategories[activeMainCategory] || [];
+    const visibleSubCategories = currentSubCategories.slice(
+        subCategoryStartIndex,
+        subCategoryStartIndex + SUB_CATEGORIES_PER_VIEW
+    );
+
     const displayedProducts = filteredProducts.slice(0, currentPage * PRODUCTS_PER_PAGE);
     const hasMoreToShow = displayedProducts.length < filteredProducts.length;
-
-    // Sort products to show favorites first
-    const sortedProducts = [...displayedProducts].sort((a, b) => {
-        const aIsFavorite = favoriteProducts.includes(a.id);
-        const bIsFavorite = favoriteProducts.includes(b.id);
-        if (aIsFavorite && !bIsFavorite) return -1;
-        if (!aIsFavorite && bIsFavorite) return 1;
-        return 0;
-    });
-
-    // Category Filter Component
-    const CategoryFilter = () => (
-        <div className="relative">
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setShowCategoryDropdown(!showCategoryDropdown);
-                    setShowSortDropdown(false);
-                }}
-                className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
-            >
-                <Icon name="Filter" size={16} className="text-primary" />
-                <span className="hidden sm:inline">
-                    {categoryOptions.find(opt => opt.value === categoryFilter)?.label || 'Categoria'}
-                </span>
-                <Icon 
-                    name="ChevronDown" 
-                    size={16} 
-                    className={`transition-transform duration-200 ${
-                        showCategoryDropdown ? 'rotate-180' : ''
-                    }`} 
-                />
-            </button>
-            
-            {showCategoryDropdown && (
-                <>
-                    <div 
-                        className="fixed inset-0 z-40"
-                        onClick={() => setShowCategoryDropdown(false)}
-                    />
-                    <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 min-w-64">
-                        <div className="max-h-60 overflow-y-auto">
-                            {categoryOptions.map((option, index) => (
-                                <button
-                                    key={option.value}
-                                    onClick={() => {
-                                        setCategoryFilter(option.value);
-                                        setShowCategoryDropdown(false);
-                                    }}
-                                    className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${
-                                        categoryFilter === option.value
-                                            ? 'bg-primary/10 text-primary'
-                                            : 'text-foreground hover:bg-muted'
-                                    }`}
-                                >
-                                    <span className="font-medium">{option.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </>
-            )}
-        </div>
-    );
 
     // Sort Filter Component
     const SortFilter = () => (
@@ -581,7 +596,6 @@ const renderStars = (rating) => {
                 onClick={(e) => {
                     e.stopPropagation();
                     setShowSortDropdown(!showSortDropdown);
-                    setShowCategoryDropdown(false);
                 }}
                 className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
             >
@@ -632,12 +646,12 @@ const renderStars = (rating) => {
     // ProductCard component using FeaturedProducts styling
     const ProductCard = ({ product }) => (
         <div
-            className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer flex flex-col h-full"
+            className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-all duration-300 group cursor-pointer flex flex-col h-full"
             onClick={() => handleProductClick(product)}
         >
             {/* Discount Badge */}
             {product?.discount && (
-                <div className="absolute top-3 left-3 z-10 bg-destructive text-destructive-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
+                <div className="absolute top-2 left-2 z-10 bg-destructive text-destructive-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
                     -{product?.discount}%
                 </div>
             )}
@@ -645,20 +659,20 @@ const renderStars = (rating) => {
             {/* Favorite Button */}
             <button
                 onClick={(e) => handleFavoriteToggle(product?.id, e)}
-                className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${favoriteProducts.includes(product?.id)
+                className={`absolute top-2 right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${favoriteProducts.includes(product?.id)
                     ? 'bg-error text-white'
                     : 'bg-white/80 backdrop-blur-sm text-muted-foreground hover:text-error hover:bg-white'
                     }`}
             >
                 <Icon
                     name="Heart"
-                    size={16}
+                    size={14}
                     className={favoriteProducts.includes(product?.id) ? 'fill-current' : ''}
                 />
             </button>
 
             {/* Image */}
-            <div className="relative h-48 overflow-hidden">
+            <div className="relative h-32 overflow-hidden">
                 <Image
                     src={product?.image}
                     alt={product?.name}
@@ -669,7 +683,7 @@ const renderStars = (rating) => {
                 {/* Availability Status */}
                 {!product?.available && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="text-white font-body font-medium bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                        <span className="text-white text-xs font-medium bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full">
                             Indisponível
                         </span>
                     </div>
@@ -677,18 +691,18 @@ const renderStars = (rating) => {
             </div>
 
             {/* Content */}
-            <div className="p-4 flex-1 flex flex-col">
+            <div className="p-3 flex-1 flex flex-col">
                 {/* Header */}
-                <div className="flex items-start justify-between mb-2">
+                <div className="flex items-start justify-between mb-1">
                     <div className="flex-1">
-                        <h3 className="font-heading font-semibold text-lg text-foreground mb-1 line-clamp-1">
+                        <h3 className="font-heading font-medium text-sm text-foreground mb-1 line-clamp-1">
                             {product?.name}
                         </h3>
-                        <div className="flex items-center space-x-1 mb-2">
-                            <Icon name="Store" size={14} className="text-muted-foreground" />
+                        <div className="flex items-center space-x-1 mb-1">
+                            <Icon name="Store" size={12} className="text-muted-foreground" />
                             <button
                                 onClick={(e) => handleVendorClick(product, e)}
-                                className="text-sm text-primary pl-1 hover:text-primary/80 hover:underline transition-colors duration-200"
+                                className="text-xs text-primary pl-1 hover:text-primary/80 hover:underline transition-colors duration-200"
                             >
                                 {product?.vendor}
                             </button>
@@ -697,47 +711,32 @@ const renderStars = (rating) => {
                 </div>
 
                 {/* Rating */}
-                <div className="flex items-center space-x-2 mb-3">
+                <div className="flex items-center space-x-1 mb-2">
                     <div className="flex items-center space-x-1">
-                        {renderStars(product?.rating || 4.5)}
+                        {renderStars(product?.rating || 4.5).slice(0, 5).map((star, index) => 
+                            React.cloneElement(star, { key: index, size: 12 })
+                        )}
                     </div>
-                    <span className="text-sm font-body font-medium text-foreground">
+                    <span className="text-xs font-body font-medium text-foreground">
                         {(product?.rating || 4.5).toFixed(1)}
                     </span>
-                    <span className="text-sm font-caption text-muted-foreground">
+                    <span className="text-xs font-caption text-muted-foreground">
                         ({product?.reviewCount || 12})
                     </span>
                 </div>
 
-                {/* Categories */}
-                <div className="flex flex-wrap gap-1 mb-4">
-                    {product?.categories?.slice(0, 3)?.map((category, index) => (
-                        <span
-                            key={index}
-                            className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full"
-                        >
-                            {category}
-                        </span>
-                    ))}
-                    {product?.categories?.length > 3 && (
-                        <span className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full">
-                            +{product?.categories?.length - 3}
-                        </span>
-                    )}
-                </div>
-
                 {/* Price */}
-                <div className="flex items-center space-x-2 mb-4">
+                <div className="flex items-center space-x-2 mb-3">
                     <div className="flex items-baseline space-x-1">
-                        <span className="text-2xl font-heading font-bold text-foreground">
+                        <span className="text-lg font-heading font-bold text-foreground">
                             {formatPrice(product?.price)}
                         </span>
-                        <span className="text-sm font-caption text-muted-foreground">
+                        <span className="text-xs font-caption text-muted-foreground">
                             /{product?.unit}
                         </span>
                     </div>
                     {product?.originalPrice && (
-                        <span className="text-sm font-caption text-muted-foreground line-through">
+                        <span className="text-xs font-caption text-muted-foreground line-through">
                             {formatPrice(product?.originalPrice)}
                         </span>
                     )}
@@ -747,14 +746,18 @@ const renderStars = (rating) => {
                 <div className="mt-auto">
                     <Button
                         variant="default"
-                        size="sm"
-                        iconName="MessageCircle"
+                        size="xs"
                         fullWidth
                         onClick={(e) => handleProductInquiry(product, e)}
                         disabled={!product?.available}
-                        className="bg-success hover:bg-success/90"
+                        className="bg-success hover:bg-success/90 text-xs py-2"
                     >
-                        {product?.available ? 'Perguntar' : 'Indisponível'}
+                        <div className="flex items-center justify-center space-x-1">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                            </svg>
+                            <span>{product?.available ? 'Comprar por' : 'Indisponível'}</span>
+                        </div>
                     </Button>
                 </div>
             </div>
@@ -763,26 +766,12 @@ const renderStars = (rating) => {
 
     const LoadingSkeleton = () => (
         <div className="bg-card border border-border rounded-lg overflow-hidden animate-pulse">
-            <div className="h-48 bg-muted" />
-            <div className="p-4 space-y-3">
-                <div className="h-4 bg-muted rounded w-3/4" />
-                <div className="h-3 bg-muted rounded w-1/2" />
-                <div className="flex space-x-1">
-                    {[...Array(5)]?.map((_, i) => (
-                        <div key={i} className="w-3 h-3 bg-muted rounded" />
-                    ))}
-                </div>
-                <div className="flex space-x-1">
-                    {[...Array(2)]?.map((_, i) => (
-                        <div key={i} className="h-6 bg-muted rounded-full w-16" />
-                    ))}
-                </div>
-                <div className="h-6 bg-muted rounded w-20" />
-                <div className="h-3 bg-muted rounded w-2/3" />
-                <div className="flex space-x-2">
-                    <div className="h-8 bg-muted rounded flex-1" />
-                    <div className="h-8 bg-muted rounded w-20" />
-                </div>
+            <div className="h-32 bg-muted" />
+            <div className="p-3 space-y-2">
+                <div className="h-3 bg-muted rounded w-3/4" />
+                <div className="h-2 bg-muted rounded w-1/2" />
+                <div className="h-4 bg-muted rounded w-20" />
+                <div className="h-6 bg-muted rounded" />
             </div>
         </div>
     );
@@ -791,48 +780,128 @@ const renderStars = (rating) => {
         <div className="min-h-screen bg-background flex flex-col">
             <ResponsiveHeader />
 
-            <main className="pt-16">
-                {/* Header Section */}
-                <div className="bg-card border-b border-border">
+            <main className="pt-16 flex-1">
+                {/* Fixed Header with Categories and Filters */}
+                <div className="bg-card border-b border-border sticky top-16 z-40">
                     <div className="container mx-auto px-4 py-6">
-                        <div>
-                            <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
-                                Produtos Próximos
-                            </h1>
-                            <p className="text-muted-foreground">
-                                {filteredProducts.length} produtos encontrados
-                            </p>
+                        {/* Main Categories */}
+                        <div className="mb-4">
+                            <div className="flex items-center space-x-3">
+                                {mainCategoryStartIndex > 0 && (
+                                    <button
+                                        onClick={() => navigateMainCategories('prev')}
+                                        className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center"
+                                    >
+                                        <Icon name="ChevronLeft" size={16} />
+                                    </button>
+                                )}
+                                
+                                <div className="flex space-x-2 overflow-hidden">
+                                    {visibleMainCategories.map((category) => (
+                                        <button
+                                            key={category.id}
+                                            onClick={() => handleMainCategoryChange(category.id)}
+                                            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-body font-medium whitespace-nowrap transition-all duration-200 border ${
+                                                activeMainCategory === category.id
+                                                    ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                                                    : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground hover:border-primary/30'
+                                            }`}
+                                        >
+                                            <Icon name={category.icon} size={16} />
+                                            <span>{category.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                {mainCategoryStartIndex + CATEGORIES_PER_VIEW < mainCategories.length && (
+                                    <button
+                                        onClick={() => navigateMainCategories('next')}
+                                        className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center"
+                                    >
+                                        <Icon name="ChevronRight" size={16} />
+                                    </button>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                {/* Search and Filters */}
-                <div className="bg-muted/50 border-b border-border">
-                    <div className="container mx-auto px-4 py-4">
+                        {/* Sub Categories */}
+                        <div className="mb-4">
+                            <div className="flex items-center space-x-3">
+                                {subCategoryStartIndex > 0 && (
+                                    <button
+                                        onClick={() => navigateSubCategories('prev')}
+                                        className="w-6 h-6 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center"
+                                    >
+                                        <Icon name="ChevronLeft" size={14} />
+                                    </button>
+                                )}
+                                
+                                <div className="flex space-x-2 overflow-hidden">
+                                    {visibleSubCategories.map((subCategory) => (
+                                        <button
+                                            key={subCategory.id}
+                                            onClick={() => handleSubCategoryChange(subCategory.id)}
+                                            className={`px-3 py-1 rounded-full text-xs font-body font-medium whitespace-nowrap transition-all duration-200 border ${
+                                                activeSubCategory === subCategory.id
+                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                    : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground'
+                                            }`}
+                                        >
+                                            {subCategory.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                {subCategoryStartIndex + SUB_CATEGORIES_PER_VIEW < currentSubCategories.length && (
+                                    <button
+                                        onClick={() => navigateSubCategories('next')}
+                                        className="w-6 h-6 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center"
+                                    >
+                                        <Icon name="ChevronRight" size={14} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Search and Sort */}
                         <div className="flex items-center gap-3">
                             {/* Search Bar */}
-                            <div className="flex-1">
-                                <SearchBar
-                                    onSearch={handleSearch}
-                                    onSearchSubmit={handleSearchSubmit}
-                                    onSuggestionClick={handleSuggestionClick}
-                                    onClear={handleClearSearch}
-                                    suggestions={filteredSuggestions}
-                                    placeholder="Buscar produtos..."
-                                    value={searchQuery}
-                                    showSuggestionsOnFocus={false}
-                                />
+                            <div className="flex-1 max-w-md">
+                                <div className="relative">
+                                    <Icon 
+                                        name="Search" 
+                                        size={16} 
+                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar produtos..."
+                                        value={searchQuery}
+                                        onChange={(e) => handleSearch(e.target.value)}
+                                        className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            onClick={handleClearSearch}
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        >
+                                            <Icon name="X" size={14} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Filters and Actions */}
+                            {/* Sort Filter */}
                             <div className="flex items-center space-x-3">
-                                <CategoryFilter />
                                 <SortFilter />
-                                <LocationSelector
-                                    currentLocation={currentLocation}
-                                    onLocationChange={handleLocationChange}
-                                />
                             </div>
+                        </div>
+
+                        {/* Results Count */}
+                        <div className="mt-4">
+                            <p className="text-sm text-muted-foreground">
+                                {filteredProducts.length} produtos encontrados
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -840,12 +909,12 @@ const renderStars = (rating) => {
                 {/* Products Grid */}
                 <div className="container mx-auto px-4 py-8">
                     {loading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {[...Array(8)].map((_, index) => (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                            {[...Array(12)].map((_, index) => (
                                 <LoadingSkeleton key={index} />
                             ))}
                         </div>
-                    ) : displayedProducts.length === 0 ? (
+                    ) : filteredProducts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16">
                             <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
                                 <Icon name="Package" className="w-12 h-12 text-muted-foreground" />
@@ -859,8 +928,8 @@ const renderStars = (rating) => {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {sortedProducts.map((product) => (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                                {displayedProducts.map((product) => (
                                     <ProductCard
                                         key={product.id}
                                         product={product}
@@ -887,17 +956,6 @@ const renderStars = (rating) => {
                     )}
                 </div>
             </main>
-
-            {/* Product Modal */}
-            <ProductModal
-                product={selectedProduct}
-                vendor={selectedProduct?.vendor}
-                isOpen={showProductModal}
-                onClose={() => {
-                    setShowProductModal(false);
-                    setSelectedProduct(null);
-                }}
-            />
 
             {/* Footer */}
             <Footer />
