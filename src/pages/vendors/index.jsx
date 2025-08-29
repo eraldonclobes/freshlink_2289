@@ -205,17 +205,17 @@ const VendorsPage = () => {
             const currentScrollY = window.scrollY;
             
             // If scrolling down and passed 100px, hide
-            if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                setIsFilterBarVisible(false);
+            if (currentScrollY > lastScrollY && currentScrollY > 150) {
+                setIsFilterBarVisible(true);
             }
             // If scrolling up, show
             else if (currentScrollY < lastScrollY) {
-                setIsFilterBarVisible(true);
+                setIsFilterBarVisible(false);
             }
             
             // If at top of page, always show
             if (currentScrollY < 10) {
-                setIsFilterBarVisible(true);
+                setIsFilterBarVisible(false);
             }
             
             setLastScrollY(currentScrollY);
@@ -367,7 +367,7 @@ const VendorsPage = () => {
                     </div>
                 )}
 
-                <div className="relative aspect-[4/3] overflow-hidden">
+                <div className="relative aspect-square overflow-hidden">
                     <Image
                         src={vendor.image}
                         alt={vendor.name}
@@ -379,12 +379,12 @@ const VendorsPage = () => {
                 <div className="p-4 flex-1 flex flex-col">
                     <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
-                            <h3 className="font-heading font-medium text-base text-foreground mb-1 line-clamp-1">
+                            <h3 className="font-heading font-medium text-lg text-foreground mb-1 line-clamp-1">
                                 {vendor.name}
                             </h3>
                             <div className="flex items-center space-x-1 mb-2">
                                 <Icon name="MapPin" size={14} className="text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">
+                                <span className="text-base text-muted-foreground">
                                     {vendor.location} • {vendor.distance}km
                                 </span>
                             </div>
@@ -403,26 +403,13 @@ const VendorsPage = () => {
                         </span>
                     </div>
 
-                    <div className="flex items-center space-x-2 mb-4">
-                        <Icon
-                            name="Clock"
-                            size={14}
-                            className={vendor.isOpen ? 'text-success' : 'text-error'}
-                        />
-                        <span className={`text-xs font-caption ${vendor.isOpen ? 'text-success' : 'text-error'}`}>
-                            {vendor.isOpen ? 'Aberto agora' : 'Fechado'}
-                        </span>
-                        <span className="text-xs font-caption text-muted-foreground">
-                            • {vendor.hours}
-                        </span>
-                    </div>
 
                     <div className="flex gap-2 mt-auto">
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => navigate('/vendor-profile-products', { state: { vendorId: vendor.id } })}
-                            className="flex-1 text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30 text-xs px-3 py-2"
+                            className="flex-1 text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30 text-sm px-3 py-2"
                         >
                             Ver Produtos
                         </Button>
@@ -430,7 +417,7 @@ const VendorsPage = () => {
                             variant="default"
                             size="sm"
                             onClick={() => handleWhatsAppContact(vendor)}
-                            className="flex-1 bg-success hover:bg-success/90 text-xs px-3 py-2"
+                            className="flex-1 bg-success hover:bg-success/90 text-sm px-3 py-2"
                         >
                             <div className="flex items-center justify-center space-x-1">
                                 <span>WhatsApp</span>
@@ -447,7 +434,7 @@ const VendorsPage = () => {
 
     const LoadingSkeleton = () => (
         <div className="bg-card border border-border rounded-xl overflow-hidden animate-pulse">
-            <div className="aspect-[4/3] bg-muted" />
+            <div className="aspect-square bg-muted" />
             <div className="p-4 space-y-3">
                 <div className="h-4 bg-muted rounded w-3/4" />
                 <div className="h-3 bg-muted rounded w-1/2" />
@@ -471,8 +458,8 @@ const VendorsPage = () => {
             <main className="pt-16 flex-1">
                 {/* Fixed Header */}
                 <div 
-                    className={`bg-card border-b border-border sticky z-40 transition-transform duration-300 ease-in-out ${
-                        isFilterBarVisible ? 'translate-y-0' : '-translate-y-full'
+                    className={`bg-card border-b border-border fixed left-0 right-0 z-40 transition-transform duration-300 ease-in-out ${
+                        isFilterBarVisible ? 'translate-y-0' : 'translate-y-full'
                     }`}
                     style={{ top: '64px' }}
                 >
@@ -534,15 +521,15 @@ const VendorsPage = () => {
                         </div>
 
                         {/* Status Filter Chips */}
-                        <div className="flex items-center space-x-3 overflow-x-auto scrollbar-hide pb-2 mb-4">
+                        <div className="flex items-center justify-start space-x-2 overflow-x-auto scrollbar-hide pb-2 mb-4">
                             {statusOptions.map((status) => (
                                 <button
                                     key={status.value}
                                     onClick={() => setStatusFilter(status.value)}
-                                    className={`flex items-center space-x-2 px-4 py-2.5 rounded-full text-sm font-body font-medium whitespace-nowrap transition-all duration-200 border ${
+                                    className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-body font-medium whitespace-nowrap transition-all duration-200 ${
                                         statusFilter === status.value
-                                            ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                                            : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground hover:border-primary/30'
+                                            ? 'bg-primary text-primary-foreground shadow-sm'
+                                            : 'bg-card text-muted-foreground hover:bg-muted hover:text-foreground'
                                     }`}
                                 >
                                     <Icon name={status.value === 'open' ? 'Clock' : status.value === 'popular' ? 'TrendingUp' : 'Grid3X3'} size={16} />
@@ -559,7 +546,7 @@ const VendorsPage = () => {
                 </div>
 
                 {/* Vendors Grid */}
-                <div className="container mx-auto px-4 py-8">
+                <div className="container mx-auto px-4 py-8" style={{ paddingTop: isFilterBarVisible ? '180px' : '32px' }}>
                     {loading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                             {[...Array(15)].map((_, index) => (

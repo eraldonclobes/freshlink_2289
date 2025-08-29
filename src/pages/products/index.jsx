@@ -227,17 +227,17 @@ const ProductsPage = () => {
             const currentScrollY = window.scrollY;
             
             // If scrolling down and passed 100px, hide
-            if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                setIsFilterBarVisible(false);
+            if (currentScrollY > lastScrollY && currentScrollY > 150) {
+                setIsFilterBarVisible(true);
             }
             // If scrolling up, show
             else if (currentScrollY < lastScrollY) {
-                setIsFilterBarVisible(true);
+                setIsFilterBarVisible(false);
             }
             
             // If at top of page, always show
             if (currentScrollY < 10) {
-                setIsFilterBarVisible(true);
+                setIsFilterBarVisible(false);
             }
             
             setLastScrollY(currentScrollY);
@@ -437,7 +437,7 @@ const ProductsPage = () => {
             </button>
 
             {/* Image - More square aspect ratio */}
-            <div className="relative aspect-[4/3] overflow-hidden">
+            <div className="relative aspect-square overflow-hidden">
                 <Image
                     src={product.image}
                     alt={product.name}
@@ -460,7 +460,7 @@ const ProductsPage = () => {
                 {/* Header */}
                 <div className="flex items-start justify-between mb-1">
                     <div className="flex-1">
-                        <h3 className="font-heading font-medium text-base text-foreground mb-1 line-clamp-1">
+                        <h3 className="font-heading font-medium text-lg text-foreground mb-1 line-clamp-1">
                             {product.name}
                         </h3>
                         <div className="flex items-center space-x-1 mb-1">
@@ -470,11 +470,11 @@ const ProductsPage = () => {
                                     e.stopPropagation();
                                     navigate('/vendor-profile-products', { state: { vendorId: product.vendorId } });
                                 }}
-                                className="text-sm text-primary hover:text-primary/80 hover:underline transition-colors duration-200"
+                                className="text-base text-primary hover:text-primary/80 hover:underline transition-colors duration-200"
                             >
                                 {product.vendor}
                             </button>
-                            <span className="text-xs text-muted-foreground">• {product.distance}km</span>
+                            <span className="text-sm text-muted-foreground">• {product.distance}km</span>
                         </div>
                     </div>
                 </div>
@@ -495,7 +495,7 @@ const ProductsPage = () => {
                 {/* Price */}
                 <div className="flex items-center space-x-2 mb-3">
                     <div className="flex items-baseline space-x-1">
-                        <span className="text-base font-heading font-bold text-foreground">
+                        <span className="text-sm font-heading font-bold text-foreground">
                             {formatPrice(product.price)}
                         </span>
                         <span className="text-xs font-caption text-muted-foreground">
@@ -503,7 +503,7 @@ const ProductsPage = () => {
                         </span>
                     </div>
                     {product.discount && (
-                        <span className="text-xs font-caption text-error bg-error/10 px-2 py-1 rounded-full">
+                        <span className="text-xs font-caption text-white bg-error px-2 py-1 rounded-full">
                             -{product.discount}%
                         </span>
                     )}
@@ -543,7 +543,7 @@ const ProductsPage = () => {
 
     const LoadingSkeleton = () => (
         <div className="bg-card border border-border rounded-xl overflow-hidden animate-pulse">
-            <div className="aspect-[4/3] bg-muted" />
+            <div className="aspect-square bg-muted" />
             <div className="p-3 space-y-2">
                 <div className="h-4 bg-muted rounded w-3/4" />
                 <div className="h-3 bg-muted rounded w-1/2" />
@@ -564,8 +564,8 @@ const ProductsPage = () => {
             <main className="pt-16 flex-1">
                 {/* Fixed Filter Bar */}
                 <div 
-                    className={`bg-card border-b border-border sticky z-40 transition-transform duration-300 ease-in-out ${
-                        isFilterBarVisible ? 'translate-y-0' : '-translate-y-full'
+                    className={`bg-card border-b border-border fixed left-0 right-0 z-40 transition-transform duration-300 ease-in-out ${
+                        isFilterBarVisible ? 'translate-y-0' : 'translate-y-full'
                     }`}
                     style={{ top: '64px' }}
                 >
@@ -618,15 +618,15 @@ const ProductsPage = () => {
                         </div>
 
                         {/* Categories */}
-                        <div className="flex items-center space-x-3 overflow-x-auto scrollbar-hide pb-2">
+                        <div className="flex items-center justify-start space-x-2 overflow-x-auto scrollbar-hide pb-2">
                             {categories.map((category) => (
                                 <button
                                     key={category.id}
                                     onClick={() => setActiveCategory(category.id)}
-                                    className={`flex items-center space-x-2 px-4 py-2.5 rounded-full text-sm font-body font-medium whitespace-nowrap transition-all duration-200 border ${
+                                    className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-body font-medium whitespace-nowrap transition-all duration-200 ${
                                         activeCategory === category.id
-                                            ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                                            : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground hover:border-primary/30'
+                                            ? 'bg-primary text-primary-foreground shadow-sm'
+                                            : 'bg-card text-muted-foreground hover:bg-muted hover:text-foreground'
                                     }`}
                                 >
                                     <Icon name={category.icon} size={16} />
@@ -646,7 +646,7 @@ const ProductsPage = () => {
                 </div>
 
                 {/* Products Grid */}
-                <div className="container mx-auto px-4 py-8">
+                <div className="container mx-auto px-4 py-8" style={{ paddingTop: isFilterBarVisible ? '200px' : '32px' }}>
                     {loading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                             {[...Array(15)].map((_, index) => (
