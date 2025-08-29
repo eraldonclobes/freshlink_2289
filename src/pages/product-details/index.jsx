@@ -240,13 +240,6 @@ const ProductDetails = () => {
         navigate('/vendor-profile-products', { state: { vendorId: vendor?.id } });
     };
 
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        }).format(price);
-    };
-
     const renderStars = (rating) => {
         const stars = [];
         const fullStars = Math.floor(rating);
