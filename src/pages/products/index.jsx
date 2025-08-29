@@ -784,8 +784,13 @@ const renderStars = (rating) => {
                {/* Fixed Header with Categories and Filters - Moves with navbar */}
                 <div 
                     data-filters-header
-                    className="bg-card border-b border-border sticky top-16 md:top-16 transition-all duration-300 z-40"
-                    style={{ top: 'var(--navbar-height, 4rem)' }}
+                    className="bg-card border-b border-border sticky transition-all duration-300 ease-in-out z-40"
+                    style={{ 
+                        top: 'var(--navbar-height, 4rem)',
+                        transitionProperty: 'top, transform',
+                        transitionDuration: '300ms',
+                        transitionTimingFunction: 'ease-in-out'
+                    }}
                 >
                     <div className="container mx-auto px-4 py-3">
                         {/* Main Categories - Horizontal Style */}
