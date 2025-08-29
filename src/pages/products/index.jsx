@@ -556,7 +556,7 @@ const ProductsPage = () => {
                 <div className={`bg-card border-b border-border sticky z-40 transition-all duration-300 ease-in-out ${
                     isHeaderVisible ? 'top-16' : 'top-0'
                 }`}>
-                    <div className="container mx-auto px-4 py-4">
+                    <div className="container mx-auto px-4 py-2">
                         {/* Categories with arrows - MOVED TO TOP */}
                         <div className="relative mb-1">
                             {showCategoryArrows && (
