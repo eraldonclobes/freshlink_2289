@@ -19,26 +19,22 @@ const VendorsPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [statusFilter, setStatusFilter] = useState('');
-    const [showSortDropdown, setShowSortDropdown] = useState(false);
+    const [isFilterBarVisible, setIsFilterBarVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
 
-    const VENDORS_PER_PAGE = 8;
+    const VENDORS_PER_PAGE = 15;
 
     const sortOptions = [
+        { value: 'relevance', label: 'Populares' },
         { value: 'distance', label: 'Mais próximos' },
         { value: 'rating', label: 'Melhor avaliados' },
-        { value: 'name', label: 'Nome A-Z' },
-        { value: 'products', label: 'Mais produtos' },
-        { value: 'reviews', label: 'Mais avaliações' }
+        { value: 'name', label: 'Nome A-Z' }
     ];
 
-    const categoryOptions = [
-        { value: '', label: 'Todas as categorias' },
-        { value: 'organicos', label: 'Orgânicos' },
-        { value: 'frutas', label: 'Frutas' },
-        { value: 'verduras', label: 'Verduras' },
-        { value: 'legumes', label: 'Legumes' },
-        { value: 'temperos', label: 'Temperos' },
-        { value: 'laticinios', label: 'Laticínios' }
+    const statusOptions = [
+        { value: '', label: 'Todos' },
+        { value: 'open', label: 'Aberto' },
+        { value: 'popular', label: 'Populares' }
     ];
 
     // Mock suggestions for search
@@ -203,6 +199,44 @@ const VendorsPage = () => {
         }
     ];
 
+    // Control filter bar visibility based on scroll
+    useEffect(() => {
+        const controlFilterBar = () => {
+            const currentScrollY = window.scrollY;
+            
+            // If scrolling down and passed 100px, hide
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                setIsFilterBarVisible(false);
+            }
+            // If scrolling up, show
+            else if (currentScrollY < lastScrollY) {
+                setIsFilterBarVisible(true);
+            }
+            
+            // If at top of page, always show
+            if (currentScrollY < 10) {
+                setIsFilterBarVisible(true);
+            }
+            
+            setLastScrollY(currentScrollY);
+        };
+
+        // Throttle function for better performance
+        let ticking = false;
+        const handleScroll = () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    controlFilterBar();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastScrollY]);
+
     // Load initial vendors
     useEffect(() => {
         loadVendors();
@@ -256,12 +290,9 @@ const VendorsPage = () => {
                     return b.rating - a.rating;
                 case 'name':
                     return a.name.localeCompare(b.name);
-                case 'products':
-                    return b.productCount - a.productCount;
-                case 'reviews':
-                    return b.reviewCount - a.reviewCount;
+                case 'relevance':
                 default:
-                    return 0;
+                    return b.rating - a.rating;
             }
         });
 
@@ -327,221 +358,7 @@ const VendorsPage = () => {
         return stars;
     };
 
-    // Status Filter Component
-    const StatusFilter = () => {
-        const statusOptions = [
-            { value: '', label: 'Todos' },
-            { value: 'open', label: 'Aberto' },
-            { value: 'closed', label: 'Fechado' }
-        ];
-
-        const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-
-        return (
-            <div className="relative">
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setShowStatusDropdown(!showStatusDropdown);
-                    }}
-                    className="flex items-center space-x-2 px-3 py-2 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
-                >
-                    <Icon name="Clock" size={16} className="text-primary" />
-                    <span className="hidden sm:inline">
-                        {statusOptions.find(opt => opt.value === statusFilter)?.label || 'Status'}
-                    </span>
-                    <Icon
-                        name="ChevronDown"
-                        size={16}
-                        className={`transition-transform duration-200 ${showStatusDropdown ? 'rotate-180' : ''
-                            }`}
-                    />
-                </button>
-
-                {showStatusDropdown && (
-                    <>
-                        <div
-                            className="fixed inset-0 z-40"
-                            onClick={() => setShowStatusDropdown(false)}
-                        />
-                        <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 min-w-64 animate-slide-down">
-                            <div className="max-h-60 overflow-y-auto">
-                                {statusOptions.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        onClick={() => {
-                                            setStatusFilter(option.value);
-                                            setShowStatusDropdown(false);
-                                        }}
-                                        className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${statusFilter === option.value
-                                            ? 'bg-primary/10 text-primary'
-                                            : 'text-foreground hover:bg-muted'
-                                            }`}
-                                    >
-                                        <span className="font-medium">{option.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
-        );
-    };
-
-    // Sort Filter Component
-    const SortFilter = () => {
-        const [showSortDropdown, setShowSortDropdown] = useState(false);
-
-        return (
-            <div className="relative">
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setShowSortDropdown(!showSortDropdown);
-                    }}
-                    className="flex items-center space-x-2 px-3 py-3 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap"
-                >
-                    <Icon name="ArrowUpDown" size={16} className="text-primary" />
-                    <span className="hidden sm:inline">
-                        {sortOptions.find(opt => opt.value === sortBy)?.label || 'Ordenar'}
-                    </span>
-                    <Icon
-                        name="ChevronDown"
-                        size={16}
-                        className={`transition-transform duration-200 ${showSortDropdown ? 'rotate-180' : ''
-                            }`}
-                    />
-                </button>
-
-                {showSortDropdown && (
-                    <>
-                        <div
-                            className="fixed inset-0 z-40"
-                            onClick={() => setShowSortDropdown(false)}
-                        />
-                        <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 min-w-64 animate-slide-down">
-                            <div className="max-h-60 overflow-y-auto">
-                                {sortOptions.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        onClick={() => {
-                                            setSortBy(option.value);
-                                            setShowSortDropdown(false);
-                                        }}
-                                        className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${sortBy === option.value
-                                            ? 'bg-primary/10 text-primary'
-                                            : 'text-foreground hover:bg-muted'
-                                            }`}
-                                    >
-                                        <span className="font-medium">{option.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
-        );
-    };
-
     const VendorCard = ({ vendor, viewMode = 'grid' }) => {
-        if (viewMode === 'list') {
-            return (
-                <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group">
-                    <div className="flex">
-                        {/* Image */}
-                        <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
-                            <Image
-                                src={vendor.image}
-                                alt={vendor.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                            {vendor.isSponsored && (
-                                <div className="absolute top-2 left-2 bg-accent text-accent-foreground text-xs font-caption font-medium px-2 py-1 rounded-full">
-                                    Patrocinado
-                                </div>
-                            )}
-                            <div className="absolute top-2 right-2 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-caption">
-                                {vendor.distance}km
-                            </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-4 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 className="font-heading font-semibold text-lg text-foreground mb-1">
-                                    {vendor.name}
-                                </h3>
-                                <div className="flex items-center space-x-1 mb-2">
-                                    <Icon name="MapPin" size={14} className="text-muted-foreground" />
-                                    <span className="text-sm font-caption text-muted-foreground">
-                                        {vendor.location}
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center space-x-2 mb-2">
-                                    <div className="flex items-center space-x-1">
-                                        {renderStars(vendor.rating)}
-                                    </div>
-                                    <span className="text-sm font-body font-medium text-foreground">
-                                        {vendor.rating.toFixed(1)}
-                                    </span>
-                                    <span className="text-sm font-caption text-muted-foreground">
-                                        ({vendor.reviewCount})
-                                    </span>
-                                </div>
-
-                                <div className="flex flex-wrap gap-1 mb-3">
-                                    {vendor.categories.slice(0, 3).map((category, index) => (
-                                        <span
-                                            key={index}
-                                            className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full"
-                                        >
-                                            {category}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-2">
-                                    <Icon
-                                        name="Clock"
-                                        size={14}
-                                        className={vendor.isOpen ? 'text-success' : 'text-error'}
-                                    />
-                                    <span className={`text-sm font-caption ${vendor.isOpen ? 'text-success' : 'text-error'}`}>
-                                        {vendor.isOpen ? 'Aberto' : 'Fechado'}
-                                    </span>
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => navigate('/vendor-profile-products', { state: { vendorId: vendor.id } })}
-                                        className="text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30"
-                                    >
-                                        Ver Produtos
-                                    </Button>
-                                    <Button
-                                        variant="default"
-                                        size="sm"
-                                        iconName="MessageCircle"
-                                        onClick={() => handleWhatsAppContact(vendor)}
-                                        className="bg-success hover:bg-success/90"
-                                    >
-                                        WhatsApp
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
         return (
             <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
                 {vendor.isSponsored && (
@@ -550,28 +367,25 @@ const VendorsPage = () => {
                     </div>
                 )}
 
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative aspect-[4/3] overflow-hidden">
                     <Image
                         src={vendor.image}
                         alt={vendor.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                    <div className="absolute top-3 right-3 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-caption">
-                        {vendor.distance}km
-                    </div>
                 </div>
 
                 <div className="p-4 flex-1 flex flex-col">
                     <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
-                            <h3 className="font-heading font-semibold text-lg text-foreground mb-1 line-clamp-1">
+                            <h3 className="font-heading font-medium text-base text-foreground mb-1 line-clamp-1">
                                 {vendor.name}
                             </h3>
                             <div className="flex items-center space-x-1 mb-2">
                                 <Icon name="MapPin" size={14} className="text-muted-foreground" />
-                                <span className="text-sm font-caption text-muted-foreground">
-                                    {vendor.location}
+                                <span className="text-sm text-muted-foreground">
+                                    {vendor.location} • {vendor.distance}km
                                 </span>
                             </div>
                         </div>
@@ -581,28 +395,12 @@ const VendorsPage = () => {
                         <div className="flex items-center space-x-1">
                             {renderStars(vendor.rating)}
                         </div>
-                        <span className="text-sm font-body font-medium text-foreground">
+                        <span className="text-xs font-body font-medium text-foreground">
                             {vendor.rating.toFixed(1)}
                         </span>
-                        <span className="text-sm font-caption text-muted-foreground">
+                        <span className="text-xs font-caption text-muted-foreground">
                             ({vendor.reviewCount})
                         </span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1 mb-4">
-                        {vendor.categories.slice(0, 3).map((category, index) => (
-                            <span
-                                key={index}
-                                className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full"
-                            >
-                                {category}
-                            </span>
-                        ))}
-                        {vendor.categories.length > 3 && (
-                            <span className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs font-caption rounded-full">
-                                +{vendor.categories.length - 3}
-                            </span>
-                        )}
                     </div>
 
                     <div className="flex items-center space-x-2 mb-4">
@@ -611,32 +409,35 @@ const VendorsPage = () => {
                             size={14}
                             className={vendor.isOpen ? 'text-success' : 'text-error'}
                         />
-                        <span className={`text-sm font-caption ${vendor.isOpen ? 'text-success' : 'text-error'}`}>
+                        <span className={`text-xs font-caption ${vendor.isOpen ? 'text-success' : 'text-error'}`}>
                             {vendor.isOpen ? 'Aberto agora' : 'Fechado'}
                         </span>
-                        <span className="text-sm font-caption text-muted-foreground">
+                        <span className="text-xs font-caption text-muted-foreground">
                             • {vendor.hours}
                         </span>
                     </div>
 
-                    {/* Botões corrigidos */}
                     <div className="flex gap-2 mt-auto">
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => navigate('/vendor-profile-products', { state: { vendorId: vendor.id } })}
-                            className="flex-1 text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30 text-sm px-3 py-5"
+                            className="flex-1 text-muted-foreground border hover:bg-muted hover:text-foreground hover:border-primary/30 text-xs px-3 py-2"
                         >
                             Ver Produtos
                         </Button>
                         <Button
                             variant="default"
                             size="sm"
-                            iconName="MessageCircle"
                             onClick={() => handleWhatsAppContact(vendor)}
-                            className="flex-1 bg-success hover:bg-success/90 text-sm px-3 py-5"
+                            className="flex-1 bg-success hover:bg-success/90 text-xs px-3 py-2"
                         >
-                            WhatsApp
+                            <div className="flex items-center justify-center space-x-1">
+                                <span>WhatsApp</span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                                </svg>
+                            </div>
                         </Button>
                     </div>
                 </div>
@@ -646,18 +447,13 @@ const VendorsPage = () => {
 
     const LoadingSkeleton = () => (
         <div className="bg-card border border-border rounded-xl overflow-hidden animate-pulse">
-            <div className="h-48 bg-muted" />
+            <div className="aspect-[4/3] bg-muted" />
             <div className="p-4 space-y-3">
                 <div className="h-4 bg-muted rounded w-3/4" />
                 <div className="h-3 bg-muted rounded w-1/2" />
                 <div className="flex space-x-1">
                     {[...Array(5)].map((_, i) => (
                         <div key={i} className="w-3 h-3 bg-muted rounded" />
-                    ))}
-                </div>
-                <div className="flex space-x-1">
-                    {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-6 bg-muted rounded-full w-16" />
                     ))}
                 </div>
                 <div className="h-3 bg-muted rounded w-2/3" />
@@ -674,14 +470,13 @@ const VendorsPage = () => {
 
             <main className="pt-16 flex-1">
                 {/* Fixed Header */}
-                <div className="bg-card border-b border-border sticky top-16 z-40">
+                <div 
+                    className={`bg-card border-b border-border sticky z-40 transition-transform duration-300 ease-in-out ${
+                        isFilterBarVisible ? 'translate-y-0' : '-translate-y-full'
+                    }`}
+                    style={{ top: '64px' }}
+                >
                     <div className="container mx-auto px-4 py-6">
-                        <div>
-                            <h1 className="text-xl font-heading font-bold text-foreground mb-4">
-                                Vendedores Próximos
-                            </h1>
-                        </div>
-
                         {/* Search and Filters */}
                         <div className="flex items-center gap-3 mb-4">
                             {/* Search Bar */}
@@ -710,15 +505,50 @@ const VendorsPage = () => {
                                 </div>
                             </div>
 
-                            {/* Filters and Actions */}
+                            {/* Sort, Location and Map Button */}
                             <div className="flex items-center space-x-3">
-                                <StatusFilter />
-                                <SortFilter />
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="px-3 py-2 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                                >
+                                    {sortOptions.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
                                 <LocationSelector
                                     currentLocation={currentLocation}
                                     onLocationChange={handleLocationChange}
                                 />
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    iconName="Map"
+                                    onClick={() => navigate('/vendors-map')}
+                                >
+                                    Ver no Mapa
+                                </Button>
                             </div>
+                        </div>
+
+                        {/* Status Filter Chips */}
+                        <div className="flex items-center space-x-3 overflow-x-auto scrollbar-hide pb-2 mb-4">
+                            {statusOptions.map((status) => (
+                                <button
+                                    key={status.value}
+                                    onClick={() => setStatusFilter(status.value)}
+                                    className={`flex items-center space-x-2 px-4 py-2.5 rounded-full text-sm font-body font-medium whitespace-nowrap transition-all duration-200 border ${
+                                        statusFilter === status.value
+                                            ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                                            : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground hover:border-primary/30'
+                                    }`}
+                                >
+                                    <Icon name={status.value === 'open' ? 'Clock' : status.value === 'popular' ? 'TrendingUp' : 'Grid3X3'} size={16} />
+                                    <span>{status.label}</span>
+                                </button>
+                            ))}
                         </div>
 
                         {/* Results Count */}
@@ -731,8 +561,8 @@ const VendorsPage = () => {
                 {/* Vendors Grid */}
                 <div className="container mx-auto px-4 py-8">
                     {loading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {[...Array(8)].map((_, index) => (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                            {[...Array(15)].map((_, index) => (
                                 <LoadingSkeleton key={index} />
                             ))}
                         </div>
@@ -748,7 +578,7 @@ const VendorsPage = () => {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                                 {displayedVendors.map((vendor) => (
                                     <VendorCard key={vendor.id} vendor={vendor} />
                                 ))}
