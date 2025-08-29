@@ -558,7 +558,7 @@ const ProductsPage = () => {
                 }`}>
                     <div className="container mx-auto px-4 py-4">
                         {/* Categories with arrows - MOVED TO TOP */}
-                        <div className="relative">
+                        <div className="relative mb-2">
                             {showCategoryArrows && (
                                 <button
                                     onClick={() => scrollCategories('left')}
