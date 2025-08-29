@@ -672,11 +672,6 @@ const ProductsPage = () => {
                                 </button>
                             )}
                         </div>
-
-                        {/* Results Count */}
-                        <p className="text-sm text-muted-foreground mt-4">
-                            {filteredProducts.length} produtos encontrados
-                        </p>
                     </div>
                 </div>
 
