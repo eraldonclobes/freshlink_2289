@@ -781,8 +781,12 @@ const renderStars = (rating) => {
             <ResponsiveHeader />
 
             <main className="pt-16 flex-1">
-                {/* Fixed Header with Categories and Filters */}
-                <div className="bg-card border-b border-border sticky top-16 z-40">
+               {/* Fixed Header with Categories and Filters - Moves with navbar */}
+                <div 
+                    data-filters-header
+                    className="bg-card border-b border-border sticky top-16 md:top-16 transition-all duration-300 z-40"
+                    style={{ top: 'var(--navbar-height, 4rem)' }}
+                >
                     <div className="container mx-auto px-4 py-3">
                         {/* Main Categories - Horizontal Style */}
                         <div className="mb-3">
@@ -824,48 +828,48 @@ const renderStars = (rating) => {
                             </div>
                         </div>
 
-                        {/* Filters Row */}
-                        <div className="flex items-center gap-2">
-                            {/* Search Bar - First */}
-                            <div className="flex-1 max-w-sm">
+                        {/* Filters Row - Desktop */}
+                        <div className="hidden md:flex items-center gap-3">
+                            {/* Search Bar - Takes available space */}
+                            <div className="flex-1">
                                 <div className="relative">
                                     <Icon 
                                         name="Search" 
                                         size={14} 
-                                        className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
                                     />
                                     <input
                                         type="text"
                                         placeholder="Buscar produtos..."
                                         value={searchQuery}
                                         onChange={(e) => handleSearch(e.target.value)}
-                                        className="w-full pl-8 pr-3 py-2 bg-background border border-border rounded-lg text-xs font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent h-9"
+                                        className="w-full pl-10 pr-10 py-2 bg-background border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent h-10"
                                     />
                                     {searchQuery && (
                                         <button
                                             onClick={handleClearSearch}
-                                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                         >
-                                            <Icon name="X" size={12} />
+                                            <Icon name="X" size={14} />
                                         </button>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Sort/Order Button - Second */}
-                            <div className="relative">
+                            {/* Sort/Order Button */}
+                            <div className="relative flex-shrink-0">
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setShowSortDropdown(!showSortDropdown);
                                     }}
-                                    className="flex items-center space-x-1 px-3 py-2 bg-muted border border-border rounded-lg text-xs font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap h-9"
+                                    className="flex items-center space-x-2 px-4 py-2 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap h-10"
                                 >
-                                    <Icon name="ArrowUpDown" size={14} className="text-primary" />
+                                    <Icon name="ArrowUpDown" size={16} className="text-primary" />
                                     <span>Ordenar</span>
                                     <Icon 
                                         name="ChevronDown" 
-                                        size={14} 
+                                        size={16} 
                                         className={`transition-transform duration-200 ${
                                             showSortDropdown ? 'rotate-180' : ''
                                         }`} 
@@ -887,7 +891,7 @@ const renderStars = (rating) => {
                                                             setSortBy(option.value);
                                                             setShowSortDropdown(false);
                                                         }}
-                                                        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-body transition-colors duration-200 ${
+                                                        className={`w-full flex items-center justify-between px-4 py-3 text-sm font-body transition-colors duration-200 ${
                                                             sortBy === option.value
                                                                 ? 'bg-primary/10 text-primary'
                                                                 : 'text-foreground hover:bg-muted'
@@ -902,23 +906,23 @@ const renderStars = (rating) => {
                                 )}
                             </div>
                             
-                            {/* Sub Categories - Third */}
-                            <div className="flex items-center space-x-1">
+                            {/* Sub Categories - Desktop */}
+                            <div className="flex items-center space-x-2 flex-shrink-0">
                                 {subCategoryStartIndex > 0 && (
                                     <button
                                         onClick={() => navigateSubCategories('prev')}
-                                        className="w-6 h-6 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
+                                        className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
                                     >
                                         <Icon name="ChevronLeft" size={12} />
                                     </button>
                                 )}
                                 
-                                <div className="flex space-x-1 overflow-hidden">
+                                <div className="flex space-x-2 overflow-hidden">
                                     {visibleSubCategories.map((subCategory) => (
                                         <button
                                             key={subCategory.id}
                                             onClick={() => handleSubCategoryChange(subCategory.id)}
-                                            className={`px-3 py-2 rounded-lg text-xs font-body font-medium whitespace-nowrap transition-all duration-200 border h-9 ${
+                                            className={`px-3 py-2 rounded-lg text-sm font-body font-medium whitespace-nowrap transition-all duration-200 border h-10 ${
                                                 activeSubCategory === subCategory.id
                                                     ? 'bg-primary text-primary-foreground border-primary'
                                                     : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground'
@@ -932,13 +936,133 @@ const renderStars = (rating) => {
                                 {currentSubCategories.length > SUB_CATEGORIES_PER_VIEW && subCategoryStartIndex + SUB_CATEGORIES_PER_VIEW < currentSubCategories.length && (
                                     <button
                                         onClick={() => navigateSubCategories('next')}
-                                        className="w-6 h-6 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
+                                        className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
                                     >
                                         <Icon name="ChevronRight" size={12} />
                                     </button>
                                 )}
                             </div>
                         </div>
+
+                        {/* Mobile Layout */}
+                        <div className="md:hidden space-y-3">
+                            {/* Search and Sort Row - Mobile */}
+                            <div className="flex items-center gap-3">
+                                {/* Search Bar - Mobile */}
+                                <div className="flex-1">
+                                    <div className="relative">
+                                        <Icon 
+                                            name="Search" 
+                                            size={14} 
+                                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar produtos..."
+                                            value={searchQuery}
+                                            onChange={(e) => handleSearch(e.target.value)}
+                                            className="w-full pl-10 pr-10 py-2 bg-background border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent h-10"
+                                        />
+                                        {searchQuery && (
+                                            <button
+                                                onClick={handleClearSearch}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                            >
+                                                <Icon name="X" size={14} />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Sort Button - Mobile */}
+                                <div className="relative flex-shrink-0">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowSortDropdown(!showSortDropdown);
+                                        }}
+                                        className="flex items-center space-x-1 px-3 py-2 bg-muted border border-border rounded-lg text-sm font-body font-medium text-foreground hover:bg-muted/80 transition-colors duration-200 whitespace-nowrap h-10"
+                                    >
+                                        <Icon name="ArrowUpDown" size={16} className="text-primary" />
+                                        <Icon 
+                                            name="ChevronDown" 
+                                            size={16} 
+                                            className={`transition-transform duration-200 ${
+                                                showSortDropdown ? 'rotate-180' : ''
+                                            }`} 
+                                        />
+                                    </button>
+                                    
+                                    {showSortDropdown && (
+                                        <>
+                                            <div 
+                                                className="fixed inset-0 z-40"
+                                                onClick={() => setShowSortDropdown(false)}
+                                            />
+                                            <div className="absolute top-full right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 min-w-52">
+                                                <div className="max-h-60 overflow-y-auto">
+                                                    {sortOptions.map((option) => (
+                                                        <button
+                                                            key={option.value}
+                                                            onClick={() => {
+                                                                setSortBy(option.value);
+                                                                setShowSortDropdown(false);
+                                                            }}
+                                                            className={`w-full flex items-center justify-between px-3 py-2 text-sm font-body transition-colors duration-200 ${
+                                                                sortBy === option.value
+                                                                    ? 'bg-primary/10 text-primary'
+                                                                    : 'text-foreground hover:bg-muted'
+                                                            }`}
+                                                        >
+                                                            <span className="font-medium">{option.label}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Sub Categories Row - Mobile */}
+                            <div className="flex items-center space-x-2">
+                                {subCategoryStartIndex > 0 && (
+                                    <button
+                                        onClick={() => navigateSubCategories('prev')}
+                                        className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
+                                    >
+                                        <Icon name="ChevronLeft" size={12} />
+                                    </button>
+                                )}
+                                
+                                <div className="flex space-x-2 overflow-hidden flex-1">
+                                    {visibleSubCategories.map((subCategory) => (
+                                        <button
+                                            key={subCategory.id}
+                                            onClick={() => handleSubCategoryChange(subCategory.id)}
+                                            className={`px-3 py-2 rounded-lg text-sm font-body font-medium whitespace-nowrap transition-all duration-200 border h-9 ${
+                                                activeSubCategory === subCategory.id
+                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                    : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground'
+                                            }`}
+                                        >
+                                            {subCategory.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                {currentSubCategories.length > SUB_CATEGORIES_PER_VIEW && subCategoryStartIndex + SUB_CATEGORIES_PER_VIEW < currentSubCategories.length && (
+                                    <button
+                                        onClick={() => navigateSubCategories('next')}
+                                        className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center flex-shrink-0"
+                                    >
+                                        <Icon name="ChevronRight" size={12} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
                     </div>
                 </div>
 
