@@ -72,7 +72,36 @@ const AccountStep = ({ formData, setFormData, onNext }) => {
             value={formData?.email || ''}
             onChange={(e) => handleInputChange('email', e?.target?.value)}
             required
-            onClick={() => setShowPassword(!showPassword)}
+          />
+          {errors?.email && (
+            <p className="text-sm text-destructive">{errors?.email}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="password">Senha</Label>
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Digite sua senha"
+              value={formData?.password || ''}
+              onChange={(e) => handleInputChange('password', e?.target?.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              <Icon name={showPassword ? 'EyeOff' : 'Eye'} size={18} />
+            </button>
+          </div>
+          {errors?.password && (
+            <p className="text-sm text-destructive">{errors?.password}</p>
+          )}
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="confirm-password">Confirmar senha</Label>
           <div className="relative">
@@ -96,36 +125,6 @@ const AccountStep = ({ formData, setFormData, onNext }) => {
             <p className="text-sm text-destructive">{errors?.confirmPassword}</p>
           )}
         </div>
-
-        <div className="flex items-start space-x-2 pt-2">
-          <Checkbox
-            id="terms"
-            checked={formData?.termsAccepted || false}
-            onCheckedChange={(checked) => handleInputChange('termsAccepted', checked)}
-          />
-          <Label htmlFor="terms" className="text-sm leading-5">
-            Eu aceito os{' '}
-            <button type="button" className="text-primary hover:underline">
-              Termos de Uso
-            </button>
-            {' '}e{' '}
-            <button type="button" className="text-primary hover:underline">
-              Política de Privacidade
-            </button>
-          </Label>
-        </div>
-        {errors?.termsAccepted && (
-          <p className="text-destructive text-sm">{errors?.termsAccepted}</p>
-        )}
-      </div>
-      <Button
-        onClick={handleNext}
-        size="lg"
-        className="w-full mt-8"
-      >
-        Continuar <Icon name="ArrowRight" size={16} className="ml-2" />
-      </Button>
-    </div>
 
         <div className="flex items-start space-x-2 pt-2">
           <Checkbox
