@@ -5,7 +5,7 @@ import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
 import SearchBar from '../../components/ui/SearchBar';
 import LocationSelector from '../../components/ui/LocationSelector';
-import Button from '../../components/ui/Button';
+import Button from '../../components/ui/button';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 
