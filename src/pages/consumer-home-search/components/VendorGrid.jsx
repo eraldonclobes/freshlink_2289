@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
-import Button from '../../../components/ui/Button';
+import { Button } from '../../../components/ui/button';
 
 const VendorGrid = ({ vendors, loading, onLoadMore, hasMore, loadingMore, className = '' }) => {
     const navigate = useNavigate();
@@ -220,6 +220,22 @@ const VendorGrid = ({ vendors, loading, onLoadMore, hasMore, loadingMore, classN
                     <VendorCard key={vendor?.id} vendor={vendor} />
                 ))}
             </div>
+
+            {/* Load More Button */}
+            {hasMore && (
+                <div className="flex justify-center mt-8">
+                    <Button
+                        onClick={onLoadMore}
+                        loading={loadingMore}
+                        variant="outline"
+                        size="lg"
+                        iconName="Plus"
+                        iconPosition="left"
+                    >
+                        Carregar mais vendedores
+                    </Button>
+                </div>
+            )}
 
             {/* Load More Button */}
             {hasMore && (

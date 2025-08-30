@@ -202,7 +202,7 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
         return stars;
     };
 
-    const ProductCard = ({ product }) => (
+    const ProductCard = ({ product, onFavoriteToggle, isFavorited }) => (
         <div
             className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer flex flex-col h-full"
             onClick={() => handleProductClick(product)}
@@ -216,7 +216,7 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
 
             {/* Favorite Button */}
             <button
-                onClick={(e) => handleFavoriteToggle(product?.id, e)}
+                onClick={(e) => onFavoriteToggle?.(product?.id, e)}
                 className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${favoriteProducts.includes(product?.id)
                     ? 'bg-error text-white'
                     : 'bg-white/80 backdrop-blur-sm text-muted-foreground hover:text-error hover:bg-white'
@@ -225,7 +225,7 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
                 <Icon
                     name="Heart"
                     size={16}
-                    className={favoriteProducts.includes(product?.id) ? 'fill-current' : ''}
+                    className={isFavorited ? 'fill-current' : ''}
                 />
             </button>
 
@@ -451,7 +451,12 @@ const FeaturedProducts = ({ className = '', onProductClick }) => {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {visibleProducts.map((product) => (
-                    <ProductCard key={product?.id} product={product} />
+                    <ProductCard 
+                        key={product?.id} 
+                        product={product}
+                        onFavoriteToggle={handleFavoriteToggle}
+                        isFavorited={favoriteProducts.includes(product?.id)}
+                    />
                 ))}
             </div>
         </div>

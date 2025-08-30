@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Star, X, MapPin, MessageCircle, Share, ChevronLeft, ChevronRight } from 'lucide-react';
-import Button from '../../components/ui/Button';
+import { Button } from './button';
 
 const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = false }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -11,31 +11,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
     const [isHovered, setIsHovered] = useState(false);
     const imageRef = useRef(null);
 
-    // Mock data to match the reference image
-    const mockProduct = {
-        name: "Beats Studio Pro Wireless Headphones — Navy",
-        brand: "Beats",
-        rating: 4.6,
-        reviewCount: 261,
-        watchCount: 3100,
-        price: 349.99,
-        images: [
-            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop",
-            "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=500&h=500&fit=crop",
-            "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&h=500&fit=crop",
-            "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=500&h=500&fit=crop"
-        ],
-        colors: ['#2B4F72', '#E8E8E8', '#4A4A4A', '#1A1A1A'],
-        description: "The Beats Studio Pro custom acoustic platform delivers an immersive listening experience. Each custom 40mm driver has been engineered for optimal clarity, with near...",
-        available: true,
-        isOrganic: false,
-        productType: "organic", // orgânico, natural, convencional
-        category: "Headphones",
-        stock: 15,
-        unit: "unit"
-    };
-
-    const displayProduct = product || mockProduct;
+    if (!product) return null;
 
     useEffect(() => {
         if (isOpen) {
@@ -49,9 +25,9 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
         };
     }, [isOpen]);
 
-    if (!isOpen) return null;
+    if (!isOpen || !product) return null;
 
-    const images = Array.isArray(displayProduct.images) ? displayProduct.images : [displayProduct.image];
+    const images = Array.isArray(product.images) ? product.images : [product.image];
 
     const handleMouseMove = (e) => {
         if (!isZoomed || !imageRef.current) return;
@@ -70,7 +46,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
     };
 
     const handleWhatsAppContact = () => {
-        const message = encodeURIComponent(`Olá! Tenho interesse no produto: ${displayProduct.name}. Está disponível?`);
+        const message = encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}. Está disponível?`);
         const whatsappUrl = `https://wa.me/55${vendor?.phone}?text=${message}`;
         window.open(whatsappUrl, '_blank');
     };
@@ -78,8 +54,8 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
     const handleShare = () => {
         if (navigator.share) {
             navigator.share({
-                title: displayProduct.name,
-                text: `Confira este produto: ${displayProduct.name}`,
+                title: product.name,
+                text: `Confira este produto: ${product.name}`,
                 url: window.location.href
             });
         } else {
@@ -90,7 +66,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
 
     const handleFavoriteClick = (e) => {
         e.stopPropagation();
-        onFavoriteToggle?.(displayProduct.id);
+        onFavoriteToggle?.(product.id);
     };
 
     const formatPrice = (price) => {
@@ -177,7 +153,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                                 <img
                                     ref={imageRef}
                                     src={images[currentImageIndex]}
-                                    alt={displayProduct.name}
+                                    alt={product.name}
                                     className={`w-full h-full object-contain transition-transform duration-300 ${isZoomed ? 'scale-150' : 'scale-100'
                                         }`}
                                     style={
@@ -222,7 +198,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                                         >
                                             <img
                                                 src={image}
-                                                alt={`${displayProduct.name} ${index + 1}`}
+                                                alt={`${product.name} ${index + 1}`}
                                                 className="w-full h-full object-contain"
                                             />
                                         </button>
@@ -238,37 +214,37 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                             {/* Product Title and Rating */}
                             <div>
                                 <h1 className="text-3xl font-heading font-bold text-foreground mb-2">
-                                    {displayProduct.name}
+                                    {product.name}
                                 </h1>
 
                                 <div className="flex items-center space-x-3 mb-4">
                                     <div className="flex items-center space-x-1">
-                                        {renderStars(displayProduct.rating || 4.6)}
+                                        {renderStars(product.rating || 4.6)}
                                     </div>
                                     <span className="text-sm font-medium text-foreground">
-                                        {(displayProduct.rating || 4.6).toFixed(1)}
+                                        {(product.rating || 4.6).toFixed(1)}
                                     </span>
                                     <span className="text-sm text-muted-foreground">
-                                        ({displayProduct.reviewCount || 261} avaliações)
+                                        ({product.reviewCount || 261} avaliações)
                                     </span>
                                 </div>
 
                                 <div className="flex items-center text-sm text-muted-foreground mb-4">
-                                    <span>Categoria: <span className="font-medium text-foreground">{displayProduct.category || 'Não informado'}</span></span>
-                                    {(displayProduct.productType === 'organic' || displayProduct.productType === 'natural') && (
+                                    <span>Categoria: <span className="font-medium text-foreground">{product.category || 'Não informado'}</span></span>
+                                    {(product.productType === 'organic' || product.productType === 'natural') && (
                                         <>
                                             <div className="w-px h-4 bg-border mx-4"></div>
-                                            <span className={`font-medium ${getProductTypeColor(displayProduct.productType)}`}>
-                                                {getProductTypeLabel(displayProduct.productType)}
+                                            <span className={`font-medium ${getProductTypeColor(product.productType)}`}>
+                                                {getProductTypeLabel(product.productType)}
                                             </span>
                                         </>
                                     )}
                                 </div>
 
-                                {displayProduct.description && (
+                                {product.description && (
                                     <p className="text-muted-foreground leading-relaxed mb-6">
-                                        {displayProduct.description}
-                                        {displayProduct.description && displayProduct.description.length > 100 && (
+                                        {product.description}
+                                        {product.description && product.description.length > 100 && (
                                             <button className="text-primary hover:text-primary/80 font-medium ml-1">
                                                 Read more
                                             </button>
@@ -278,10 +254,10 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
 
                                 <div className="flex items-center space-x-4 mb-6">
                                     <div className="text-3xl font-heading font-bold text-primary">
-                                        {formatPrice(displayProduct.price)}
+                                        {formatPrice(product.price)}
                                     </div>
                                     <div className="text-muted-foreground">
-                                        por {displayProduct.unit}
+                                        por {product.unit}
                                     </div>
                                 </div>
 
@@ -350,7 +326,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                             </div>
 
                             {/* Product Details */}
-                            {displayProduct.stock && (
+                            {product.stock && (
                                 <div className="space-y-3">
                                     <h3 className="font-body font-semibold text-foreground">
                                         Informações Adicionais
@@ -359,7 +335,7 @@ const ProductModal = ({ product, vendor, isOpen, onClose, onFavoriteToggle = fal
                                         <div>
                                             <span className="text-muted-foreground">Estoque:</span>
                                             <span className="ml-2 font-medium text-foreground">
-                                                {displayProduct.stock} unidades
+                                                {product.stock} unidades
                                             </span>
                                         </div>
                                     </div>

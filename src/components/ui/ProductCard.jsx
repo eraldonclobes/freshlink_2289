@@ -144,7 +144,6 @@ const ProductCard = ({ product, vendor, onProductClick, onFavoriteToggle, isFavo
                 {vendor && (
                     <button
                         onClick={handleVendorClick}
-                        className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200 mb-3 block"
                     >
                         {vendor.name}
                     </button>

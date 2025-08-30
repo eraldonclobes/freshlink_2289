@@ -1,7 +1,7 @@
 import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
-import { Button } from '../../../components/ui/Button';
+import { Button } from '../../../components/ui/button';
 
 const VendorHeroSection = ({ vendor, onWhatsAppContact, onDirections, onShare }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false);
@@ -16,20 +16,20 @@ const VendorHeroSection = ({ vendor, onWhatsAppContact, onDirections, onShare })
 
         for (let i = 0; i < fullStars; i++) {
             stars.push(
-                <Icon key={i} name="Star" size={14} className="text-yellow-400 fill-current" />
+                <Icon key={i} name="Star" size={14} className="text-warning fill-current" />
             );
         }
 
         if (hasHalfStar) {
             stars.push(
-                <Icon key="half" name="StarHalf" size={14} className="text-yellow-400 fill-current" />
+                <Icon key="half" name="StarHalf" size={14} className="text-warning fill-current" />
             );
         }
 
         const emptyStars = 5 - Math.ceil(rating);
         for (let i = 0; i < emptyStars; i++) {
             stars.push(
-                <Icon key={`empty-${i}`} name="Star" size={14} className="text-gray-300" />
+                <Icon key={`empty-${i}`} name="Star" size={14} className="text-muted-foreground" />
             );
         }
 

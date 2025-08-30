@@ -418,16 +418,16 @@ const ProductsPage = () => {
         return stars;
     };
 
-    const ProductCard = ({ product }) => (
+    const ProductCard = ({ product, onFavoriteToggle, isFavorited }) => (
         <div
             className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer flex flex-col h-full"
             onClick={() => handleProductClick(product)}
         >
             {/* Favorite Button */}
             <button
-                onClick={(e) => handleFavoriteToggle(product.id, e)}
+                onClick={(e) => onFavoriteToggle?.(product.id, e)}
                 className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                    favoriteProducts.includes(product.id)
+                    isFavorited
                         ? 'bg-error text-white'
                         : 'bg-white/80 backdrop-blur-sm text-muted-foreground hover:text-error hover:bg-white'
                 }`}
@@ -435,7 +435,7 @@ const ProductsPage = () => {
                 <Icon
                     name="Heart"
                     size={16}
-                    className={favoriteProducts.includes(product.id) ? 'fill-current' : ''}
+                    className={isFavorited ? 'fill-current' : ''}
                 />
             </button>
 
@@ -676,7 +676,12 @@ const ProductsPage = () => {
                     {loading ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             {[...Array(10)].map((_, index) => (
-                                <LoadingSkeleton key={index} />
+                                <ProductCard 
+                                    key={product.id} 
+                                    product={product}
+                                    onFavoriteToggle={handleFavoriteToggle}
+                                    isFavorited={favoriteProducts.includes(product.id)}
+                                />
                             ))}
                         </div>
                     ) : displayedProducts.length === 0 ? (

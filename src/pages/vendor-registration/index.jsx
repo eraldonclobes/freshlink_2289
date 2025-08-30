@@ -89,9 +89,8 @@ const VendorRegistration = () => {
           <OperatingHoursStep
             formData={formData}
             setFormData={setFormData}
-            onNext={handleNextStep}
-            onBack={handlePreviousStep}
             onComplete={handleComplete}
+            onBack={handlePreviousStep}
           />
         );
       default:
