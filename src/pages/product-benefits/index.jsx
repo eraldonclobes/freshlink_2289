@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
-import Button from '../../components/ui/Button';
+import Button from '../../components/ui/button';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 
