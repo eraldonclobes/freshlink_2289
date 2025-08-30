@@ -1,7 +1,7 @@
 import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
-import Button from '../../../components/ui/Button';
+import Button from '../../../components/ui/button';
 
 const ProductCard = ({ 
   product, 
