@@ -4,7 +4,7 @@ import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/input';
 import Select from '../../../components/ui/select';
-import { Checkbox } from '../../../components/ui/Checkbox';
+import { Checkbox } from '../../../components/ui/checkbox';
 
 const ProductForm = ({ product, onSave, onCancel, isEditing = false }) => {
   const [formData, setFormData] = useState({
