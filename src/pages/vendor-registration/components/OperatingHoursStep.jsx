@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import Button from '../../../components/ui/Button';
-import Select from '../../../components/ui/Select';
-import { Checkbox } from '../../../components/ui/Checkbox';
+import { Button } from '../../../components/ui/button';
+import { Checkbox } from '../../../components/ui/checkbox';
+import { Label } from '../../../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
 import Icon from '../../../components/AppIcon';
 
 const OperatingHoursStep = ({ formData, setFormData, onNext, onBack, onComplete }) => {
@@ -133,78 +135,109 @@ const OperatingHoursStep = ({ formData, setFormData, onNext, onBack, onComplete 
           Todos os dias
         </Button>
         <Button
-          onClick={() => setAllDays(false)}
-          variant="outline"
-          size="sm"
-          iconName="X"
-          iconPosition="left"
-        >
-          Limpar tudo
+                <Card key={day?.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={day?.id}
+                          checked={isOpen}
+                          onCheckedChange={(checked) => handleDayToggle(day?.id, checked)}
+                        />
+                        <Label htmlFor={day?.id}>{day?.label}</Label>
+                      </div>
+                      {isOpen && (
+                        <div className="flex items-center space-x-2 text-sm text-success">
+                          <Icon name="Clock" size={16} />
+                          <span>Aberto</span>
+                        </div>
+                      )}
+                    </div>
+
         </Button>
       </div>
-      {/* Days Configuration */}
-      <div className="space-y-4">
-        {daysOfWeek?.map(day => {
-          const dayData = formData?.operatingHours?.[day?.id] || {};
-          const isOpen = dayData?.isOpen || false;
-
-          return (
-            <div key={day?.id} className="border border-border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-3">
-                <Checkbox
-                  label={day?.label}
-                  checked={isOpen}
-                  onChange={(e) => handleDayToggle(day?.id, e?.target?.checked)}
-                />
-                {isOpen && (
-                  <div className="flex items-center space-x-2 text-sm font-caption text-success">
+                        <div className="space-y-2">
+                          <Label>Abertura</Label>
+                          <Select value={dayData?.openTime || ''} onValueChange={(value) => handleTimeChange(day?.id, 'openTime', value)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {timeOptions.map((time) => (
+                                <SelectItem key={time.value} value={time.value}>
+                                  {time.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {errors?.[`${day?.id}_open`] && (
+                            <p className="text-sm text-destructive">{errors?.[`${day?.id}_open`]}</p>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Fechamento</Label>
+                          <Select value={dayData?.closeTime || ''} onValueChange={(value) => handleTimeChange(day?.id, 'closeTime', value)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {timeOptions.map((time) => (
+                                <SelectItem key={time.value} value={time.value}>
+                                  {time.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {errors?.[`${day?.id}_close`] && (
+                            <p className="text-sm text-destructive">{errors?.[`${day?.id}_close`]}</p>
+                          )}
+                        </div>
                     <Icon name="Clock" size={16} />
                     <span>Aberto</span>
-                  </div>
+                            <p className="text-destructive text-sm">{errors?.[`${day?.id}_time`]}</p>
                 )}
               </div>
               {isOpen && (
                 <div className="grid grid-cols-2 gap-3 mt-3">
-                  <div>
-                    <Select
+                  </CardContent>
+                </Card>
                       label="Abertura"
                       options={timeOptions}
                       value={dayData?.openTime || ''}
-                      onChange={(value) => handleTimeChange(day?.id, 'openTime', value)}
-                      error={errors?.[`${day?.id}_open`]}
-                      searchable
-                    />
-                  </div>
-                  <div>
-                    <Select
-                      label="Fechamento"
-                      options={timeOptions}
-                      value={dayData?.closeTime || ''}
-                      onChange={(value) => handleTimeChange(day?.id, 'closeTime', value)}
-                      error={errors?.[`${day?.id}_close`]}
-                      searchable
+          
+          <Card className="mt-6">
+            <CardContent className="p-4">
+              <div className="flex items-start space-x-3">
+                <Icon name="Info" size={20} className="text-primary mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-foreground mb-1">
+                    Dica importante
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Estes horários serão mostrados aos clientes. Você pode alterá-los a qualquer momento no seu painel.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
                     />
                   </div>
                   {errors?.[`${day?.id}_time`] && (
                     <div className="col-span-2">
                       <p className="text-error text-sm font-caption">{errors?.[`${day?.id}_time`]}</p>
-                    </div>
-                  )}
-                </div>
+              className="flex-1"
               )}
-            </div>
-          );
-        })}
-      </div>
+              <Icon name="ArrowLeft" size={16} className="mr-2" />
+              Voltar
+              <Icon name="Clock" size={16} className="mr-2" />
+              Todos os dias
       <div className="bg-muted/50 rounded-lg p-4 mt-6">
-        <div className="flex items-start space-x-3">
           <Icon name="Info" size={20} className="text-primary mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="text-sm font-body font-medium text-foreground mb-1">
-              Dica importante
-            </p>
-            <p className="text-sm font-caption text-muted-foreground">
-              Estes horários serão mostrados aos clientes. Você pode alterá-los a qualquer momento no seu painel.
+              className="flex-1"
+              <Icon name="X" size={16} className="mr-2" />
+              Criar Conta
+              <Icon name="Check" size={16} className="ml-2" />
             </p>
           </div>
         </div>

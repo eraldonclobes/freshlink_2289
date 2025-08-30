@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import Input from '../../../components/ui/Input';
-import Button from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/input';
+import { Button } from '../../../components/ui/button';
+import { Checkbox } from '../../../components/ui/checkbox';
+import { Label } from '../../../components/ui/label';
 import Icon from '../../../components/AppIcon';
 
 const AccountStep = ({ formData, setFormData, onNext }) => {
@@ -61,26 +63,44 @@ const AccountStep = ({ formData, setFormData, onNext }) => {
         </p>
       </div>
       <div className="space-y-4">
-        <Input
-          label="Email"
-          type="email"
-          placeholder="seu@email.com"
-          value={formData?.email || ''}
-          onChange={(e) => handleInputChange('email', e?.target?.value)}
-          error={errors?.email}
-          required
-        />
-
-        <div className="relative">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
           <Input
-            label="Senha"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Mínimo 8 caracteres"
-            value={formData?.password || ''}
-            onChange={(e) => handleInputChange('password', e?.target?.value)}
-            error={errors?.password}
+            id="email"
+            type="email"
+            placeholder="seu@email.com"
+            value={formData?.email || ''}
+            onChange={(e) => handleInputChange('email', e?.target?.value)}
             required
           />
+          {errors?.email && (
+            <p className="text-sm text-destructive">{errors?.email}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="password">Senha</Label>
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Mínimo 8 caracteres"
+              value={formData?.password || ''}
+              onChange={(e) => handleInputChange('password', e?.target?.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              <Icon name={showPassword ? 'EyeOff' : 'Eye'} size={18} />
+            </button>
+          </div>
+          {errors?.password && (
+            <p className="text-sm text-destructive">{errors?.password}</p>
+          )}
+        </div>
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
@@ -90,16 +110,29 @@ const AccountStep = ({ formData, setFormData, onNext }) => {
           </button>
         </div>
 
-        <div className="relative">
-          <Input
-            label="Confirmar senha"
-            type={showConfirmPassword ? 'text' : 'password'}
-            placeholder="Digite a senha novamente"
-            value={formData?.confirmPassword || ''}
-            onChange={(e) => handleInputChange('confirmPassword', e?.target?.value)}
-            error={errors?.confirmPassword}
-            required
-          />
+        <div className="space-y-2">
+          <Label htmlFor="confirm-password">Confirmar senha</Label>
+          <div className="relative">
+            <Input
+              id="confirm-password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Digite a senha novamente"
+              value={formData?.confirmPassword || ''}
+              onChange={(e) => handleInputChange('confirmPassword', e?.target?.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              <Icon name={showConfirmPassword ? 'EyeOff' : 'Eye'} size={18} />
+            </button>
+          </div>
+          {errors?.confirmPassword && (
+            <p className="text-sm text-destructive">{errors?.confirmPassword}</p>
+          )}
+        </div>
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -109,39 +142,33 @@ const AccountStep = ({ formData, setFormData, onNext }) => {
           </button>
         </div>
 
-        <div className="flex items-start space-x-3 pt-2">
-          <input
-            type="checkbox"
+        <div className="flex items-start space-x-2 pt-2">
+          <Checkbox
             id="terms"
             checked={formData?.termsAccepted || false}
-            onChange={(e) => handleInputChange('termsAccepted', e?.target?.checked)}
-            className="mt-1 w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
+            onCheckedChange={(checked) => handleInputChange('termsAccepted', checked)}
           />
-          <label htmlFor="terms" className="text-sm font-body text-foreground">
+          <Label htmlFor="terms" className="text-sm leading-5">
             Eu aceito os{' '}
-            <button className="text-primary hover:underline">
+            <button type="button" className="text-primary hover:underline">
               Termos de Uso
             </button>
             {' '}e{' '}
-            <button className="text-primary hover:underline">
+            <button type="button" className="text-primary hover:underline">
               Política de Privacidade
             </button>
-          </label>
+          </Label>
         </div>
         {errors?.termsAccepted && (
-          <p className="text-error text-sm font-caption">{errors?.termsAccepted}</p>
+          <p className="text-destructive text-sm">{errors?.termsAccepted}</p>
         )}
       </div>
       <Button
         onClick={handleNext}
-        variant="default"
         size="lg"
-        fullWidth
-        iconName="ArrowRight"
-        iconPosition="right"
-        className="mt-8"
+        className="w-full mt-8"
       >
-        Continuar
+        Continuar <Icon name="ArrowRight" size={16} className="ml-2" />
       </Button>
     </div>
   );

@@ -158,58 +158,76 @@ const VendorProfile = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Input
-          label="Nome do Negócio"
-          value={profileData.businessName}
-          onChange={(e) => handleInputChange('businessName', e.target.value)}
-          disabled={!isEditing}
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="business-name">Nome do Negócio</Label>
+          <Input
+            id="business-name"
+            value={profileData.businessName}
+            onChange={(e) => handleInputChange('businessName', e.target.value)}
+            disabled={!isEditing}
+            required
+          />
+        </div>
 
-        <Input
-          label="Email"
-          type="email"
-          value={profileData.email}
-          onChange={(e) => handleInputChange('email', e.target.value)}
-          disabled={!isEditing}
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={profileData.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            disabled={!isEditing}
+            required
+          />
+        </div>
 
-        <Input
-          label="Telefone"
-          value={profileData.phone}
-          onChange={(e) => handleInputChange('phone', e.target.value)}
-          disabled={!isEditing}
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="phone">Telefone</Label>
+          <Input
+            id="phone"
+            value={profileData.phone}
+            onChange={(e) => handleInputChange('phone', e.target.value)}
+            disabled={!isEditing}
+            required
+          />
+        </div>
 
-        <Input
-          label="WhatsApp"
-          value={profileData.whatsappNumber}
-          onChange={(e) => handleInputChange('whatsappNumber', e.target.value)}
-          disabled={!isEditing}
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="whatsapp">WhatsApp</Label>
+          <Input
+            id="whatsapp"
+            value={profileData.whatsappNumber}
+            onChange={(e) => handleInputChange('whatsappNumber', e.target.value)}
+            disabled={!isEditing}
+            required
+          />
+        </div>
       </div>
 
-      <Select
-        label="Tipo de Negócio"
-        options={businessTypes}
-        value={profileData.businessType}
-        onChange={(value) => handleInputChange('businessType', value)}
-        disabled={!isEditing}
-      />
+      <div className="space-y-2">
+        <Label htmlFor="business-type">Tipo de Negócio</Label>
+        <Select value={profileData.businessType} onValueChange={(value) => handleInputChange('businessType', value)} disabled={!isEditing}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione o tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            {businessTypes.map((type) => (
+              <SelectItem key={type.value} value={type.value}>
+                {type.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <div>
-        <label className="block text-sm font-body font-medium text-foreground mb-2">
-          Descrição do Negócio
-        </label>
-        <textarea
+        <Label htmlFor="description">Descrição do Negócio</Label>
+        <Textarea
+          id="description"
           value={profileData.description}
           onChange={(e) => handleInputChange('description', e.target.value)}
           disabled={!isEditing}
           rows={4}
-          className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none disabled:opacity-50 disabled:cursor-not-allowed"
         />
       </div>
     </div>
@@ -218,9 +236,10 @@ const VendorProfile = () => {
   const renderLocation = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 space-y-2">
+          <Label htmlFor="address">Endereço Completo</Label>
           <Input
-            label="Endereço Completo"
+            id="address"
             value={profileData.address}
             onChange={(e) => handleInputChange('address', e.target.value)}
             disabled={!isEditing}
@@ -228,36 +247,43 @@ const VendorProfile = () => {
           />
         </div>
 
-        <Input
-          label="Cidade"
-          value={profileData.city}
-          onChange={(e) => handleInputChange('city', e.target.value)}
-          disabled={!isEditing}
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="city">Cidade</Label>
+          <Input
+            id="city"
+            value={profileData.city}
+            onChange={(e) => handleInputChange('city', e.target.value)}
+            disabled={!isEditing}
+            required
+          />
+        </div>
 
-        <Input
-          label="Estado"
-          value={profileData.state}
-          onChange={(e) => handleInputChange('state', e.target.value)}
-          disabled={!isEditing}
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="state">Estado</Label>
+          <Input
+            id="state"
+            value={profileData.state}
+            onChange={(e) => handleInputChange('state', e.target.value)}
+            disabled={!isEditing}
+            required
+          />
+        </div>
 
-        <Input
-          label="CEP"
-          value={profileData.zipCode}
-          onChange={(e) => handleInputChange('zipCode', e.target.value)}
-          disabled={!isEditing}
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="zipcode">CEP</Label>
+          <Input
+            id="zipcode"
+            value={profileData.zipCode}
+            onChange={(e) => handleInputChange('zipCode', e.target.value)}
+            disabled={!isEditing}
+            required
+          />
+        </div>
       </div>
 
       {/* Map Preview */}
       <div>
-        <label className="block text-sm font-body font-medium text-foreground mb-2">
-          Localização no Mapa
-        </label>
+        <Label>Localização no Mapa</Label>
         <div className="w-full h-64 bg-muted rounded-lg border border-border overflow-hidden">
           <iframe
             width="100%"
@@ -280,14 +306,25 @@ const VendorProfile = () => {
         const isOpen = dayData.isOpen || false;
 
         return (
-          <div key={day.id} className="border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
-              <Checkbox
-                label={day.label}
-                checked={isOpen}
-                onChange={(e) => handleOperatingHoursChange(day.id, 'isOpen', e.target.checked)}
-                disabled={!isEditing}
-              />
+          <Card key={day.id}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id={day.id}
+                    checked={isOpen}
+                    onCheckedChange={(checked) => handleOperatingHoursChange(day.id, 'isOpen', checked)}
+                    disabled={!isEditing}
+                  />
+                  <Label htmlFor={day.id}>{day.label}</Label>
+                </div>
+                {isOpen && (
+                  <div className="flex items-center space-x-2 text-sm text-success">
+                    <Icon name="Clock" size={16} />
+                    <span>Aberto</span>
+                  </div>
+                )}
+              </div>
               {isOpen && (
                 <div className="flex items-center space-x-2 text-sm font-caption text-success">
                   <Icon name="Clock" size={16} />
@@ -325,74 +362,100 @@ const VendorProfile = () => {
   const renderBusinessSettings = () => (
     <div className="space-y-6">
       {/* Delivery Settings */}
-      <div className="border border-border rounded-lg p-4">
-        <h3 className="font-body font-medium text-foreground mb-4">Entrega</h3>
-        
-        <div className="space-y-4">
-          <Checkbox
-            label="Ofereço entrega"
-            checked={profileData.deliveryAvailable}
-            onChange={(e) => handleInputChange('deliveryAvailable', e.target.checked)}
-            disabled={!isEditing}
-          />
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Entrega</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="delivery"
+              checked={profileData.deliveryAvailable}
+              onCheckedChange={(checked) => handleInputChange('deliveryAvailable', checked)}
+              disabled={!isEditing}
+            />
+            <Label htmlFor="delivery">Ofereço entrega</Label>
+          </div>
 
           {profileData.deliveryAvailable && (
             <div className="grid grid-cols-2 gap-4 ml-6">
-              <Input
-                label="Raio de Entrega (km)"
-                type="number"
-                value={profileData.deliveryRadius}
-                onChange={(e) => handleInputChange('deliveryRadius', e.target.value)}
-                disabled={!isEditing}
-              />
-              <Input
-                label="Taxa de Entrega (R$)"
-                value={profileData.deliveryFee}
-                onChange={(e) => handleInputChange('deliveryFee', formatPrice(e.target.value))}
-                disabled={!isEditing}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="delivery-radius">Raio de Entrega (km)</Label>
+                <Input
+                  id="delivery-radius"
+                  type="number"
+                  value={profileData.deliveryRadius}
+                  onChange={(e) => handleInputChange('deliveryRadius', e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="delivery-fee">Taxa de Entrega (R$)</Label>
+                <Input
+                  id="delivery-fee"
+                  value={profileData.deliveryFee}
+                  onChange={(e) => handleInputChange('deliveryFee', formatPrice(e.target.value))}
+                  disabled={!isEditing}
+                />
+              </div>
             </div>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Pickup Settings */}
-      <div className="border border-border rounded-lg p-4">
-        <h3 className="font-body font-medium text-foreground mb-4">Retirada</h3>
-        
-        <Checkbox
-          label="Permito retirada no local"
-          checked={profileData.pickupAvailable}
-          onChange={(e) => handleInputChange('pickupAvailable', e.target.checked)}
-          disabled={!isEditing}
-        />
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Retirada</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="pickup"
+              checked={profileData.pickupAvailable}
+              onCheckedChange={(checked) => handleInputChange('pickupAvailable', checked)}
+              disabled={!isEditing}
+            />
+            <Label htmlFor="pickup">Permito retirada no local</Label>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Payment Methods */}
-      <div className="border border-border rounded-lg p-4">
-        <h3 className="font-body font-medium text-foreground mb-4">Formas de Pagamento</h3>
-        
-        <div className="space-y-3">
-          <Checkbox
-            label="Dinheiro"
-            checked={profileData.paymentMethods.includes('cash')}
-            onChange={(e) => handlePaymentMethodChange('cash', e.target.checked)}
-            disabled={!isEditing}
-          />
-          <Checkbox
-            label="PIX"
-            checked={profileData.paymentMethods.includes('pix')}
-            onChange={(e) => handlePaymentMethodChange('pix', e.target.checked)}
-            disabled={!isEditing}
-          />
-          <Checkbox
-            label="Cartão"
-            checked={profileData.paymentMethods.includes('card')}
-            onChange={(e) => handlePaymentMethodChange('card', e.target.checked)}
-            disabled={!isEditing}
-          />
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Formas de Pagamento</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="cash"
+              checked={profileData.paymentMethods.includes('cash')}
+              onCheckedChange={(checked) => handlePaymentMethodChange('cash', checked)}
+              disabled={!isEditing}
+            />
+            <Label htmlFor="cash">Dinheiro</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="pix"
+              checked={profileData.paymentMethods.includes('pix')}
+              onCheckedChange={(checked) => handlePaymentMethodChange('pix', checked)}
+              disabled={!isEditing}
+            />
+            <Label htmlFor="pix">PIX</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="card"
+              checked={profileData.paymentMethods.includes('card')}
+              onCheckedChange={(checked) => handlePaymentMethodChange('card', checked)}
+              disabled={!isEditing}
+            />
+            <Label htmlFor="card">Cartão</Label>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 
@@ -436,28 +499,50 @@ const VendorProfile = () => {
                     onClick={() => setIsEditing(false)}
                     disabled={isSaving}
                   >
-                    Cancelar
-                  </Button>
-                  <Button
-                    onClick={handleSave}
-                    loading={isSaving}
-                    iconName="Save"
-                    iconPosition="left"
-                  >
-                    Salvar Alterações
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={() => setIsEditing(true)}
-                  iconName="Edit"
-                  iconPosition="left"
-                >
-                  Editar Perfil
-                </Button>
+              {isOpen && (
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div className="space-y-2">
+                    <Label>Abertura</Label>
+                    <Select 
+                      value={dayData.openTime || ''} 
+                      onValueChange={(value) => handleOperatingHoursChange(day.id, 'openTime', value)}
+                      disabled={!isEditing}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeOptions.map((time) => (
+                          <SelectItem key={time.value} value={time.value}>
+                            {time.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Fechamento</Label>
+                    <Select 
+                      value={dayData.closeTime || ''} 
+                      onValueChange={(value) => handleOperatingHoursChange(day.id, 'closeTime', value)}
+                      disabled={!isEditing}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeOptions.map((time) => (
+                          <SelectItem key={time.value} value={time.value}>
+                            {time.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Tab Navigation */}
           <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">

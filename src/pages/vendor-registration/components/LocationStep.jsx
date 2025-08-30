@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Input from '../../../components/ui/Input';
-import Button from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/input';
+import { Button } from '../../../components/ui/button';
+import { Label } from '../../../components/ui/label';
+import Icon from '../../../components/AppIcon';
 
 
 const LocationStep = ({ formData, setFormData, onNext, onBack }) => {
@@ -99,65 +101,84 @@ const LocationStep = ({ formData, setFormData, onNext, onBack }) => {
       </div>
       <div className="space-y-4">
         <div className="flex gap-3">
-          <div className="flex-1">
+          <div className="flex-1 space-y-2">
+            <Label htmlFor="zipcode">CEP</Label>
             <Input
-              label="CEP"
+              id="zipcode"
               type="text"
               placeholder="12345-678"
               value={formData?.zipCode || ''}
               onChange={handleZipCodeChange}
-              error={errors?.zipCode}
               required
             />
+            {errors?.zipCode && (
+              <p className="text-sm text-destructive">{errors?.zipCode}</p>
+            )}
           </div>
           <Button
             onClick={getCurrentLocation}
             variant="outline"
             size="default"
-            loading={isLoadingLocation}
-            iconName="MapPin"
-            className="mt-6"
+            disabled={isLoadingLocation}
+            className="mt-8"
           >
-            Localizar
+            {isLoadingLocation ? (
+              <Icon name="Loader2" size={16} className="animate-spin" />
+            ) : (
+              <Icon name="MapPin" size={16} />
+            )}
           </Button>
         </div>
 
-        <Input
-          label="Endereço completo"
-          type="text"
-          placeholder="Rua, número, complemento"
-          value={formData?.address || ''}
-          onChange={(e) => handleInputChange('address', e?.target?.value)}
-          error={errors?.address}
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="address">Endereço completo</Label>
+          <Input
+            id="address"
+            type="text"
+            placeholder="Rua, número, complemento"
+            value={formData?.address || ''}
+            onChange={(e) => handleInputChange('address', e?.target?.value)}
+            required
+          />
+          {errors?.address && (
+            <p className="text-sm text-destructive">{errors?.address}</p>
+          )}
+        </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Input
-            label="Cidade"
-            type="text"
-            placeholder="São Paulo"
-            value={formData?.city || ''}
-            onChange={(e) => handleInputChange('city', e?.target?.value)}
-            error={errors?.city}
-            required
-          />
-          <Input
-            label="Estado"
-            type="text"
-            placeholder="SP"
-            value={formData?.state || ''}
-            onChange={(e) => handleInputChange('state', e?.target?.value)}
-            error={errors?.state}
-            required
-          />
+          <div className="space-y-2">
+            <Label htmlFor="city">Cidade</Label>
+            <Input
+              id="city"
+              type="text"
+              placeholder="São Paulo"
+              value={formData?.city || ''}
+              onChange={(e) => handleInputChange('city', e?.target?.value)}
+              required
+            />
+            {errors?.city && (
+              <p className="text-sm text-destructive">{errors?.city}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="state">Estado</Label>
+            <Input
+              id="state"
+              type="text"
+              placeholder="SP"
+              value={formData?.state || ''}
+              onChange={(e) => handleInputChange('state', e?.target?.value)}
+              required
+            />
+            {errors?.state && (
+              <p className="text-sm text-destructive">{errors?.state}</p>
+            )}
+          </div>
         </div>
 
         {/* Map Preview */}
         <div className="mt-6">
-          <label className="block text-sm font-body font-medium text-foreground mb-2">
-            Localização no mapa
-          </label>
+          <Label>Localização no mapa</Label>
           <div className="w-full h-48 bg-muted rounded-lg border border-border overflow-hidden">
             <iframe
               width="100%"
@@ -169,7 +190,7 @@ const LocationStep = ({ formData, setFormData, onNext, onBack }) => {
               className="border-0"
             />
           </div>
-          <p className="text-xs font-caption text-muted-foreground mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             Esta localização será mostrada aos clientes para facilitar o contato
           </p>
         </div>
@@ -179,21 +200,18 @@ const LocationStep = ({ formData, setFormData, onNext, onBack }) => {
           onClick={onBack}
           variant="outline"
           size="lg"
-          fullWidth
-          iconName="ArrowLeft"
-          iconPosition="left"
+          className="flex-1"
         >
+          <Icon name="ArrowLeft" size={16} className="mr-2" />
           Voltar
         </Button>
         <Button
           onClick={handleNext}
-          variant="default"
           size="lg"
-          fullWidth
-          iconName="ArrowRight"
-          iconPosition="right"
+          className="flex-1"
         >
           Continuar
+          <Icon name="ArrowRight" size={16} className="ml-2" />
         </Button>
       </div>
     </div>

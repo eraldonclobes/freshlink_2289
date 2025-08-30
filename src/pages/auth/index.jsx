@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import { Checkbox } from '../../components/ui/Checkbox';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Checkbox } from '../../components/ui/checkbox';
+import { Label } from '../../components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import Icon from '../../components/AppIcon';
 import ResponsiveHeader from '../../components/ui/ResponsiveHeader';
 import Footer from '../../components/ui/Footer';
@@ -169,239 +172,250 @@ const Auth = () => {
       
       <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-md mx-auto">
-          <div className="bg-card rounded-lg border border-border p-6 shadow-sm auth-form">
-            {/* Tab Navigation */}
-            <div className="flex mb-6 bg-muted rounded-lg p-1">
-              <button
-                onClick={() => setActiveTab('login')}
-                className={`flex-1 py-2 px-4 text-sm font-body font-medium rounded-md transition-colors duration-200 ${
-                  activeTab === 'login'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Entrar
-              </button>
-              <button
-                onClick={() => setActiveTab('register')}
-                className={`flex-1 py-2 px-4 text-sm font-body font-medium rounded-md transition-colors duration-200 ${
-                  activeTab === 'register'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Cadastrar
-              </button>
-            </div>
-
-            {activeTab === 'login' ? (
-              <div>
-                <div className="text-center mb-6">
-                  <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
-                    Entrar na sua conta
-                  </h1>
-                  <p className="text-sm font-body text-muted-foreground">
-                    Acesse sua conta para uma experiência personalizada
-                  </p>
-                </div>
-
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <Input
-                    label="Email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    error={errors.email}
-                    required
-                  />
-
-                  <div className="relative">
-                    <Input
-                      label="Senha"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Digite sua senha"
-                      value={formData.password}
-                      onChange={(e) => handleInputChange('password', e.target.value)}
-                      error={errors.password}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-9 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                    >
-                      <Icon name={showPassword ? "EyeOff" : "Eye"} size={18} />
-                    </button>
+          <Card className="auth-form">
+            <CardContent className="p-6">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="login">Entrar</TabsTrigger>
+                  <TabsTrigger value="register">Cadastrar</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="login" className="space-y-4">
+                  <div className="text-center mb-6">
+                    <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
+                      Entrar na sua conta
+                    </h1>
+                    <p className="text-sm font-body text-muted-foreground">
+                      Acesse sua conta para uma experiência personalizada
+                    </p>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <Checkbox
-                      label="Lembrar de mim"
-                      checked={formData.rememberMe}
-                      onChange={(e) => handleInputChange('rememberMe', e.target.checked)}
-                      size="sm"
-                    />
-                    
-                    <button
-                      type="button"
-                      className="text-sm font-body text-primary hover:text-primary/80 transition-colors duration-200"
-                    >
-                      Esqueci minha senha
-                    </button>
-                  </div>
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        required
+                      />
+                      {errors.email && (
+                        <p className="text-sm text-destructive">{errors.email}</p>
+                      )}
+                    </div>
 
-                  <Button
-                    type="submit"
-                    variant="default"
-                    size="lg"
-                    fullWidth
-                    loading={isLoading}
-                    className="mt-6"
-                  >
-                    Entrar
-                  </Button>
-                </form>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Senha</Label>
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Digite sua senha"
+                          value={formData.password}
+                          onChange={(e) => handleInputChange('password', e.target.value)}
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                        >
+                          <Icon name={showPassword ? "EyeOff" : "Eye"} size={18} />
+                        </button>
+                      </div>
+                      {errors.password && (
+                        <p className="text-sm text-destructive">{errors.password}</p>
+                      )}
+                    </div>
 
-                <div className="mt-6 text-center">
-                  <p className="text-sm font-body text-muted-foreground">
-                    Quer vender seus produtos?{' '}
-                    <button
-                      onClick={() => navigate('/vendor-registration')}
-                      className="text-primary hover:text-primary/80 font-medium transition-colors duration-200"
-                    >
-                      Cadastre-se como vendedor
-                    </button>
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div className="text-center mb-6">
-                  <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
-                    Criar conta de cliente
-                  </h1>
-                  <p className="text-sm font-body text-muted-foreground">
-                    Crie sua conta para encontrar produtos frescos
-                  </p>
-                </div>
-
-                <form onSubmit={handleRegister} className="space-y-4">
-                  <Input
-                    label="Nome completo"
-                    type="text"
-                    placeholder="Seu nome"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    error={errors.name}
-                    required
-                  />
-
-                  <Input
-                    label="Email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    error={errors.email}
-                    required
-                  />
-
-                  <div className="relative">
-                    <Input
-                      label="Senha"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Mínimo 6 caracteres"
-                      value={formData.password}
-                      onChange={(e) => handleInputChange('password', e.target.value)}
-                      error={errors.password}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-9 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                    >
-                      <Icon name={showPassword ? "EyeOff" : "Eye"} size={18} />
-                    </button>
-                  </div>
-
-                  <div className="relative">
-                    <Input
-                      label="Confirmar senha"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Digite a senha novamente"
-                      value={formData.confirmPassword}
-                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      error={errors.confirmPassword}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-9 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                    >
-                      <Icon name={showConfirmPassword ? "EyeOff" : "Eye"} size={18} />
-                    </button>
-                  </div>
-
-                  <div className="flex items-start space-x-3 pt-2">
-                    <input
-                      type="checkbox"
-                      id="terms"
-                      checked={formData.termsAccepted}
-                      onChange={(e) => handleInputChange('termsAccepted', e.target.checked)}
-                      className="mt-1 w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
-                    />
-                    <label htmlFor="terms" className="text-sm font-body text-foreground">
-                      Eu aceito os{' '}
-                      <button type="button" className="text-primary hover:underline">
-                        Termos de Uso
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="remember"
+                          checked={formData.rememberMe}
+                          onCheckedChange={(checked) => handleInputChange('rememberMe', checked)}
+                        />
+                        <Label htmlFor="remember" className="text-sm">Lembrar de mim</Label>
+                      </div>
+                      
+                      <button
+                        type="button"
+                        className="text-sm font-body text-primary hover:text-primary/80 transition-colors duration-200"
+                      >
+                        Esqueci minha senha
                       </button>
-                      {' '}e{' '}
-                      <button type="button" className="text-primary hover:underline">
-                        Política de Privacidade
+                    </div>
+
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full mt-6"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Entrando...' : 'Entrar'}
+                    </Button>
+                  </form>
+
+                  <div className="mt-6 text-center">
+                    <p className="text-sm font-body text-muted-foreground">
+                      Quer vender seus produtos?{' '}
+                      <button
+                        onClick={() => navigate('/vendor-registration')}
+                        className="text-primary hover:text-primary/80 font-medium transition-colors duration-200"
+                      >
+                        Cadastre-se como vendedor
                       </button>
-                    </label>
+                    </p>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="register" className="space-y-4">
+                  <div className="text-center mb-6">
+                    <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
+                      Criar conta de cliente
+                    </h1>
+                    <p className="text-sm font-body text-muted-foreground">
+                      Crie sua conta para encontrar produtos frescos
+                    </p>
                   </div>
 
-                  {errors.termsAccepted && (
-                    <p className="text-error text-sm font-caption">{errors.termsAccepted}</p>
-                  )}
+                  <form onSubmit={handleRegister} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nome completo</Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        placeholder="Seu nome"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        required
+                      />
+                      {errors.name && (
+                        <p className="text-sm text-destructive">{errors.name}</p>
+                      )}
+                    </div>
 
-                  <Button
-                    type="submit"
-                    variant="default"
-                    size="lg"
-                    fullWidth
-                    loading={isLoading}
-                    className="mt-6"
-                  >
-                    Criar Conta
-                  </Button>
-                </form>
+                    <div className="space-y-2">
+                      <Label htmlFor="register-email">Email</Label>
+                      <Input
+                        id="register-email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        required
+                      />
+                      {errors.email && (
+                        <p className="text-sm text-destructive">{errors.email}</p>
+                      )}
+                    </div>
 
-                <div className="mt-6 text-center">
-                  <p className="text-sm font-body text-muted-foreground">
-                    Quer vender seus produtos?{' '}
-                    <button
-                      onClick={() => navigate('/vendor-registration')}
-                      className="text-primary hover:text-primary/80 font-medium transition-colors duration-200"
+                    <div className="space-y-2">
+                      <Label htmlFor="register-password">Senha</Label>
+                      <div className="relative">
+                        <Input
+                          id="register-password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Mínimo 6 caracteres"
+                          value={formData.password}
+                          onChange={(e) => handleInputChange('password', e.target.value)}
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                        >
+                          <Icon name={showPassword ? "EyeOff" : "Eye"} size={18} />
+                        </button>
+                      </div>
+                      {errors.password && (
+                        <p className="text-sm text-destructive">{errors.password}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-password">Confirmar senha</Label>
+                      <div className="relative">
+                        <Input
+                          id="confirm-password"
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="Digite a senha novamente"
+                          value={formData.confirmPassword}
+                          onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                        >
+                          <Icon name={showConfirmPassword ? "EyeOff" : "Eye"} size={18} />
+                        </button>
+                      </div>
+                      {errors.confirmPassword && (
+                        <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                      )}
+                    </div>
+
+                    <div className="flex items-start space-x-2 pt-2">
+                      <Checkbox
+                        id="terms"
+                        checked={formData.termsAccepted}
+                        onCheckedChange={(checked) => handleInputChange('termsAccepted', checked)}
+                      />
+                      <Label htmlFor="terms" className="text-sm leading-5">
+                        Eu aceito os{' '}
+                        <button type="button" className="text-primary hover:underline">
+                          Termos de Uso
+                        </button>
+                        {' '}e{' '}
+                        <button type="button" className="text-primary hover:underline">
+                          Política de Privacidade
+                        </button>
+                      </Label>
+                    </div>
+
+                    {errors.termsAccepted && (
+                      <p className="text-destructive text-sm">{errors.termsAccepted}</p>
+                    )}
+
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full mt-6"
+                      disabled={isLoading}
                     >
-                      Cadastre-se como vendedor
-                    </button>
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+                      {isLoading ? 'Criando conta...' : 'Criar Conta'}
+                    </Button>
+                  </form>
+
+                  <div className="mt-6 text-center">
+                    <p className="text-sm font-body text-muted-foreground">
+                      Quer vender seus produtos?{' '}
+                      <button
+                        onClick={() => navigate('/vendor-registration')}
+                        className="text-primary hover:text-primary/80 font-medium transition-colors duration-200"
+                      >
+                        Cadastre-se como vendedor
+                      </button>
+                    </p>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
 
           {/* Benefits Section */}
-          <div className="mt-8 bg-muted/50 rounded-lg p-6">
-            <h3 className="font-body font-medium text-foreground mb-4 text-center">
-              {activeTab === 'login' ? 'Bem-vindo de volta!' : 'Vantagens de ter uma conta'}
-            </h3>
-            <div className="space-y-3">
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle className="text-center text-lg">
+                {activeTab === 'login' ? 'Bem-vindo de volta!' : 'Vantagens de ter uma conta'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Icon name="Heart" size={16} className="text-primary flex-shrink-0" />
                 <span className="text-sm font-body text-muted-foreground">
@@ -420,8 +434,8 @@ const Auth = () => {
                   Notificações de novos produtos
                 </span>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
 

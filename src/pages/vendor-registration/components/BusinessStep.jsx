@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import Input from '../../../components/ui/Input';
-import Select from '../../../components/ui/Select';
-import Button from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/input';
+import { Button } from '../../../components/ui/button';
+import { Label } from '../../../components/ui/label';
+import { Textarea } from '../../../components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+import Icon from '../../../components/AppIcon';
 
 const BusinessStep = ({ formData, setFormData, onNext, onBack }) => {
   const [errors, setErrors] = useState({});
@@ -79,53 +82,72 @@ const BusinessStep = ({ formData, setFormData, onNext, onBack }) => {
         </p>
       </div>
       <div className="space-y-4">
-        <Input
-          label="Nome do negócio"
-          type="text"
-          placeholder="Ex: Fazenda São João"
-          value={formData?.businessName || ''}
-          onChange={(e) => handleInputChange('businessName', e?.target?.value)}
-          error={errors?.businessName}
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="business-name">Nome do negócio</Label>
+          <Input
+            id="business-name"
+            type="text"
+            placeholder="Ex: Fazenda São João"
+            value={formData?.businessName || ''}
+            onChange={(e) => handleInputChange('businessName', e?.target?.value)}
+            required
+          />
+          {errors?.businessName && (
+            <p className="text-sm text-destructive">{errors?.businessName}</p>
+          )}
+        </div>
 
-        <Select
-          label="Tipo de negócio"
-          placeholder="Selecione o tipo do seu negócio"
-          options={businessTypes}
-          value={formData?.businessType || ''}
-          onChange={(value) => handleInputChange('businessType', value)}
-          error={errors?.businessType}
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="business-type">Tipo de negócio</Label>
+          <Select value={formData?.businessType || ''} onValueChange={(value) => handleInputChange('businessType', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione o tipo do seu negócio" />
+            </SelectTrigger>
+            <SelectContent>
+              {businessTypes.map((type) => (
+                <SelectItem key={type.value} value={type.value}>
+                  {type.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors?.businessType && (
+            <p className="text-sm text-destructive">{errors?.businessType}</p>
+          )}
+        </div>
 
-        <Input
-          label="WhatsApp para contato"
-          type="tel"
-          placeholder="(11) 99999-9999"
-          value={formData?.whatsappNumber || ''}
-          onChange={handleWhatsAppChange}
-          error={errors?.whatsappNumber}
-          description="Clientes entrarão em contato através deste número"
-          required
-        />
+        <div className="space-y-2">
+          <Label htmlFor="whatsapp">WhatsApp para contato</Label>
+          <Input
+            id="whatsapp"
+            type="tel"
+            placeholder="(11) 99999-9999"
+            value={formData?.whatsappNumber || ''}
+            onChange={handleWhatsAppChange}
+            required
+          />
+          <p className="text-sm text-muted-foreground">
+            Clientes entrarão em contato através deste número
+          </p>
+          {errors?.whatsappNumber && (
+            <p className="text-sm text-destructive">{errors?.whatsappNumber}</p>
+          )}
+        </div>
 
         <div>
-          <label className="block text-sm font-body font-medium text-foreground mb-2">
-            Descrição do negócio *
-          </label>
-          <textarea
+          <Label htmlFor="description">Descrição do negócio</Label>
+          <Textarea
+            id="description"
             placeholder="Descreva seus produtos, experiência e diferenciais. Mínimo 50 caracteres."
             value={formData?.businessDescription || ''}
             onChange={(e) => handleInputChange('businessDescription', e?.target?.value)}
             rows={4}
-            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm font-body placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 resize-none"
           />
           <div className="flex justify-between items-center mt-1">
             {errors?.businessDescription && (
-              <p className="text-error text-sm font-caption">{errors?.businessDescription}</p>
+              <p className="text-destructive text-sm">{errors?.businessDescription}</p>
             )}
-            <p className="text-xs font-caption text-muted-foreground ml-auto">
+            <p className="text-xs text-muted-foreground ml-auto">
               {(formData?.businessDescription || '')?.length}/500
             </p>
           </div>
@@ -136,21 +158,18 @@ const BusinessStep = ({ formData, setFormData, onNext, onBack }) => {
           onClick={onBack}
           variant="outline"
           size="lg"
-          fullWidth
-          iconName="ArrowLeft"
-          iconPosition="left"
+          className="flex-1"
         >
+          <Icon name="ArrowLeft" size={16} className="mr-2" />
           Voltar
         </Button>
         <Button
           onClick={handleNext}
-          variant="default"
           size="lg"
-          fullWidth
-          iconName="ArrowRight"
-          iconPosition="right"
+          className="flex-1"
         >
           Continuar
+          <Icon name="ArrowRight" size={16} className="ml-2" />
         </Button>
       </div>
     </div>
