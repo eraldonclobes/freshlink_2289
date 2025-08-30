@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Input } from '../../../components/ui/input';
-import { Button } from '../../../components/ui/Button';
+import { Button } from '../../../components/ui/button';
 import { Checkbox } from '../../../components/ui/checkbox';
 import { Label } from '../../../components/ui/label';
 import Icon from '../../../components/AppIcon';
 
-const OperatingHoursStep = ({ formData, setFormData, onNext, onPrev }) => {
+const OperatingHoursStep = ({ formData, setFormData, onComplete, onBack }) => {
   const [errors, setErrors] = useState({});
 
   const daysOfWeek = [
@@ -51,7 +51,7 @@ const OperatingHoursStep = ({ formData, setFormData, onNext, onPrev }) => {
 
   const handleNext = () => {
     if (validateStep()) {
-      onNext();
+      onComplete();
     }
   };
 
@@ -179,7 +179,7 @@ const OperatingHoursStep = ({ formData, setFormData, onNext, onPrev }) => {
       <div className="flex gap-4 pt-6">
         <Button
           variant="outline"
-          onClick={onPrev}
+          onClick={onBack}
           className="flex-1"
         >
           <Icon name="ArrowLeft" size={16} className="mr-2" />
@@ -189,8 +189,8 @@ const OperatingHoursStep = ({ formData, setFormData, onNext, onPrev }) => {
           onClick={handleNext}
           className="flex-1"
         >
-          Continuar
-          <Icon name="ArrowRight" size={16} className="ml-2" />
+          Finalizar Cadastro
+          <Icon name="Check" size={16} className="ml-2" />
         </Button>
       </div>
     </div>

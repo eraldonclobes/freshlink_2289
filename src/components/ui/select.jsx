@@ -2,8 +2,56 @@ import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 import { cn } from "../../utils/cn"
+import { Label } from "./label"
 
-const Select = SelectPrimitive.Root
+const Select = React.forwardRef(({ 
+  label, 
+  options = [], 
+  placeholder = "Selecione...", 
+  className,
+  id,
+  ...props 
+}, ref) => {
+  const selectId = id || React.useId()
+
+  if (label) {
+    return (
+      <div className="space-y-2">
+        <Label htmlFor={selectId} className="text-sm font-medium">
+          {label}
+        </Label>
+        <SelectPrimitive.Root {...props}>
+          <SelectTrigger id={selectId} className={className} ref={ref}>
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </SelectPrimitive.Root>
+      </div>
+    )
+  }
+
+  return (
+    <SelectPrimitive.Root {...props}>
+      <SelectTrigger className={className} ref={ref}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((option) => (
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </SelectPrimitive.Root>
+  )
+})
+Select.displayName = "Select"
 
 const SelectGroup = SelectPrimitive.Group
 
