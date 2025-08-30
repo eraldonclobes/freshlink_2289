@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/input';
-import Checkbox from '../../../components/ui/Checkbox';
+import Checkbox from '../../../components/ui/checkbox';
 import Icon from '../../../components/AppIcon';
 
 const LoginForm = ({ onSubmit, isLoading = false }) => {
