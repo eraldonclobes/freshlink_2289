@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
+import Input from '../../../components/ui/input';
 import Select from '../../../components/ui/Select';
 import { Checkbox } from '../../../components/ui/Checkbox';
 
