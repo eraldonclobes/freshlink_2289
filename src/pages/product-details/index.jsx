@@ -5,7 +5,7 @@ import Footer from '../../components/ui/Footer';
 import ShareModal from '../../components/ui/ShareModal';
 import NutritionalInfoModal from '../../components/ui/NutritionalInfoModal';
 import ProductReviewsSection from '../../components/ui/ProductReviewsSection';
-import Button from '../../components/ui/Button';
+import Button from '../../components/ui/button';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 
