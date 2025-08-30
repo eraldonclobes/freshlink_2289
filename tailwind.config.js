@@ -72,10 +72,10 @@ export default {
         "2xl": "20px",
       },
       fontFamily: {
-        heading: ['Poppins', 'sans-serif'],
-        body: ['Poppins', 'sans-serif'],
-        caption: ['Poppins', 'sans-serif'],
-        data: ['Poppins', 'monospace'],
+        heading: ['Inter', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+        caption: ['Inter', 'sans-serif'],
+        data: ['Inter', 'monospace'],
       },
       boxShadow: {
         'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
