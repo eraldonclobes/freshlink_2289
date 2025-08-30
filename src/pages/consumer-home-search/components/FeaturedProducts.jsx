@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
-import Button from '../../../components/ui/Button';
+import Button from '../../../components/ui/button';
 
 const FeaturedProducts = ({ className = '', onProductClick }) => {
     const navigate = useNavigate();
