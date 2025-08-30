@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Icon from '../AppIcon';
 import Image from '../AppImage';
-import Button from './Button';
+import Button from './button';
 
 const ResponsiveHeader = ({ className = '' }) => {
     const navigate = useNavigate();
