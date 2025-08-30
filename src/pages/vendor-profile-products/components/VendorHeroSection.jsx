@@ -1,7 +1,7 @@
 import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
-import Button from '../../../components/ui/button';
+import { Button } from '../../../components/ui/Button';
 
 const VendorHeroSection = ({ vendor, onWhatsAppContact, onDirections, onShare }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false);
