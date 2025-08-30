@@ -72,9 +72,9 @@ export default {
         "2xl": "20px",
       },
       fontFamily: {
-        heading: ['Inter', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
-        caption: ['Inter', 'sans-serif'],
+        heading: ['Inter', 'monospace'],
+        body: ['Inter', 'monospace'],
+        caption: ['Inter', 'monospace'],
         data: ['Inter', 'monospace'],
       },
       boxShadow: {
