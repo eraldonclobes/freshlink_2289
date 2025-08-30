@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import Icon from '../AppIcon';
-import Button from './Button';
+import Button from './button';
 
 const NutritionalInfoModal = ({ isOpen, onClose, nutritionalInfo, productName }) => {
   useEffect(() => {
