@@ -1,6 +1,6 @@
 import React from 'react';
 import Icon from '../../../components/AppIcon';
-import Button from '../../../components/ui/Button';
+import Button from '../../../components/ui/button';
 
 const QuickActionCard = ({ title, description, icon, buttonText, onClick, variant = 'default', className = '' }) => {
   return (
