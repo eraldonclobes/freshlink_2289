@@ -1,6 +1,6 @@
 import React from 'react';
 import Icon from '../../../components/AppIcon';
-import Button from '../../../components/ui/Button';
+import Button from '../../../components/ui/button';
 
 const ActivityFeedItem = ({ type, title, description, timestamp, actionText, onAction, className = '' }) => {
   const getActivityIcon = (type) => {
