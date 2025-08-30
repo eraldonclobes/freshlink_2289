@@ -72,9 +72,9 @@ export default {
         "2xl": "20px",
       },
       fontFamily: {
-        heading: ['Poppins', 'sans-serif'],
-        body: ['Open Sans', 'sans-serif'],
-        caption: ['Nunito', 'sans-serif'],
+        heading: ['Inter', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+        caption: ['Inter', 'sans-serif'],
         data: ['Inter', 'monospace'],
       },
       boxShadow: {
