@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Icon from '../AppIcon';
 import Image from '../AppImage';
-import Button from './button';
+import Button from './Button';
 
 const ProductReviewsSection = ({ productId, productName, reviews = [], averageRating = 0, totalReviews = 0 }) => {
   const [showAllReviews, setShowAllReviews] = useState(false);

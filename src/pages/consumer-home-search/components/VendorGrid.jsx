@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
-import Button from '../../../components/ui/button';
+import Button from '../../../components/ui/Button';
 
 const VendorGrid = ({ vendors, loading, onLoadMore, hasMore, loadingMore, className = '' }) => {
     const navigate = useNavigate();
