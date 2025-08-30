@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 import Image from '../AppImage';
-import Button from './Button';
+import Button from './button';
 
 const ProductCard = ({ product, vendor, onProductClick, onFavoriteToggle, isFavorited = false }) => {
     const navigate = useNavigate();
