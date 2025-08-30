@@ -5,7 +5,7 @@ import Footer from '../../components/ui/Footer';
 import LocationSelector from '../../components/ui/LocationSelector';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
-import Button from '../../components/ui/Button';
+import Button from '../../components/ui/button';
 
 const VendorsPage = () => {
     const navigate = useNavigate();
